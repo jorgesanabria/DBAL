@@ -10,12 +10,12 @@ class ResultIterator implements \Iterator, \JsonSerializable
 	protected $result;
 	protected $i;
 	protected $stm;
-	protected $mapers;
-	public function __construct(\PDO $pdo, MessageInterface $message, array $mapers = [])
+	protected $mappers;
+	public function __construct(\PDO $pdo, MessageInterface $message, array $mappers = [])
 	{
 		$this->pdo = $pdo;
 		$this->message = $message;
-		$this->mapers = $mapers;
+		$this->mapers = $mappers;
 	}
 	public function rewind()
 	{
@@ -35,8 +35,8 @@ class ResultIterator implements \Iterator, \JsonSerializable
 	public function current()
 	{
 		$result = $this->result;
-		foreach ($this->mapers as $maper)
-			$result = call_user_func_array($maper, [$result]);
+		foreach ($this->mappers as $mapper)
+			$result = call_user_func_array($mapper, [$result]);
 		return $result;
 	}
 	public function next()
