@@ -1,20 +1,26 @@
 <?php
 namespace DBAL;
 
+use DBAL\QueryBuilder\MessageInterface;
+
 class ResultIterator implements \Iterator, \JsonSerializable
 {
-	protected $stm;
-	protected $values;
+	protected $pdo;
+	protected $message;
 	protected $result;
 	protected $i;
-	public function __construct(\PDOStatement $stm, array $values)
+	protected $stm;
+	protected $mapers;
+	public function __construct(\PDO $pdo, MessageInterface $message, array $mapers = [])
 	{
-		$this->stm = $stm;
-		$this->values = $values;
+		$this->pdo = $pdo;
+		$this->message = $message;
+		$this->mapers = $mapers;
 	}
 	public function rewind()
 	{
-		$this->stm->execute($this->values);
+		$this->stm = $this->pdo->prepare($this->message->readMessage());
+		$this->stm->execute($this->message->getValues());
 		$this->result = $this->stm->fetch();
 		$this->i = 0;
 	}
@@ -28,7 +34,10 @@ class ResultIterator implements \Iterator, \JsonSerializable
 	}
 	public function current()
 	{
-		return $this->result;
+		$result = $this->result;
+		foreach ($this->mapers as $maper)
+			$result = call_user_func_array($maper, [$result]);
+		return $result;
 	}
 	public function next()
 	{
@@ -37,7 +46,7 @@ class ResultIterator implements \Iterator, \JsonSerializable
 	}
 	public function jsonSerialize()
 	{
-		$this->stm->execute($this->values);
+		$this->rewind();
 		return $this->stm->fetchAll();
 	}
 }
