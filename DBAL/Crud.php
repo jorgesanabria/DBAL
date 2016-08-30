@@ -21,12 +21,7 @@ class Crud extends Query
 	public function select(...$fields)
 	{
 		$message = $this->buildSelect(...$fields);
-		$stm = $this->connection->prepare($message->readMessage());
-		if ($this->entity_class !== null)
-			$stm->setFetchMode(\PDO::FETCH_CLASS|\PDO::FETCH_PROPS_LATE, $this->entity_class, $entity_di);
-		else
-			$stm->setFetchMode(\PDO::FETCH_ASSOC);
-		return new ResultIterator($stm, $message->getValues());
+		return new ResultIterator($this->connection, $message, $this->mapers);
 	}
 	public function insert(array $fields)
 	{
