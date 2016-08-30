@@ -6,21 +6,16 @@ use DBAL\QueryBuilder\Query;
 class Crud extends Query
 {
 	protected $connection;
-	protected $entity_class;
-	protected $entity_di = [];
+	protected $mapers = [];
 	public function __construct(\PDO $connection)
 	{
 		$this->connection = $connection;
 		parent::__construct();
 	}
-	public function entity(string $entity, ...$arguments)
+	public function map(callable $callback)
 	{
 		$clon = clone $this;
-		if (class_exists($entity)) {
-			$this->entity_class = $entity;
-			$this->entity_di = $arguments;
-		}
-
+		$clon->mapers[] = $callback;
 		return $clon;
 	}
 	public function select(...$fields)
