@@ -15,7 +15,7 @@ class ResultIterator implements \Iterator, \JsonSerializable
 	{
 		$this->pdo = $pdo;
 		$this->message = $message;
-		$this->mapers = $mappers;
+		$this->mappers = $mappers;
 	}
 	public function rewind()
 	{
