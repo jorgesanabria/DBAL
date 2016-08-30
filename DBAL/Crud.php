@@ -6,7 +6,7 @@ use DBAL\QueryBuilder\Query;
 class Crud extends Query
 {
 	protected $connection;
-	protected $mapers = [];
+	protected $mappers = [];
 	public function __construct(\PDO $connection)
 	{
 		$this->connection = $connection;
@@ -15,13 +15,13 @@ class Crud extends Query
 	public function map(callable $callback)
 	{
 		$clon = clone $this;
-		$clon->mapers[] = $callback;
+		$clon->mappers[] = $callback;
 		return $clon;
 	}
 	public function select(...$fields)
 	{
 		$message = $this->buildSelect(...$fields);
-		return new ResultIterator($this->connection, $message, $this->mapers);
+		return new ResultIterator($this->connection, $message, $this->mappers);
 	}
 	public function insert(array $fields)
 	{
