@@ -3,7 +3,7 @@ namespace DBAL\QueryBuilder\Node;
 
 use DBAL\QueryBuilder\MessageInterface;
 
-class EmtyNode extends NotImplementedNode
+class EmptyNode extends NotImplementedNode
 {
 	protected $isEmpty = true;
 	public function send(MessageInterface $message)
