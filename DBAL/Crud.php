@@ -9,6 +9,7 @@ class Crud extends Query
         protected $connection;
         protected $mappers = [];
         protected $middlewares = [];
+        protected $tables = [];
         public function __construct(\PDO $connection)
         {
                 $this->connection = $connection;
@@ -26,6 +27,20 @@ class Crud extends Query
                 $clon->middlewares[] = $mw;
                 return $clon;
         }
+
+        public function from(...$tables)
+        {
+                $clon = parent::from(...$tables);
+                foreach ($tables as $table) {
+                        $clon->tables[] = $table;
+                }
+                return $clon;
+        }
+
+        private function primaryTable()
+        {
+                return $this->tables[0] ?? '';
+        }
         protected function runMiddlewares(MessageInterface $message)
         {
                 foreach ($this->middlewares as $mw)
@@ -38,6 +53,11 @@ class Crud extends Query
         }
         public function insert(array $fields)
         {
+                foreach ($this->middlewares as $mw) {
+                        if ($mw instanceof EntityValidationInterface) {
+                                $mw->beforeInsert($this->primaryTable(), $fields);
+                        }
+                }
                 $message = $this->buildInsert($fields);
                 $this->runMiddlewares($message);
                 $stm = $this->connection->prepare($message->readMessage());
@@ -46,6 +66,11 @@ class Crud extends Query
         }
         public function update(array $fields)
         {
+                foreach ($this->middlewares as $mw) {
+                        if ($mw instanceof EntityValidationInterface) {
+                                $mw->beforeUpdate($this->primaryTable(), $fields);
+                        }
+                }
                 $message = $this->buildUpdate($fields);
                 $this->runMiddlewares($message);
                 $stm = $this->connection->prepare($message->readMessage());
