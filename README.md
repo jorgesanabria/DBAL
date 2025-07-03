@@ -317,3 +317,20 @@ $crud = (new DBAL\Crud($pdo))
     ->from('users')
     ->withMiddleware($mw);
 ```
+
+### Schema builder
+
+`SchemaTableBuilder` can create `CREATE TABLE` statements programmatically. Columns may be defined using a lambda that receives a `SchemaColumnBuilder` instance:
+
+```php
+use DBAL\Schema\SchemaTableBuilder;
+
+$table = (new SchemaTableBuilder('users'))
+    ->column('id', function ($c) {
+        $c->integer()->primaryKey()->autoIncrement();
+    })
+    ->column('name', 'TEXT');
+
+$sql = $table->build();
+// "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"
+```
