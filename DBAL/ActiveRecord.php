@@ -6,24 +6,20 @@ namespace DBAL;
  */
 class ActiveRecord implements \JsonSerializable
 {
-/** @var mixed */
-        private $crud;
-/** @var mixed */
-        private $original = [];
-/** @var mixed */
-        private $modified = [];
+        private Crud $crud;
+        private array $original = [];
+        private array $modified = [];
 
 /**
  * __construct
  * @param Crud $crud
- * @param array $data
+ * @param array $original
  * @return void
  */
 
-        public function __construct(Crud $crud, array $data)
+        public function __construct(private Crud $crud, array $original)
         {
-                $this->crud = $crud;
-                $this->original = $data;
+                $this->original = $original;
         }
 
 /**

@@ -9,12 +9,9 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class TransactionMiddleware implements MiddlewareInterface
 {
-/** @var mixed */
-    private $pdo;
-/** @var mixed */
-    private $log = [];
-/** @var mixed */
-    private $inTx = false;
+    private PDO $pdo;
+    private array $log = [];
+    private bool $inTx = false;
 
 /**
  * __construct
@@ -22,10 +19,8 @@ class TransactionMiddleware implements MiddlewareInterface
  * @return void
  */
 
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    public function __construct(private PDO $pdo)
+    {    }
 
 /**
  * __invoke

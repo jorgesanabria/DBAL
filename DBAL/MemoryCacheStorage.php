@@ -6,8 +6,7 @@ namespace DBAL;
  */
 class MemoryCacheStorage implements CacheStorageInterface
 {
-/** @var mixed */
-    private $data = [];
+    private array $data = [];
 
 /**
  * get

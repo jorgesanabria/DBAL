@@ -10,10 +10,9 @@ use DBAL\QueryBuilder\Node\NodeInterface;
  */
 class OrderNode extends Node
 {
-	const ORDER_DESC = 'DESC';
-	const ORDER_ASC = 'ASC';
-/** @var mixed */
-	protected $isEmpty = false;
+        const ORDER_DESC = 'DESC';
+        const ORDER_ASC = 'ASC';
+        protected bool $isEmpty = false;
 /**
  * send
  * @param MessageInterface $message

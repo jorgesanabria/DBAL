@@ -6,14 +6,10 @@ namespace DBAL;
  */
 class RelationDefinition
 {
-/** @var mixed */
-    private $name;
-/** @var mixed */
-    private $table;
-/** @var mixed */
-    private $type;
-/** @var mixed */
-    private $conditions = [];
+    private string $name;
+    private string $table;
+    private string $type;
+    private array $conditions = [];
 
 /**
  * __construct
@@ -21,10 +17,8 @@ class RelationDefinition
  * @return void
  */
 
-    public function __construct(string $name)
-    {
-        $this->name = $name;
-    }
+    public function __construct(private string $name)
+    {    }
 
 /**
  * hasOne

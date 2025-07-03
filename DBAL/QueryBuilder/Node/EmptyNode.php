@@ -8,8 +8,7 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class EmptyNode extends NotImplementedNode
 {
-/** @var mixed */
-	protected $isEmpty = true;
+        protected bool $isEmpty = true;
 /**
  * send
  * @param MessageInterface $message

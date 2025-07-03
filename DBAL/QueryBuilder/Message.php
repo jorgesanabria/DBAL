@@ -6,12 +6,9 @@ namespace DBAL\QueryBuilder;
  */
 class Message implements MessageInterface
 {
-/** @var mixed */
-	protected $type;
-/** @var mixed */
-	protected $message;
-/** @var mixed */
-	protected $values;
+        protected int $type;
+        protected string $message;
+        protected array $values;
 /**
  * __construct
  * @param mixed $type

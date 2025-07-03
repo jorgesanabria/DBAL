@@ -9,13 +9,10 @@ use DBAL\QueryBuilder\Message;
  */
 class FilterNode extends Node
 {
-        protected static $filters = [];
-/** @var mixed */
-        protected $isEmpty = false;
-/** @var mixed */
-        protected $parts;
-/** @var mixed */
-        protected $operator;
+        protected static array $filters = [];
+        protected bool $isEmpty = false;
+        protected array $parts;
+        protected string $operator;
 /**
  * __construct
  * @param array $parts

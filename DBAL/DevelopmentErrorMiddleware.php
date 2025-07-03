@@ -8,14 +8,10 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class DevelopmentErrorMiddleware implements MiddlewareInterface
 {
-/** @var mixed */
-    private $console;
-/** @var mixed */
-    private $persistPath;
-/** @var mixed */
-    private $theme;
-/** @var mixed */
-    private $fontSize;
+    private bool $console;
+    private ?string $persistPath;
+    private string $theme;
+    private string $fontSize;
 
 /**
  * __construct

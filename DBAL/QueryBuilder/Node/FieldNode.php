@@ -8,10 +8,8 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class FieldNode extends NotImplementedNode
 {
-/** @var mixed */
-	protected $isEmpty = false;
-/** @var mixed */
-	protected $field;
+        protected bool $isEmpty = false;
+        protected mixed $field;
 /**
  * __construct
  * @param mixed $field

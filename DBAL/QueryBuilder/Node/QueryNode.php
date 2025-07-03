@@ -10,8 +10,7 @@ use DBAL\QueryBuilder\NodeInterface;
  */
 class QueryNode extends Node
 {
-/** @var mixed */
-	protected $isEmpty = false;
+        protected bool $isEmpty = false;
 /**
  * __construct
  * @return void

@@ -9,10 +9,8 @@ use DBAL\QueryBuilder\Node\FilterNode;
  */
 class DynamicFilterBuilder
 {
-/** @var mixed */
-       protected $stack = [];
-/** @var mixed */
-       protected $nextOperator = MessageInterface::SEPARATOR_AND;
+       protected array $stack = [];
+       protected string $nextOperator = MessageInterface::SEPARATOR_AND;
 
 /**
  * __construct

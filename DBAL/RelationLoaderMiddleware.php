@@ -8,10 +8,8 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class RelationLoaderMiddleware implements MiddlewareInterface
 {
-/** @var mixed */
-    private $currentTable;
-/** @var mixed */
-    private $relations = [];
+    private string $currentTable;
+    private array $relations = [];
 
 /**
  * __invoke

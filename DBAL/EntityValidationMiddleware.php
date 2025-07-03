@@ -10,15 +10,11 @@ use DBAL\RelationDefinition;
  */
 class EntityValidationMiddleware implements EntityValidationInterface
 {
-/** @var mixed */
-    private $rules = [];
-/** @var mixed */
-    private $relations = [];
+    private array $rules = [];
+    private array $relations = [];
 
-/** @var mixed */
-    private $currentTable;
-/** @var mixed */
-    private $currentField;
+    private string $currentTable;
+    private string $currentField;
 
 /**
  * __invoke

@@ -10,12 +10,8 @@ use JsonSerializable;
  */
 class LazyRelation implements IteratorAggregate, JsonSerializable
 {
-/** @var mixed */
-    private $loader;
-/** @var mixed */
-    private $loaded = false;
-/** @var mixed */
-    private $data;
+    private bool $loaded = false;
+    private mixed $data;
 
 /**
  * __construct
@@ -23,9 +19,8 @@ class LazyRelation implements IteratorAggregate, JsonSerializable
  * @return void
  */
 
-    public function __construct(callable $loader)
+    public function __construct(private callable $loader)
     {
-        $this->loader = $loader;
     }
 
 /**

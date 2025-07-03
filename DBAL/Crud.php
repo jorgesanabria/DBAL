@@ -12,25 +12,19 @@ use Generator;
  */
 class Crud extends Query
 {
-/** @var mixed */
-        protected $connection;
-/** @var mixed */
-        protected $mappers = [];
-/** @var mixed */
-        protected $middlewares = [];
-/** @var mixed */
-        protected $tables = [];
-/** @var mixed */
-        protected $with = [];
+        protected \PDO $connection;
+        protected array $mappers = [];
+        protected array $middlewares = [];
+        protected array $tables = [];
+        protected array $with = [];
 /**
  * __construct
  * @param \PDO $connection
  * @return void
  */
 
-        public function __construct(\PDO $connection)
+        public function __construct(protected \PDO $connection)
         {
-                $this->connection = $connection;
                 parent::__construct();
         }
 /**
