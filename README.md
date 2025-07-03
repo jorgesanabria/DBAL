@@ -1,46 +1,47 @@
 # DBAL
-Simple dbal for php
 
-## Instalación
+A lightweight Database Abstraction Layer for PHP.
 
-Instala la biblioteca vía [Composer](https://getcomposer.org/):
+## Installation
+
+Install the library via [Composer](https://getcomposer.org/):
 
 ```bash
 composer require jorgesanabria/dbal
 ```
 
-## Uso básico
+## Basic Usage
 
 ```php
 $pdo = new \PDO('mysql:host=localhost;dbname=test', 'user', 'pass');
-$crud = (new DBAL\Crud($pdo))->from('usuarios');
+$crud = (new DBAL\Crud($pdo))->from('users');
 ```
 
-### Insertar
+### Insert records
 
 ```php
 $id = $crud->insert([
-    'nombre' => 'Juan',
-    'correo' => 'juan@example.com'
+    'name'  => 'John',
+    'email' => 'john@example.com'
 ]);
 ```
 
-### Consultar con `select` y `where`
+### Select with `where`
 
 ```php
-$resultados = $crud
-    ->select('id', 'nombre')
+$rows = $crud
+    ->select('id', 'name')
     ->where(['id__gt' => 10]);
 
-foreach ($resultados as $fila) {
-    echo $fila['nombre'];
+foreach ($rows as $row) {
+    echo $row['name'];
 }
 ```
 
-### Actualizar y eliminar
+### Update and delete
 
 ```php
-$crud->where(['id' => $id])->update(['nombre' => 'Pedro']);
+$crud->where(['id' => $id])->update(['name' => 'Peter']);
 
 $crud->where(['id' => $id])->delete();
 ```
@@ -48,45 +49,71 @@ $crud->where(['id' => $id])->delete();
 ### Joins
 
 ```php
-$resultado = $crud
-    ->from('usuarios u')
-    ->leftJoin('perfiles p', function ($on) {
-        $on->{'u.id__eqf'}('p.usuario_id');
+$result = $crud
+    ->from('users u')
+    ->leftJoin('profiles p', function ($on) {
+        $on->{'u.id__eqf'}('p.user_id');
     })
-    ->where(['p.activo__eq' => 1])
-    ->select('u.id', 'p.foto');
+    ->where(['p.active__eq' => 1])
+    ->select('u.id', 'p.photo');
 ```
 
-### Filtros dinámicos
+### Dynamic filters
 
 ```php
 $crud->where(function ($q) {
-    $q->nombre__startWith('Al')->edad__ge(21);
+    $q->name__startWith('Al')
+       ->age__ge(21);
 });
 ```
 
-### Extender filtros
+Dynamic filters can also be grouped with logical operators:
+
+```php
+$crud->where(function ($q) {
+    $q->orGroup(function ($g) {
+        $g->name__eq('Alice')->orNext()->name__eq('Bob');
+    })->andGroup(function ($g) {
+        $g->status__eq('active');
+    });
+});
+```
+
+### Extending filters
+
+Custom filters can be registered using `FilterNode::filter`:
 
 ```php
 use DBAL\QueryBuilder\Node\FilterNode;
 
-FilterNode::filter('startWith', function ($campo, $valor, $msg) {
-    return $msg->insertAfter(sprintf('%s LIKE ?', $campo))
-               ->addValues([$valor . '%']);
+FilterNode::filter('startWith', function ($field, $value, $msg) {
+    return $msg->insertAfter(sprintf('%s LIKE ?', $field))
+               ->addValues([$value . '%']);
 });
 
-$crud->where(['nombre__startWith' => 'Al']);
+$crud->where(['name__startWith' => 'Al']);
+```
+
+### Grouping, ordering and limiting
+
+```php
+$rows = $crud
+    ->group('status')
+    ->order('DESC', ['created_at'])
+    ->limit(10)
+    ->offset(20)
+    ->select();
 ```
 
 ### Mappers
 
 ```php
-$crudConMapper = $crud->map(function (array $fila) {
-    return (object) $fila;
+$crudWithMapper = $crud->map(function (array $row) {
+    return (object) $row;
 });
 
-foreach ($crudConMapper->select() as $fila) {
-    echo $fila->nombre;
+foreach ($crudWithMapper->select() as $row) {
+    echo $row->name;
 }
 ```
 
