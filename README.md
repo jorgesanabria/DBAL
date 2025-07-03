@@ -197,3 +197,32 @@ $crud = (new DBAL\Crud($pdo))
 An `InvalidArgumentException` is thrown when validations fail. Declared
 relations can be used by future lazy or eager loading features.
 
+### Relationships and eager loading
+
+Relationships are defined in the validation middleware. Once set up, relations
+can be eagerly loaded via `with()` and are available lazily on demand.
+
+```php
+$validation = (new DBAL\EntityValidationMiddleware())
+    ->table('users')
+        ->relation('profile', 'hasOne', 'profiles', 'id', 'user_id')
+    ->table('profiles')
+        ->relation('user', 'belongsTo', 'users', 'user_id', 'id');
+
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($validation);
+
+// Eager load
+$users = $crud->with('profile')->select();
+
+foreach ($users as $user) {
+    echo $user['profile']['photo'];
+}
+
+// Lazy load
+$user = iterator_to_array($crud->where(['id' => 1])->select())[0];
+$profile = $user['profile'];
+echo $profile['photo'];
+```
+
