@@ -60,6 +60,25 @@ class RelationLoaderMiddleware implements MiddlewareInterface
         return $this;
     }
 
+    public function belongsTo(string $name, string $table, string $localKey, string $foreignKey, callable $on = null, string $joinType = 'left'): self
+    {
+        if ($on === null) {
+            $local = $this->currentTable;
+            $on = function ($j) use ($local, $table, $localKey, $foreignKey) {
+                $j->{"{$local}.{$localKey}__eqf"}("{$table}.{$foreignKey}");
+            };
+        }
+        $this->relations[$this->currentTable][$name] = [
+            'type' => 'belongsTo',
+            'table' => $table,
+            'localKey' => $localKey,
+            'foreignKey' => $foreignKey,
+            'joinType' => $joinType,
+            'on' => $on,
+        ];
+        return $this;
+    }
+
     public function getRelations(string $table): array
     {
         return $this->relations[$table] ?? [];
