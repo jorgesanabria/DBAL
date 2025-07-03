@@ -91,18 +91,23 @@ class Query extends QueryNode
 			$clon->getChild('having')->appendChild(new FilterNode($filter));
 		return $clon;
 	}
-	public function group(...$fields)
-	{
-		$clon = clone $this;
-		foreach ($fields as $field)
-			$clon->getChild('group')->appendChild(new FieldNode($field));
-		return $clon;
-	}
-	public function order($type, array $fields)
-	{
-		$clon = clone $this;
-		foreach ($fields as $field)
-			$clon->getChild('order')->appendChild(new FieldNode(sprintf('%s %s', $field, $type)));
+        public function group(...$fields)
+        {
+                $clon = clone $this;
+                foreach ($fields as $field)
+                        $clon->getChild('group')->appendChild(new FieldNode($field));
+                return $clon;
+        }
+        public function groupBy(...$fields)
+        {
+                $clon = clone $this;
+                return $clon->group(...$fields);
+        }
+        public function order($type, array $fields)
+        {
+                $clon = clone $this;
+                foreach ($fields as $field)
+                        $clon->getChild('order')->appendChild(new FieldNode(sprintf('%s %s', $field, $type)));
 		return $clon;
 	}
 	public function desc(...$fields)
