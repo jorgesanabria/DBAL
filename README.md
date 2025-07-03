@@ -374,13 +374,93 @@ $crud = (new DBAL\Crud($pdo))
 
 `AbmEventMiddleware` lets you execute callbacks after inserts, bulk inserts, updates or deletes to implement custom hooks.
 
-## Practical use cases
+## Real use cases
 
-- **Online book stores**: manage books and orders with validation and caching.
-- **Cinema ticketing**: control screenings and seat reservations with transactional safety.
-- **Logistics microservices**: build lightweight APIs that share filters and schemas across services.
+DBAL is primarily intended for building microservices, powering small scripts and supporting lightweight sites. The following examples illustrate possible ways to use the library in different domains:
+
+- **Online book stores**: manage the catalogue and categories, monitor stock, handle orders or returns, and offer search or recommendation endpoints.
+- **Cinema ticketing**: schedule screenings, reserve seats and sell tickets atomically.
+- **Logistics microservices**: manage shipments, monitor packages across warehouses and reuse filters and schemas between services.
+
+These example domains are merely illustrative—developers are free to decide where and how to apply the library.
 
 DBAL integrates easily with minimal frameworks like Slim and Lumen or even plain PHP scripts. Additional examples and API reference can be found in the [docs](docs/) folder.
+
+## Bookstore example
+
+Below is a short walkthrough of common tasks for a fictional book store. It demonstrates how to insert, update, delete and search for books, map them to authors, validate input and run bulk operations inside transactions.
+
+### Set up relations and validations
+
+```php
+$validation = (new DBAL\EntityValidationMiddleware())
+    ->table('books')
+        ->field('title')->required()->string()->maxLength(100)
+        ->field('author_id')->required()->integer()
+        ->relation('author', 'belongsTo', 'authors', 'author_id', 'id')
+    ->table('authors')
+        ->field('name')->required()->string()->maxLength(50)
+        ->relation('books', 'hasMany', 'books', 'id', 'author_id');
+
+$books = (new DBAL\Crud($pdo))
+    ->from('books')
+    ->withMiddleware($validation);
+```
+
+### Insert, update and delete
+
+```php
+$bookId = $books->insert([
+    'title'     => 'Dune',
+    'author_id' => 1,
+]);
+
+$books->where(['id' => $bookId])->update(['title' => 'Dune (Revised)']);
+$books->where(['id' => $bookId])->delete();
+```
+
+### Filter and search
+
+```php
+$results = $books
+    ->where(['title__like' => '%robot%'])
+    ->order('ASC', ['title'])
+    ->select('id', 'title');
+```
+
+
+### Filtering with dynamic methods
+
+```php
+$byAuthor = $books->where(function ($q) {
+    $q->author_id__gt(1)->title__like('%dune%');
+})->select('id', 'title');
+```
+### Working with relations
+
+```php
+foreach ($books->with('author')->select() as $book) {
+    echo $book['title'].' by '.$book['author']['name'];
+}
+```
+
+### Bulk insert with transactions
+
+```php
+$tx = new DBAL\TransactionMiddleware();
+$bulk = $books->withMiddleware($tx);
+
+$tx->begin();
+try {
+    $bulk->bulkInsert([
+        ['title' => 'Book A', 'author_id' => 2],
+        ['title' => 'Book B', 'author_id' => 3],
+    ]);
+    $tx->commit();
+} catch (Throwable $e) {
+    $tx->rollback();
+}
+```
 
 ## Expanding DBAL
 
