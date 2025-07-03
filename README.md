@@ -135,3 +135,30 @@ $crud->insert(['name' => 'John']);
 You can register multiple middlewares and they will run before the SQL statement
 is prepared and executed.
 
+Middlewares can also be implemented as classes. Additional methods exposed by a
+middleware are accessible through the `Crud` instance thanks to `__call`:
+
+```php
+use DBAL\MiddlewareInterface;
+use DBAL\QueryBuilder\MessageInterface;
+
+class LoggerMiddleware implements MiddlewareInterface
+{
+    public function __invoke(MessageInterface $msg): void
+    {
+        error_log($msg->readMessage());
+    }
+
+    public function greet($name)
+    {
+        return "Hello {$name}";
+    }
+}
+
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware(new LoggerMiddleware());
+
+echo $crud->greet('John'); // "Hello John"
+```
+
