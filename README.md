@@ -131,6 +131,23 @@ $byLetter = $users->groupBy(function ($row) {
 });
 ```
 
+### Streaming results
+
+`Crud::stream()` returns a generator that yields each row lazily. A callback can
+be provided to process rows as they are produced.
+
+```php
+$generator = $crud->stream('id', 'name');
+
+foreach ($generator as $row) {
+    echo $row['name'];
+}
+
+$crud->stream(function ($row) {
+    echo $row['name'];
+}, 'id', 'name');
+```
+
 ### Middlewares
 
 Middlewares allow you to intercept query execution for tasks like logging or
