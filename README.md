@@ -317,30 +317,21 @@ $crud = (new DBAL\Crud($pdo))
     ->from('users')
     ->withMiddleware($mw);
 ```
+### Schema middleware
 
-### Schema builder
-
-`SchemaTableBuilder` can create `CREATE TABLE` statements programmatically. Columns may be defined using a lambda that receives a `SchemaColumnBuilder` instance:
-
-```php
-use DBAL\Schema\SchemaTableBuilder;
-
-$table = (new SchemaTableBuilder('users'))
-    ->column('id', function ($c) {
-        $c->integer()->primaryKey()->autoIncrement();
-    })
-    ->column('name', 'TEXT');
-
-$sql = $table->build();
-// "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"
-```
-After creating the table, additional columns may be appended using `addColumn()`.
+`SchemaMiddleware` provides a fluent API to create or modify tables via the `Crud` instance.
 
 ```php
-$table->addColumn('age', function ($c) {
-    $c->integer();
-});
+$schema = new DBAL\SchemaMiddleware($pdo);
+$crud = (new DBAL\Crud($pdo))
+    ->withMiddleware($schema);
 
-$sql = $table->build();
-// "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER)"
+$crud->createTable('items')
+    ->column('id INTEGER PRIMARY KEY AUTOINCREMENT')
+    ->column('name TEXT')
+    ->execute();
+
+$crud->alterTable('items')
+    ->addColumn('price REAL')
+    ->execute();
 ```
