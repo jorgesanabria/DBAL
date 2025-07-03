@@ -5,25 +5,29 @@ use DBAL\QueryBuilder\MessageInterface;
 
 class ResultIterator implements \Iterator, \JsonSerializable
 {
-	protected $pdo;
-	protected $message;
-	protected $result;
-	protected $i;
-	protected $stm;
-	protected $mappers;
-	public function __construct(\PDO $pdo, MessageInterface $message, array $mappers = [])
-	{
-		$this->pdo = $pdo;
-		$this->message = $message;
-		$this->mappers = $mappers;
-	}
-	public function rewind()
-	{
-		$this->stm = $this->pdo->prepare($this->message->readMessage());
-		$this->stm->execute($this->message->getValues());
-		$this->result = $this->stm->fetch();
-		$this->i = 0;
-	}
+        protected $pdo;
+        protected $message;
+        protected $result;
+        protected $i;
+        protected $stm;
+        protected $mappers;
+        protected $middlewares;
+        public function __construct(\PDO $pdo, MessageInterface $message, array $mappers = [], array $middlewares = [])
+        {
+                $this->pdo = $pdo;
+                $this->message = $message;
+                $this->mappers = $mappers;
+                $this->middlewares = $middlewares;
+        }
+        public function rewind()
+        {
+                foreach ($this->middlewares as $mw)
+                        $mw($this->message);
+                $this->stm = $this->pdo->prepare($this->message->readMessage());
+                $this->stm->execute($this->message->getValues());
+                $this->result = $this->stm->fetch();
+                $this->i = 0;
+        }
 	public function valid()
 	{
 		return $this->result !== false;

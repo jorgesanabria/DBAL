@@ -117,3 +117,21 @@ foreach ($crudWithMapper->select() as $row) {
 }
 ```
 
+### Middlewares
+
+Middlewares allow you to intercept query execution for tasks like logging or
+validation.
+
+```php
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware(function (DBAL\QueryBuilder\MessageInterface $msg) {
+        error_log($msg->readMessage());
+    });
+
+$crud->insert(['name' => 'John']);
+```
+
+You can register multiple middlewares and they will run before the SQL statement
+is prepared and executed.
+
