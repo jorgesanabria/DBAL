@@ -2,6 +2,7 @@
 use PHPUnit\Framework\TestCase;
 use DBAL\Crud;
 use DBAL\SchemaMiddleware;
+use DBAL\SqlSchemaTableBuilder;
 
 class SchemaMiddlewareTest extends TestCase
 {
@@ -16,10 +17,11 @@ class SchemaMiddlewareTest extends TestCase
         $schema = new SchemaMiddleware($pdo);
         $crud = (new Crud($pdo))->withMiddleware($schema);
 
-        $crud->createTable('items')
-            ->column('id INTEGER PRIMARY KEY AUTOINCREMENT')
-            ->column('name TEXT')
-            ->execute();
+        $builder = $crud->createTable('items');
+        $this->assertInstanceOf(SqlSchemaTableBuilder::class, $builder);
+        $builder->column('id INTEGER PRIMARY KEY AUTOINCREMENT')
+                ->column('name TEXT')
+                ->execute();
 
         $pdo->exec("INSERT INTO items (name) VALUES ('A')");
 

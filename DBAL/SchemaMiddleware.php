@@ -18,13 +18,13 @@ class SchemaMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterf
         // no-op
     }
 
-    public function createTable(Crud $crud, string $table): SchemaTableBuilder
+    public function createTable(Crud $crud, string $table): SqlSchemaTableBuilder
     {
-        return new SchemaTableBuilder($this->pdo, $table, true);
+        return new SqlSchemaTableBuilder($this->pdo, $table, true);
     }
 
-    public function alterTable(Crud $crud, string $table): SchemaTableBuilder
+    public function alterTable(Crud $crud, string $table): SqlSchemaTableBuilder
     {
-        return new SchemaTableBuilder($this->pdo, $table, false);
+        return new SqlSchemaTableBuilder($this->pdo, $table, false);
     }
 }
