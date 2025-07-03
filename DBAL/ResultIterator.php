@@ -60,7 +60,7 @@ class ResultIterator implements \Iterator, \JsonSerializable
                                                 $rel['foreignKey'].'__eq' => $value
                                         ]);
                                         $rows = iterator_to_array($crud->select());
-                                        if ($rel['type'] === 'hasOne') {
+                                        if (in_array($rel['type'], ['hasOne', 'belongsTo'])) {
                                                 return $rows[0] ?? null;
                                         }
                                         return $rows;

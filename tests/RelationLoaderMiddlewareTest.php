@@ -58,4 +58,47 @@ class RelationLoaderMiddlewareTest extends TestCase
         $this->assertEquals('Bio', $profile['bio']);
         $this->assertStringContainsString('FROM profiles', $log[1]);
     }
+
+    public function testBelongsToEagerLoadingAddsJoin()
+    {
+        $pdo = $this->createPdo();
+        $log = [];
+        $logger = function (MessageInterface $m) use (&$log) { $log[] = $m->readMessage(); };
+
+        $rel = (new RelationLoaderMiddleware())
+            ->table('profiles')
+            ->belongsTo('user', 'users', 'user_id', 'id');
+
+        $crud = (new Crud($pdo))
+            ->from('profiles')
+            ->withMiddleware($rel)
+            ->withMiddleware($logger);
+
+        iterator_to_array($crud->with('user')->select());
+
+        $this->assertStringContainsString('LEFT JOIN users', $log[0]);
+    }
+
+    public function testBelongsToLazyLoadingFetchesOnDemand()
+    {
+        $pdo = $this->createPdo();
+        $log = [];
+        $logger = function (MessageInterface $m) use (&$log) { $log[] = $m->readMessage(); };
+
+        $rel = (new RelationLoaderMiddleware())
+            ->table('profiles')
+            ->belongsTo('user', 'users', 'user_id', 'id');
+
+        $crud = (new Crud($pdo))
+            ->from('profiles')
+            ->withMiddleware($rel)
+            ->withMiddleware($logger);
+
+        $rows = iterator_to_array($crud->select());
+        $this->assertStringNotContainsString('users', $log[0]);
+
+        $user = $rows[0]['user']->get();
+        $this->assertEquals('Alice', $user['name']);
+        $this->assertStringContainsString('FROM users', $log[1]);
+    }
 }
