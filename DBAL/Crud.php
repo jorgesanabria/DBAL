@@ -114,6 +114,21 @@ class Crud extends Query
                 $stm->execute($message->getValues());
                 return $this->connection->lastInsertId();
         }
+        public function bulkInsert(array $rows)
+        {
+                foreach ($this->middlewares as $mw) {
+                        if ($mw instanceof EntityValidationInterface) {
+                                foreach ($rows as $row) {
+                                        $mw->beforeInsert($this->primaryTable(), $row);
+                                }
+                        }
+                }
+                $message = $this->buildBulkInsert($rows);
+                $this->runMiddlewares($message);
+                $stm = $this->connection->prepare($message->readMessage());
+                $stm->execute($message->getValues());
+                return $stm->rowCount();
+        }
         public function update(array $fields)
         {
                 foreach ($this->middlewares as $mw) {

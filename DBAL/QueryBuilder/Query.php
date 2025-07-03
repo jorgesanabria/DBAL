@@ -152,19 +152,27 @@ class Query extends QueryNode
 		}
 		return $message;
 	}
-	public function buildInsert(array $fields)
-	{
-		$clon = clone $this;
-		$message = new Message(MessageInterface::MESSAGE_TYPE_INSERT);
-		$clon->getChild('change')->setFields($fields);
-		$message = $clon->send($message);
-		return $message;
-	}
-	public function buildUpdate(array $fields)
-	{
-		$clon = clone $this;
-		$message = new Message(MessageInterface::MESSAGE_TYPE_UPDATE);
-		$clon->getChild('change')->setFields($fields);
+        public function buildInsert(array $fields)
+        {
+                $clon = clone $this;
+                $message = new Message(MessageInterface::MESSAGE_TYPE_INSERT);
+                $clon->getChild('change')->setFields($fields);
+                $message = $clon->send($message);
+                return $message;
+        }
+        public function buildBulkInsert(array $rows)
+        {
+                $clon = clone $this;
+                $message = new Message(MessageInterface::MESSAGE_TYPE_INSERT);
+                $clon->getChild('change')->setRows($rows);
+                $message = $clon->send($message);
+                return $message;
+        }
+        public function buildUpdate(array $fields)
+        {
+                $clon = clone $this;
+                $message = new Message(MessageInterface::MESSAGE_TYPE_UPDATE);
+                $clon->getChild('change')->setFields($fields);
 		$message = $clon->send($message);
 		return $message;
 	}
