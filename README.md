@@ -177,3 +177,23 @@ $crud = (new DBAL\Crud($pdo))
 echo $crud->greet('John'); // "Hello John"
 ```
 
+### Entity validation middleware
+
+`EntityValidationMiddleware` provides a fluent API to validate data before it is
+inserted or updated. Validations are defined per table and field:
+
+```php
+$validation = (new DBAL\EntityValidationMiddleware())
+    ->table('users')
+        ->field('name')->required()->string()->maxLength(50)
+        ->field('email')->required()->email()
+    ->relation('profile', 'hasOne', 'profiles', 'id', 'user_id');
+
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($validation);
+```
+
+An `InvalidArgumentException` is thrown when validations fail. Declared
+relations can be used by future lazy or eager loading features.
+
