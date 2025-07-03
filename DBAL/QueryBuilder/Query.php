@@ -19,6 +19,7 @@ use DBAL\QueryBuilder\Node\GroupNode;
 use DBAL\QueryBuilder\Node\OrderNode;
 use DBAL\QueryBuilder\Node\LimitNode;
 use DBAL\QueryBuilder\Node\ChangeNode;
+use DBAL\QueryBuilder\DynamicFilterBuilder;
 
 class Query extends QueryNode
 {
@@ -54,13 +55,20 @@ class Query extends QueryNode
 		$clon->join(JoinNode::RIGHT_JOIN, $table, $on);
 		return $clon;
 	}
-	public function where(array ...$filters)
-	{
-		$clon = clone $this;
-		foreach ($filters as $filter) 
-			$clon->getChild('where')->appendChild(new FilterNode($filter));
-		return $clon;
-	}
+       public function where(...$filters)
+       {
+               $clon = clone $this;
+               foreach ($filters as $filter) {
+                       if (is_callable($filter)) {
+                               $builder = new DynamicFilterBuilder();
+                               $filter($builder);
+                               $filter = $builder->toArray();
+                       }
+                       if (is_array($filter))
+                               $clon->getChild('where')->appendChild(new FilterNode($filter));
+               }
+               return $clon;
+       }
 	public function having(array ...$filters)
 	{
 		$clon = clone $this;
