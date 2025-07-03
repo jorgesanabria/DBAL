@@ -23,10 +23,11 @@ class SchemaMiddlewareTest extends TestCase
                 ->column('name TEXT')
                 ->execute();
 
+
         $pdo->exec("INSERT INTO items (name) VALUES ('A')");
 
         $crud->alterTable('items')
-            ->addColumn('price INTEGER')
+            ->addColumn('price', 'INTEGER')
             ->execute();
 
         $pdo->exec("INSERT INTO items (name, price) VALUES ('B', 10)");

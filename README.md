@@ -327,12 +327,12 @@ $crud = (new DBAL\Crud($pdo))
     ->withMiddleware($schema);
 
 $crud->createTable('items')
-    ->column('id INTEGER PRIMARY KEY AUTOINCREMENT')
-    ->column('name TEXT')
+    ->column('id', 'INTEGER PRIMARY KEY AUTOINCREMENT')
+    ->column('name', 'TEXT')
     ->execute();
 
 $crud->alterTable('items')
-    ->addColumn('price REAL')
+    ->addColumn('price', 'REAL')
     ->execute();
 ```
 

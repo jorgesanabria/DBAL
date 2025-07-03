@@ -17,18 +17,26 @@ class SqlSchemaTableBuilder
         $this->create = $create;
     }
 
-    public function column(string $name, string $type): self
+    public function column(string $name, string $type = null): self
     {
         if ($this->create) {
-            $this->definitions[] = sprintf('%s %s', $name, $type);
+            if ($type === null) {
+                $this->definitions[] = $name;
+            } else {
+                $this->definitions[] = sprintf('%s %s', $name, $type);
+            }
         }
         return $this;
     }
 
-    public function addColumn(string $name, string $type): self
+    public function addColumn(string $name, string $type = null): self
     {
         if (!$this->create) {
-            $this->definitions[] = sprintf('ADD COLUMN %s %s', $name, $type);
+            if ($type === null) {
+                $this->definitions[] = sprintf('ADD COLUMN %s', $name);
+            } else {
+                $this->definitions[] = sprintf('ADD COLUMN %s %s', $name, $type);
+            }
         }
         return $this;
     }
