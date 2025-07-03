@@ -117,6 +117,20 @@ foreach ($crudWithMapper->select() as $row) {
 }
 ```
 
+### Grouping results
+
+`ResultIterator` instances can group rows by a field name or a callback with `groupBy()`:
+
+```php
+$users = $crud->select();
+
+$byStatus = $users->groupBy('status');
+
+$byLetter = $users->groupBy(function ($row) {
+    return $row['name'][0];
+});
+```
+
 ### Middlewares
 
 Middlewares allow you to intercept query execution for tasks like logging or

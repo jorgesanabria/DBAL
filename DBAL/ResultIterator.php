@@ -102,4 +102,17 @@ class ResultIterator implements \Iterator, \JsonSerializable
                 $this->rewind();
                 return $this->rows;
         }
+
+        public function groupBy($key)
+        {
+                $groups = [];
+                $this->rewind();
+                foreach ($this as $row) {
+                        $groupKey = is_callable($key)
+                                ? $key($row)
+                                : ($row[$key] ?? null);
+                        $groups[$groupKey][] = $row;
+                }
+                return $groups;
+        }
 }
