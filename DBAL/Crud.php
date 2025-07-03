@@ -4,6 +4,7 @@ namespace DBAL;
 use DBAL\QueryBuilder\Query;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\RelationDefinition;
+use Generator;
 
 class Crud extends Query
 {
@@ -100,6 +101,25 @@ class Crud extends Query
                         $relations,
                         $this->with
                 );
+        }
+
+        public function stream(...$args)
+        {
+                $callback = null;
+                if (isset($args[0]) && is_callable($args[0])) {
+                        $callback = array_shift($args);
+                }
+                $message = $this->buildSelect(...$args);
+                $relations = $this->collectRelations($this->primaryTable());
+                $generator = new ResultGenerator(
+                        $this->connection,
+                        $message,
+                        $this->mappers,
+                        $this->middlewares,
+                        $relations,
+                        $this->with
+                );
+                return $generator->getIterator($callback);
         }
         public function insert(array $fields)
         {
