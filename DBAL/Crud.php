@@ -60,4 +60,14 @@ class Crud extends Query
                $stm->execute($message->getValues());
                return $stm->rowCount();
        }
+
+       public function __call($name, $arguments)
+       {
+               foreach ($this->middlewares as $mw) {
+                       if (is_object($mw) && is_callable([$mw, $name])) {
+                               return $mw->$name(...$arguments);
+                       }
+               }
+               throw new \BadMethodCallException(sprintf('Method %s does not exist', $name));
+       }
 }
