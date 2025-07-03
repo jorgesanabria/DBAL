@@ -338,10 +338,13 @@ $crud->alterTable('items')
 
 ### Development error middleware
 
-`DevelopmentErrorMiddleware` installs an exception handler that displays a basic HTML page whenever an uncaught exception happens. The page supports light and dark themes and allows switching between small, medium and large fonts. In console mode the middleware can optionally output the error to `STDERR`. Rendered pages are stored in a timestamped folder so they can be reviewed later.
+`DevelopmentErrorMiddleware` installs an exception handler that displays a basic HTML page whenever an uncaught exception happens. The page supports light and dark themes and allows switching between small, medium and large fonts. When `console` is enabled a text version of the error is written to `STDERR`. If `persistPath` is provided, rendered pages are stored in timestamped folders so they can be reviewed later.
 
 ```php
-$errors = new DBAL\DevelopmentErrorMiddleware(true, __DIR__.'/errors');
+$errors = new DBAL\DevelopmentErrorMiddleware([
+    'console'     => true,
+    'persistPath' => __DIR__.'/errors',
+]);
 $crud = (new DBAL\Crud($pdo))
     ->withMiddleware($errors);
 ```
