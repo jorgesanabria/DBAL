@@ -271,3 +271,24 @@ $user = iterator_to_array($crud->where(['id' => 1])->select())[0];
 $profile = $user['profile'];
 echo $profile['photo'];
 ```
+
+### Transaction and Unit of Work middlewares
+
+`TransactionMiddleware` exposes helpers to control database transactions while `UnitOfWorkMiddleware` batches operations to be executed atomically.
+
+```php
+$tx  = new DBAL\TransactionMiddleware($pdo);
+$uow = new DBAL\UnitOfWorkMiddleware($tx);
+
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($uow)
+    ->withMiddleware($tx);
+
+$crud->registerNew('users', ['name' => 'Alice']);
+$crud->commit();
+
+$crud->begin();
+$crud->insert(['name' => 'Bob']);
+$crud->rollback();
+```
