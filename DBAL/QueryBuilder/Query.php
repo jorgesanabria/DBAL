@@ -25,11 +25,12 @@ class Query extends QueryNode
 	public function from(...$tables)
 	{
 		$clon = clone $this;
-		foreach ($tables as $table) {
-			if (!$table instanceof TableNode)
-				$_table = new TableNode($table);
-			$clon->getChild('tables')->appendChild($_table, $table);
-		}
+               foreach ($tables as $table) {
+                       $_table = ($table instanceof TableNode)
+                               ? $table
+                               : new TableNode($table);
+                       $clon->getChild('tables')->appendChild($_table);
+               }
 		return $clon;
 	}
 	protected function join($type, $table, array $on = [])
