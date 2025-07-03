@@ -54,4 +54,21 @@ class QueryBuilderTest extends TestCase
         $msg = $query->buildSelect();
         $this->assertEquals('SELECT * FROM users u LEFT JOIN profiles p ON u.id = p.user_id', $msg->readMessage());
     }
+
+    public function testGroupByAlias()
+    {
+        $groupSql = (new Query())
+            ->from('users')
+            ->group('status')
+            ->buildSelect()
+            ->readMessage();
+
+        $groupBySql = (new Query())
+            ->from('users')
+            ->groupBy('status')
+            ->buildSelect()
+            ->readMessage();
+
+        $this->assertEquals($groupSql, $groupBySql);
+    }
 }

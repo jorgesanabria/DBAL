@@ -98,7 +98,7 @@ $crud->where(['name__startWith' => 'Al']);
 
 ```php
 $rows = $crud
-    ->group('status')
+    ->groupBy('status')
     ->order('DESC', ['created_at'])
     ->limit(10)
     ->offset(20)
