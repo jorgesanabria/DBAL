@@ -1,7 +1,6 @@
 <?php
 namespace DBAL\QueryBuilder;
 
-use DBAL\Entity;
 use DBAL\ResultIterator;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Message;
