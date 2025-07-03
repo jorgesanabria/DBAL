@@ -26,6 +26,15 @@ $id = $crud->insert([
 ]);
 ```
 
+### Bulk insert
+
+```php
+$count = $crud->bulkInsert([
+    ['name' => 'Alice'],
+    ['name' => 'Bob']
+]);
+```
+
 ### Select with `where`
 
 ```php
