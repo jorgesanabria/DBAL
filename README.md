@@ -177,6 +177,22 @@ $crud = (new DBAL\Crud($pdo))
 echo $crud->greet('John'); // "Hello John"
 ```
 
+### First/Last middleware
+
+`FirstLastMiddleware` provides helper methods to retrieve the first or last row of a query.
+
+```php
+$fl = new DBAL\FirstLastMiddleware();
+$crud = (new DBAL\Crud($pdo))
+    ->from('users');
+$crud = $fl->attach($crud);
+
+$user = $crud->first();
+$lastUser = $crud->last('id', 'name');
+```
+
+`first()` and `last()` throw a `RuntimeException` when no rows exist. `firstOrDefault()` and `lastOrDefault()` allow providing a default value.
+
 ### Entity validation middleware
 
 `EntityValidationMiddleware` provides a fluent API to validate data before it is
