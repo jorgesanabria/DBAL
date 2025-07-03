@@ -38,6 +38,13 @@ class ResultGenerator
             if (!in_array($name, $this->eagerRelations)) {
                 $pdo = $this->pdo;
                 $middlewares = $this->middlewares;
+                if (!array_key_exists($rel['localKey'], $row)) {
+                    throw new \RuntimeException(sprintf(
+                        'Missing local key %s for relation %s',
+                        $rel['localKey'],
+                        $name
+                    ));
+                }
                 $value = $row[$rel['localKey']];
                 $loader = function () use ($pdo, $middlewares, $rel, $value) {
                     $crud = new Crud($pdo);

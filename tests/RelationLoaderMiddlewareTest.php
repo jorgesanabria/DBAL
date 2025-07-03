@@ -101,4 +101,36 @@ class RelationLoaderMiddlewareTest extends TestCase
         $this->assertEquals('Alice', $user['name']);
         $this->assertStringContainsString('FROM users', $log[1]);
     }
+
+    public function testMissingLocalKeyThrowsException()
+    {
+        $pdo = $this->createPdo();
+
+        $rel = (new RelationLoaderMiddleware())
+            ->table('profiles')
+            ->belongsTo('user', 'users', 'user_id', 'id');
+
+        $crud = (new Crud($pdo))
+            ->from('profiles')
+            ->withMiddleware($rel);
+
+        $this->expectException(RuntimeException::class);
+        iterator_to_array($crud->select('bio'));
+    }
+
+    public function testMissingLocalKeyThrowsExceptionInStream()
+    {
+        $pdo = $this->createPdo();
+
+        $rel = (new RelationLoaderMiddleware())
+            ->table('profiles')
+            ->belongsTo('user', 'users', 'user_id', 'id');
+
+        $crud = (new Crud($pdo))
+            ->from('profiles')
+            ->withMiddleware($rel);
+
+        $this->expectException(RuntimeException::class);
+        iterator_to_array($crud->stream('bio'));
+    }
 }
