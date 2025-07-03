@@ -140,6 +140,9 @@ class Crud extends Query
        {
                foreach ($this->middlewares as $mw) {
                        if (is_object($mw) && is_callable([$mw, $name])) {
+                               if ($mw instanceof CrudAwareMiddlewareInterface) {
+                                       array_unshift($arguments, $this);
+                               }
                                return $mw->$name(...$arguments);
                        }
                }

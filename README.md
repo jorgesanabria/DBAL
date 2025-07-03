@@ -193,6 +193,20 @@ $lastUser = $crud->last('id', 'name');
 
 `first()` and `last()` throw a `RuntimeException` when no rows exist. `firstOrDefault()` and `lastOrDefault()` allow providing a default value.
 
+### Linq middleware
+
+`LinqMiddleware` exposes helper methods to query for the existence of records.
+
+```php
+$linq = new DBAL\LinqMiddleware();
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($linq);
+
+$hasInactive = $crud->any(['active__eq' => 0]);
+$allActive = $crud->all(['active__eq' => 1]);
+```
+
 ### Entity validation middleware
 
 `EntityValidationMiddleware` provides a fluent API to validate data before it is
