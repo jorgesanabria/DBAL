@@ -227,4 +227,3 @@ $user = iterator_to_array($crud->where(['id' => 1])->select())[0];
 $profile = $user['profile'];
 echo $profile['photo'];
 ```
-
