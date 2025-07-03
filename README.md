@@ -291,3 +291,22 @@ $crud = (new DBAL\Crud($pdo))
     ->from('users')
     ->withMiddleware($mw);
 ```
+
+### Schema middleware
+
+`SchemaMiddleware` provides a fluent API to create or modify tables via the `Crud` instance.
+
+```php
+$schema = new DBAL\SchemaMiddleware($pdo);
+$crud = (new DBAL\Crud($pdo))
+    ->withMiddleware($schema);
+
+$crud->createTable('items')
+    ->column('id INTEGER PRIMARY KEY AUTOINCREMENT')
+    ->column('name TEXT')
+    ->execute();
+
+$crud->alterTable('items')
+    ->addColumn('price REAL')
+    ->execute();
+```
