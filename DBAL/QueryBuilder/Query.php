@@ -33,28 +33,40 @@ class Query extends QueryNode
                }
 		return $clon;
 	}
-	protected function join($type, $table, array $on = [])
-	{
-		$this->getChild('joins')->appendChild(new JoinNode($table, $type, $on));
-	}
-	public function innerJoin($table, array ...$on)
-	{
-		$clon = clone $this;
-		$clon->join(JoinNode::INNER_JOIN, $table, $on);
-		return $clon;
-	}
-	public function leftJoin($table, array ...$on)
-	{
-		$clon = clone $this;
-		$clon->join(JoinNode::LEFT_JOIN, $table, $on);
-		return $clon;
-	}
-	public function rightJoin($table, array ...$on)
-	{
-		$clon = clone $this;
-		$clon->join(JoinNode::RIGHT_JOIN, $table, $on);
-		return $clon;
-	}
+        protected function join($type, $table, array $on = [])
+        {
+                $conditions = [];
+                foreach ($on as $filter) {
+                        if (is_callable($filter)) {
+                                $builder = new DynamicFilterBuilder();
+                                $filter($builder);
+                                $conditions[] = $builder->toNode();
+                        } elseif ($filter instanceof FilterNode) {
+                                $conditions[] = $filter;
+                        } elseif (is_array($filter)) {
+                                $conditions[] = new FilterNode($filter);
+                        }
+                }
+                $this->getChild('joins')->appendChild(new JoinNode($table, $type, $conditions));
+        }
+        public function innerJoin($table, ...$on)
+        {
+                $clon = clone $this;
+                $clon->join(JoinNode::INNER_JOIN, $table, $on);
+                return $clon;
+        }
+        public function leftJoin($table, ...$on)
+        {
+                $clon = clone $this;
+                $clon->join(JoinNode::LEFT_JOIN, $table, $on);
+                return $clon;
+        }
+        public function rightJoin($table, ...$on)
+        {
+                $clon = clone $this;
+                $clon->join(JoinNode::RIGHT_JOIN, $table, $on);
+                return $clon;
+        }
        public function where(...$filters)
        {
                $clon = clone $this;

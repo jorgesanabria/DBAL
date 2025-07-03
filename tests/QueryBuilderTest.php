@@ -43,4 +43,15 @@ class QueryBuilderTest extends TestCase
         $msg = $query->buildSelect();
         $this->assertEquals('SELECT * FROM users WHERE (name = ? OR name = ?) AND status = ?', $msg->readMessage());
     }
+
+    public function testJoinWithDynamicFilter()
+    {
+        $query = (new Query())
+            ->from('users u')
+            ->leftJoin('profiles p', function ($j) {
+                $j->{'u.id__eqf'}('p.user_id');
+            });
+        $msg = $query->buildSelect();
+        $this->assertEquals('SELECT * FROM users u LEFT JOIN profiles p ON u.id = p.user_id', $msg->readMessage());
+    }
 }

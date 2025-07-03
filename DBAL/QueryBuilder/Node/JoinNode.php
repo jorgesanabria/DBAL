@@ -17,8 +17,13 @@ class JoinNode extends NotImplementedNode
         {
                 $this->table = $table;
                 $this->type  = $type;
-                foreach ($on as $filter)
-                        $this->on[] = new FilterNode($filter);
+                foreach ($on as $filter) {
+                        if ($filter instanceof FilterNode) {
+                                $this->on[] = $filter;
+                        } else {
+                                $this->on[] = new FilterNode($filter);
+                        }
+                }
         }
         public function send(MessageInterface $message)
         {

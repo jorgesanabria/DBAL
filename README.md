@@ -50,7 +50,9 @@ $crud->where(['id' => $id])->delete();
 ```php
 $resultado = $crud
     ->from('usuarios u')
-    ->leftJoin('perfiles p', ['u.id__eqf' => 'p.usuario_id'])
+    ->leftJoin('perfiles p', function ($on) {
+        $on->{'u.id__eqf'}('p.usuario_id');
+    })
     ->where(['p.activo__eq' => 1])
     ->select('u.id', 'p.foto');
 ```
