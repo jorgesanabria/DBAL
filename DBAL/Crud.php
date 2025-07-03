@@ -10,6 +10,7 @@ class Crud extends Query
         protected $mappers = [];
         protected $middlewares = [];
         protected $tables = [];
+        protected $with = [];
         public function __construct(\PDO $connection)
         {
                 $this->connection = $connection;
@@ -25,6 +26,14 @@ class Crud extends Query
         {
                 $clon = clone $this;
                 $clon->middlewares[] = $mw;
+                return $clon;
+        }
+
+        public function with(string ...$relations)
+        {
+                $clon = clone $this;
+                foreach ($relations as $r)
+                        $clon->with[] = $r;
                 return $clon;
         }
 
@@ -46,9 +55,36 @@ class Crud extends Query
                 foreach ($this->middlewares as $mw)
                         $mw($message);
         }
+
+        private function resolveRelation($name)
+        {
+                foreach ($this->middlewares as $mw) {
+                        if (is_object($mw) && method_exists($mw, 'getRelation')) {
+                                $rel = $mw->getRelation($this->primaryTable(), $name);
+                                if ($rel) return $rel;
+                        }
+                }
+                return null;
+        }
         public function select(...$fields)
         {
-                $message = $this->buildSelect(...$fields);
+                $query = $this;
+                foreach ($this->with as $relName) {
+                        $rel = $this->resolveRelation($relName);
+                        if ($rel) {
+                                $conds = [];
+                                foreach ($rel->getConditions() as $c) {
+                                        if ($c[1] === '=') {
+                                                $conds[] = [$c[0].'__eqf' => $c[2]];
+                                        }
+                                }
+                                if (!empty($conds)) {
+                                        $query = $query->leftJoin($rel->getTable(), ...$conds);
+                                }
+                        }
+                }
+
+                $message = $query->buildSelect(...$fields);
                 return new ResultIterator($this->connection, $message, $this->mappers, $this->middlewares);
         }
         public function insert(array $fields)
