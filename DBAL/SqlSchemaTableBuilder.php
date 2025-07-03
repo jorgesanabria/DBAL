@@ -3,7 +3,7 @@ namespace DBAL;
 
 use PDO;
 
-class SchemaTableBuilder
+class SqlSchemaTableBuilder
 {
     private $pdo;
     private $table;

@@ -336,6 +336,9 @@ $crud->alterTable('items')
     ->execute();
 ```
 
+Both `createTable()` and `alterTable()` return an instance of
+`SqlSchemaTableBuilder` used to define the table schema fluently.
+
 ### Development error middleware
 
 `DevelopmentErrorMiddleware` installs an exception handler that displays a basic HTML page whenever an uncaught exception happens. The page supports light and dark themes and allows switching between small, medium and large fonts. When `console` is enabled a text version of the error is written to `STDERR`. If `persistPath` is provided, rendered pages are stored in timestamped folders so they can be reviewed later.
