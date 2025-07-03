@@ -2,80 +2,47 @@
 namespace DBAL;
 
 use InvalidArgumentException;
+use ReflectionClass;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\RelationDefinition;
+use DBAL\Attributes\Required;
+use DBAL\Attributes\StringType;
+use DBAL\Attributes\IntegerType;
+use DBAL\Attributes\MaxLength;
+use DBAL\Attributes\Email;
+use DBAL\Attributes\HasOne;
+use DBAL\Attributes\HasMany;
+use DBAL\Attributes\BelongsTo;
 
 /**
- * Clase/Interfaz EntityValidationMiddleware
+ * EntityValidationMiddleware parses attribute annotations on entity classes
+ * to configure validation rules and relations.
  */
 class EntityValidationMiddleware implements EntityValidationInterface
 {
-/** @var mixed */
     private $rules = [];
-/** @var mixed */
     private $relations = [];
-
-/** @var mixed */
-    private $currentTable;
-/** @var mixed */
-    private $currentField;
-
-/**
- * __invoke
- * @param MessageInterface $msg
- * @return void
- */
 
     public function __invoke(MessageInterface $msg): void
     {
         // no-op
     }
 
-/**
- * table
- * @param string $table
- * @return self
- */
-
-    public function table(string $table): self
+    /**
+     * Register an entity class for a given table.
+     */
+    public function register(string $table, string $class): self
     {
-        $this->currentTable = $table;
-        if (!isset($this->rules[$table])) {
-            $this->rules[$table] = [];
-        }
-        if (!isset($this->relations[$table])) {
-            $this->relations[$table] = [];
-        }
-        return $this;
-    }
+        $this->rules[$table] = [];
+        $this->relations[$table] = [];
 
-/**
- * field
- * @param string $field
- * @return self
- */
-
-    public function field(string $field): self
-    {
-        $this->currentField = $field;
-        if (!isset($this->rules[$this->currentTable][$field])) {
-            $this->rules[$this->currentTable][$field] = [
+        $ref = new ReflectionClass($class);
+        foreach ($ref->getProperties() as $prop) {
+            $field = $prop->getName();
+            $rule = [
                 'required' => false,
                 'validators' => []
             ];
-        }
-        return $this;
-    }
-
-    public function relation(
-        string $name,
-        string $type = null,
-        string $table = null,
-        string $localKey = null,
-        string $foreignKey = null
-    ): RelationDefinition {
-        $relation = new RelationDefinition($name);
-        $this->relations[$this->currentTable][$name] = $relation;
 
         if ($type !== null && $table !== null && $localKey !== null && $foreignKey !== null) {
             $relation = match ($type) {
@@ -128,70 +95,62 @@ class EntityValidationMiddleware implements EntityValidationInterface
             if (!is_string($value)) {
                 throw new InvalidArgumentException('Value must be a string');
             }
-        });
-    }
-
-/**
- * integer
- * @return self
- */
-
-    public function integer(): self
-    {
-        return $this->addValidator(function ($value) {
-            if (!is_int($value)) {
-                throw new InvalidArgumentException('Value must be an integer');
+            foreach ($prop->getAttributes(IntegerType::class) as $a) {
+                $rule['validators'][] = function ($value) {
+                    if (!is_int($value)) {
+                        throw new InvalidArgumentException('Value must be an integer');
+                    }
+                };
             }
-        });
-    }
-
-/**
- * maxLength
- * @param int $length
- * @return self
- */
-
-    public function maxLength(int $length): self
-    {
-        return $this->addValidator(function ($value) use ($length) {
-            if (is_string($value) && strlen($value) > $length) {
-                throw new InvalidArgumentException("Length must be <= {$length}");
+            foreach ($prop->getAttributes(MaxLength::class) as $a) {
+                $len = $a->newInstance()->length;
+                $rule['validators'][] = function ($value) use ($len) {
+                    if (is_string($value) && strlen($value) > $len) {
+                        throw new InvalidArgumentException("Length must be <= {$len}");
+                    }
+                };
             }
-        });
-    }
-
-/**
- * email
- * @return self
- */
-
-    public function email(): self
-    {
-        return $this->addValidator(function ($value) {
-            if (!is_string($value) || !filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                throw new InvalidArgumentException('Invalid email');
+            foreach ($prop->getAttributes(Email::class) as $a) {
+                $rule['validators'][] = function ($value) {
+                    if (!is_string($value) || !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                        throw new InvalidArgumentException('Invalid email');
+                    }
+                };
             }
-        });
-    }
 
-/**
- * addValidator
- * @param callable $validator
- * @return self
- */
+            if ($rule['required'] || $rule['validators']) {
+                $this->rules[$table][$field] = $rule;
+            }
 
-    private function addValidator(callable $validator): self
-    {
-        $this->rules[$this->currentTable][$this->currentField]['validators'][] = $validator;
+            foreach ($prop->getAttributes() as $attr) {
+                $name = $attr->getName();
+                if (in_array($name, [HasOne::class, HasMany::class, BelongsTo::class], true)) {
+                    $def = new RelationDefinition($field);
+                    $inst = $attr->newInstance();
+                    switch ($name) {
+                        case HasOne::class:
+                            $def->hasOne($inst->table);
+                            break;
+                        case HasMany::class:
+                            $def->hasMany($inst->table);
+                            break;
+                        case BelongsTo::class:
+                            $def->belongsTo($inst->table);
+                            break;
+                    }
+                    $def->on("{$table}.{$inst->localKey}", '=', "{$inst->table}.{$inst->foreignKey}");
+                    $this->relations[$table][$field] = $def;
+                }
+            }
+        }
+
         return $this;
     }
 
-/**
- * beforeInsert
- * @param string $table
- * @param array $fields
- * @return void
- */
+    public function getRelations(string $table): array
+    {
+        return $this->relations[$table] ?? [];
+    }
 
     public function beforeInsert(string $table, array $fields): void
     {
@@ -212,13 +171,6 @@ class EntityValidationMiddleware implements EntityValidationInterface
         }
     }
 
-/**
- * beforeUpdate
- * @param string $table
- * @param array $fields
- * @return void
- */
-
     public function beforeUpdate(string $table, array $fields): void
     {
         if (!isset($this->rules[$table])) {
@@ -233,13 +185,6 @@ class EntityValidationMiddleware implements EntityValidationInterface
             }
         }
     }
-
-/**
- * getRelation
- * @param string $table
- * @param string $name
- * @return ?RelationDefinition
- */
 
     public function getRelation(string $table, string $name): ?RelationDefinition
     {

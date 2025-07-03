@@ -255,17 +255,27 @@ $allActive = $crud->all(['active__eq' => 1]);
 
 ### Entity validation middleware
 
-`EntityValidationMiddleware` provides a fluent API to validate data before it is
-inserted or updated. Validations are defined per table and field:
+`EntityValidationMiddleware` now reads PHP attributes from entity classes:
 
 ```php
+use DBAL\Attributes\{Required, StringType, MaxLength, Email, HasOne};
+
+class User {
+    #[Required]
+    #[StringType]
+    #[MaxLength(50)]
+    public $name;
+
+    #[Required]
+    #[Email]
+    public $email;
+
+    #[HasOne('profiles', 'id', 'user_id')]
+    public $profile;
+}
+
 $validation = (new DBAL\EntityValidationMiddleware())
-    ->table('users')
-        ->field('name')->required()->string()->maxLength(50)
-        ->field('email')->required()->email()
-        ->relation('profile')
-            ->hasOne('profiles')
-            ->on('users.id', '=', 'profiles.user_id');
+    ->register('users', User::class);
 
 $crud = (new DBAL\Crud($pdo))
     ->from('users')
@@ -281,11 +291,19 @@ Relationships are defined in the validation middleware. Once set up, relations
 can be eagerly loaded via `with()` and are available lazily on demand.
 
 ```php
+class User {
+    #[HasOne('profiles', 'id', 'user_id')]
+    public $profile;
+}
+
+class Profile {
+    #[BelongsTo('users', 'user_id', 'id')]
+    public $user;
+}
+
 $validation = (new DBAL\EntityValidationMiddleware())
-    ->table('users')
-        ->relation('profile', 'hasOne', 'profiles', 'id', 'user_id')
-    ->table('profiles')
-        ->relation('user', 'belongsTo', 'users', 'user_id', 'id');
+    ->register('users', User::class)
+    ->register('profiles', Profile::class);
 
 $crud = (new DBAL\Crud($pdo))
     ->from('users')

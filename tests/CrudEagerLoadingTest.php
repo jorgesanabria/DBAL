@@ -2,6 +2,12 @@
 use PHPUnit\Framework\TestCase;
 use DBAL\Crud;
 use DBAL\EntityValidationMiddleware;
+use DBAL\Attributes\HasOne;
+
+class UserWithProfile {
+    #[HasOne('profiles', 'id', 'user_id')]
+    public $profile;
+}
 
 class CrudEagerLoadingTest extends TestCase
 {
@@ -19,10 +25,7 @@ class CrudEagerLoadingTest extends TestCase
     {
         $pdo = $this->createPdo();
         $mw = (new EntityValidationMiddleware())
-            ->table('users')
-                ->relation('profile')
-                    ->hasOne('profiles')
-                    ->on('users.id', '=', 'profiles.user_id');
+            ->register('users', UserWithProfile::class);
 
         $crud = (new Crud($pdo))->from('users')->withMiddleware($mw)->with('profile');
         $rows = iterator_to_array($crud->select('users.id', 'profiles.bio'));
