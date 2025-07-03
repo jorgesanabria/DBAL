@@ -4,6 +4,7 @@ namespace DBAL;
 use DBAL\QueryBuilder\Query;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\RelationDefinition;
+use DBAL\AbmEventInterface;
 use Generator;
 
 class Crud extends Query
@@ -132,7 +133,13 @@ class Crud extends Query
                 $this->runMiddlewares($message);
                 $stm = $this->connection->prepare($message->readMessage());
                 $stm->execute($message->getValues());
-                return $this->connection->lastInsertId();
+                $id = $this->connection->lastInsertId();
+                foreach ($this->middlewares as $mw) {
+                        if ($mw instanceof AbmEventInterface) {
+                                $mw->afterInsert($this->primaryTable(), $fields, $id);
+                        }
+                }
+                return $id;
         }
         public function bulkInsert(array $rows)
         {
@@ -147,7 +154,13 @@ class Crud extends Query
                 $this->runMiddlewares($message);
                 $stm = $this->connection->prepare($message->readMessage());
                 $stm->execute($message->getValues());
-                return $stm->rowCount();
+                $count = $stm->rowCount();
+                foreach ($this->middlewares as $mw) {
+                        if ($mw instanceof AbmEventInterface) {
+                                $mw->afterBulkInsert($this->primaryTable(), $rows, $count);
+                        }
+                }
+                return $count;
         }
         public function update(array $fields)
         {
@@ -160,7 +173,13 @@ class Crud extends Query
                 $this->runMiddlewares($message);
                 $stm = $this->connection->prepare($message->readMessage());
                 $stm->execute($message->getValues());
-                return $stm->rowCount();
+                $count = $stm->rowCount();
+                foreach ($this->middlewares as $mw) {
+                        if ($mw instanceof AbmEventInterface) {
+                                $mw->afterUpdate($this->primaryTable(), $fields, $count);
+                        }
+                }
+                return $count;
         }
        public function delete()
        {
@@ -168,7 +187,13 @@ class Crud extends Query
                $this->runMiddlewares($message);
                $stm = $this->connection->prepare($message->readMessage());
                $stm->execute($message->getValues());
-               return $stm->rowCount();
+               $count = $stm->rowCount();
+               foreach ($this->middlewares as $mw) {
+                       if ($mw instanceof AbmEventInterface) {
+                               $mw->afterDelete($this->primaryTable(), $count);
+                       }
+               }
+               return $count;
        }
 
        public function __call($name, $arguments)
