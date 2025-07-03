@@ -132,6 +132,21 @@ $crud = (new DBAL\Crud($pdo))
 $crud->insert(['name' => 'John']);
 ```
 
+Alternatively, you can create a class that implements
+`DBAL\MiddlewareInterface`:
+
+```php
+class MyMiddleware implements DBAL\MiddlewareInterface
+{
+    public function __invoke(DBAL\QueryBuilder\MessageInterface $msg): void
+    {
+        error_log($msg->readMessage());
+    }
+}
+
+$crud = $crud->withMiddleware(new MyMiddleware());
+```
+
 You can register multiple middlewares and they will run before the SQL statement
 is prepared and executed.
 
