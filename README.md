@@ -26,6 +26,15 @@ $id = $crud->insert([
 ]);
 ```
 
+### Bulk insert
+
+```php
+$count = $crud->bulkInsert([
+    ['name' => 'Alice'],
+    ['name' => 'Bob']
+]);
+```
+
 ### Select with `where`
 
 ```php
@@ -129,6 +138,23 @@ $byStatus = $users->groupBy('status');
 $byLetter = $users->groupBy(function ($row) {
     return $row['name'][0];
 });
+```
+
+### Streaming results
+
+`Crud::stream()` returns a generator that yields each row lazily. A callback can
+be provided to process rows as they are produced.
+
+```php
+$generator = $crud->stream('id', 'name');
+
+foreach ($generator as $row) {
+    echo $row['name'];
+}
+
+$crud->stream(function ($row) {
+    echo $row['name'];
+}, 'id', 'name');
 ```
 
 ### Middlewares
@@ -291,7 +317,6 @@ $crud = (new DBAL\Crud($pdo))
     ->from('users')
     ->withMiddleware($mw);
 ```
-
 ### Schema middleware
 
 `SchemaMiddleware` provides a fluent API to create or modify tables via the `Crud` instance.

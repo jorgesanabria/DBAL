@@ -4,6 +4,7 @@ namespace DBAL;
 use DBAL\QueryBuilder\Query;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\RelationDefinition;
+use Generator;
 
 class Crud extends Query
 {
@@ -101,6 +102,25 @@ class Crud extends Query
                         $this->with
                 );
         }
+
+        public function stream(...$args)
+        {
+                $callback = null;
+                if (isset($args[0]) && is_callable($args[0])) {
+                        $callback = array_shift($args);
+                }
+                $message = $this->buildSelect(...$args);
+                $relations = $this->collectRelations($this->primaryTable());
+                $generator = new ResultGenerator(
+                        $this->connection,
+                        $message,
+                        $this->mappers,
+                        $this->middlewares,
+                        $relations,
+                        $this->with
+                );
+                return $generator->getIterator($callback);
+        }
         public function insert(array $fields)
         {
                 foreach ($this->middlewares as $mw) {
@@ -113,6 +133,21 @@ class Crud extends Query
                 $stm = $this->connection->prepare($message->readMessage());
                 $stm->execute($message->getValues());
                 return $this->connection->lastInsertId();
+        }
+        public function bulkInsert(array $rows)
+        {
+                foreach ($this->middlewares as $mw) {
+                        if ($mw instanceof EntityValidationInterface) {
+                                foreach ($rows as $row) {
+                                        $mw->beforeInsert($this->primaryTable(), $row);
+                                }
+                        }
+                }
+                $message = $this->buildBulkInsert($rows);
+                $this->runMiddlewares($message);
+                $stm = $this->connection->prepare($message->readMessage());
+                $stm->execute($message->getValues());
+                return $stm->rowCount();
         }
         public function update(array $fields)
         {
