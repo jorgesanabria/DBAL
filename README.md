@@ -187,7 +187,9 @@ $validation = (new DBAL\EntityValidationMiddleware())
     ->table('users')
         ->field('name')->required()->string()->maxLength(50)
         ->field('email')->required()->email()
-    ->relation('profile', 'hasOne', 'profiles', 'id', 'user_id');
+        ->relation('profile')
+            ->hasOne('profiles')
+            ->on('users.id', '=', 'profiles.user_id');
 
 $crud = (new DBAL\Crud($pdo))
     ->from('users')
@@ -196,4 +198,26 @@ $crud = (new DBAL\Crud($pdo))
 
 An `InvalidArgumentException` is thrown when validations fail. Declared
 relations can be used by future lazy or eager loading features.
+
+### Loading relations
+
+`RelationLoaderMiddleware` lets you define relationships and load them eagerly
+or lazily.
+
+```php
+$relations = (new DBAL\RelationLoaderMiddleware())
+    ->table('users')
+        ->hasOne('profile', 'profiles', 'id', 'user_id');
+
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($relations);
+
+// Eager load using JOIN
+$rows = iterator_to_array($crud->with('profile')->select());
+
+// Lazy load on demand
+$row = iterator_to_array($crud->select())[0];
+$profile = $row['profile']->get();
+```
 

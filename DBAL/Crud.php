@@ -3,6 +3,7 @@ namespace DBAL;
 
 use DBAL\QueryBuilder\Query;
 use DBAL\QueryBuilder\MessageInterface;
+use DBAL\RelationDefinition;
 
 class Crud extends Query
 {
@@ -29,19 +30,41 @@ class Crud extends Query
                 return $clon;
         }
 
-        public function with(string ...$relations)
-        {
-                $clon = clone $this;
-                foreach ($relations as $r)
-                        $clon->with[] = $r;
-                return $clon;
-        }
-
         public function from(...$tables)
         {
                 $clon = parent::from(...$tables);
                 foreach ($tables as $table) {
                         $clon->tables[] = $table;
+                }
+                return $clon;
+        }
+
+        public function with(...$relations)
+        {
+                $clon = clone $this;
+                $defs = $clon->collectRelations($clon->primaryTable());
+                foreach ($relations as $rel) {
+                        if (!isset($defs[$rel])) {
+                                continue;
+                        }
+                        $def = $defs[$rel];
+                        if ($def instanceof RelationDefinition) {
+                                $conds = [];
+                                foreach ($def->getConditions() as $c) {
+                                        if ($c[1] === '=') {
+                                                $conds[] = [$c[0] . '__eqf' => $c[2]];
+                                        }
+                                }
+                                $clon = $clon->leftJoin($def->getTable(), ...$conds);
+                        } else {
+                                $join = $def['on'];
+                                if (($def['joinType'] ?? 'left') === 'inner') {
+                                        $clon = $clon->innerJoin($def['table'], $join);
+                                } else {
+                                        $clon = $clon->leftJoin($def['table'], $join);
+                                }
+                        }
+                        $clon->with[] = $rel;
                 }
                 return $clon;
         }
@@ -55,37 +78,28 @@ class Crud extends Query
                 foreach ($this->middlewares as $mw)
                         $mw($message);
         }
-
-        private function resolveRelation($name)
+        private function collectRelations($table)
         {
+                $relations = [];
                 foreach ($this->middlewares as $mw) {
-                        if (is_object($mw) && method_exists($mw, 'getRelation')) {
-                                $rel = $mw->getRelation($this->primaryTable(), $name);
-                                if ($rel) return $rel;
+                        if (is_object($mw) && method_exists($mw, 'getRelations')) {
+                                $relations += $mw->getRelations($table);
                         }
                 }
-                return null;
+                return $relations;
         }
         public function select(...$fields)
         {
-                $query = $this;
-                foreach ($this->with as $relName) {
-                        $rel = $this->resolveRelation($relName);
-                        if ($rel) {
-                                $conds = [];
-                                foreach ($rel->getConditions() as $c) {
-                                        if ($c[1] === '=') {
-                                                $conds[] = [$c[0].'__eqf' => $c[2]];
-                                        }
-                                }
-                                if (!empty($conds)) {
-                                        $query = $query->leftJoin($rel->getTable(), ...$conds);
-                                }
-                        }
-                }
-
-                $message = $query->buildSelect(...$fields);
-                return new ResultIterator($this->connection, $message, $this->mappers, $this->middlewares);
+                $message = $this->buildSelect(...$fields);
+                $relations = $this->collectRelations($this->primaryTable());
+                return new ResultIterator(
+                        $this->connection,
+                        $message,
+                        $this->mappers,
+                        $this->middlewares,
+                        $relations,
+                        $this->with
+                );
         }
         public function insert(array $fields)
         {

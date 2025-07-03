@@ -12,12 +12,16 @@ class ResultIterator implements \Iterator, \JsonSerializable
         protected $stm;
         protected $mappers;
         protected $middlewares;
-        public function __construct(\PDO $pdo, MessageInterface $message, array $mappers = [], array $middlewares = [])
+        protected $relations;
+        protected $eagerRelations;
+        public function __construct(\PDO $pdo, MessageInterface $message, array $mappers = [], array $middlewares = [], array $relations = [], array $eagerRelations = [])
         {
                 $this->pdo = $pdo;
                 $this->message = $message;
                 $this->mappers = $mappers;
                 $this->middlewares = $middlewares;
+                $this->relations = $relations;
+                $this->eagerRelations = $eagerRelations;
         }
         public function rewind()
         {
@@ -36,13 +40,36 @@ class ResultIterator implements \Iterator, \JsonSerializable
 	{
 		return $this->i;
 	}
-	public function current()
-	{
-		$result = $this->result;
-		foreach ($this->mappers as $mapper)
-			$result = call_user_func_array($mapper, [$result]);
-		return $result;
-	}
+        public function current()
+        {
+                $result = $this->result;
+                foreach ($this->mappers as $mapper)
+                        $result = call_user_func_array($mapper, [$result]);
+
+                foreach ($this->relations as $name => $rel) {
+                        if (!in_array($name, $this->eagerRelations)) {
+                                $pdo = $this->pdo;
+                                $middlewares = $this->middlewares;
+                                $value = $result[$rel['localKey']];
+                                $loader = function () use ($pdo, $middlewares, $rel, $value) {
+                                        $crud = new Crud($pdo);
+                                        foreach ($middlewares as $mw) {
+                                                $crud = $crud->withMiddleware($mw);
+                                        }
+                                        $crud = $crud->from($rel['table'])->where([
+                                                $rel['foreignKey'].'__eq' => $value
+                                        ]);
+                                        $rows = iterator_to_array($crud->select());
+                                        if ($rel['type'] === 'hasOne') {
+                                                return $rows[0] ?? null;
+                                        }
+                                        return $rows;
+                                };
+                                $result[$name] = new LazyRelation($loader);
+                        }
+                }
+                return $result;
+        }
 	public function next()
 	{
 		$this->result = $this->stm->fetch();
