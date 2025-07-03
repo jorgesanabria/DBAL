@@ -3,18 +3,42 @@ namespace DBAL;
 
 use DBAL\QueryBuilder\MessageInterface;
 
+/**
+ * Clase/Interfaz ResultIterator
+ */
 class ResultIterator implements \Iterator, \JsonSerializable
 {
+/** @var mixed */
         protected $pdo;
+/** @var mixed */
         protected $message;
+/** @var mixed */
         protected $result;
+/** @var mixed */
         protected $i;
+/** @var mixed */
         protected $stm;
+/** @var mixed */
         protected $rows = [];
+/** @var mixed */
         protected $mappers;
+/** @var mixed */
         protected $middlewares;
+/** @var mixed */
         protected $relations;
+/** @var mixed */
         protected $eagerRelations;
+/**
+ * __construct
+ * @param \PDO $pdo
+ * @param MessageInterface $message
+ * @param array $mappers
+ * @param array $middlewares
+ * @param array $relations
+ * @param array $eagerRelations
+ * @return void
+ */
+
         public function __construct(\PDO $pdo, MessageInterface $message, array $mappers = [], array $middlewares = [], array $relations = [], array $eagerRelations = [])
         {
                 $this->pdo = $pdo;
@@ -24,6 +48,11 @@ class ResultIterator implements \Iterator, \JsonSerializable
                 $this->relations = $relations;
                 $this->eagerRelations = $eagerRelations;
         }
+/**
+ * rewind
+ * @return mixed
+ */
+
         public function rewind()
         {
                 foreach ($this->middlewares as $mw)
@@ -54,14 +83,29 @@ class ResultIterator implements \Iterator, \JsonSerializable
                 $this->i = 0;
                 $this->result = $this->rows[0] ?? false;
         }
+/**
+ * valid
+ * @return mixed
+ */
+
         public function valid()
         {
                 return $this->i < count($this->rows);
         }
+/**
+ * key
+ * @return mixed
+ */
+
         public function key()
         {
                 return $this->i;
         }
+/**
+ * current
+ * @return mixed
+ */
+
         public function current()
         {
                 $result = $this->rows[$this->i];
@@ -99,16 +143,32 @@ class ResultIterator implements \Iterator, \JsonSerializable
                 }
                 return $result;
         }
+/**
+ * next
+ * @return mixed
+ */
+
         public function next()
         {
                 $this->i++;
                 $this->result = $this->rows[$this->i] ?? false;
         }
+/**
+ * jsonSerialize
+ * @return mixed
+ */
+
         public function jsonSerialize()
         {
                 $this->rewind();
                 return $this->rows;
         }
+
+/**
+ * groupBy
+ * @param mixed $key
+ * @return mixed
+ */
 
         public function groupBy($key)
         {

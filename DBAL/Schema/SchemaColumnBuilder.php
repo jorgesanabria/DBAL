@@ -1,16 +1,34 @@
 <?php
 namespace DBAL\Schema;
 
+/**
+ * Clase/Interfaz SchemaColumnBuilder
+ */
 class SchemaColumnBuilder
 {
+/** @var mixed */
     private $name;
+/** @var mixed */
     private $type = '';
+/** @var mixed */
     private $constraints = [];
+
+/**
+ * __construct
+ * @param string $name
+ * @return void
+ */
 
     public function __construct(string $name)
     {
         $this->name = $name;
     }
+
+/**
+ * type
+ * @param string $type
+ * @return self
+ */
 
     public function type(string $type): self
     {
@@ -18,20 +36,40 @@ class SchemaColumnBuilder
         return $this;
     }
 
+/**
+ * integer
+ * @return self
+ */
+
     public function integer(): self
     {
         return $this->type('INTEGER');
     }
+
+/**
+ * text
+ * @return self
+ */
 
     public function text(): self
     {
         return $this->type('TEXT');
     }
 
+/**
+ * real
+ * @return self
+ */
+
     public function real(): self
     {
         return $this->type('REAL');
     }
+
+/**
+ * primaryKey
+ * @return self
+ */
 
     public function primaryKey(): self
     {
@@ -39,11 +77,21 @@ class SchemaColumnBuilder
         return $this;
     }
 
+/**
+ * autoIncrement
+ * @return self
+ */
+
     public function autoIncrement(): self
     {
         $this->constraints[] = 'AUTOINCREMENT';
         return $this;
     }
+
+/**
+ * build
+ * @return string
+ */
 
     public function build(): string
     {

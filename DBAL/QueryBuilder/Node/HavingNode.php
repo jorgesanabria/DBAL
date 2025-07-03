@@ -5,9 +5,19 @@ use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Message;
 use DBAL\QueryBuilder\Node\NodeInterface;
 
+/**
+ * Clase/Interfaz HavingNode
+ */
 class HavingNode extends Node
 {
+/** @var mixed */
 	protected $isEmpty = false;
+/**
+ * send
+ * @param MessageInterface $message
+ * @return mixed
+ */
+
 	public function send(MessageInterface $message)
 	{
 		$msg = new Message($message->type());
@@ -16,6 +26,13 @@ class HavingNode extends Node
 		}
 		return ($msg->getLength() > 0)? $message->join($msg->insertBefore('HAVING')) : $message;
 	}
+/**
+ * appendChild
+ * @param NodeInterface $node
+ * @param mixed $name
+ * @return mixed
+ */
+
 	public function appendChild(NodeInterface $node, $name = null)
 	{
 		if ($node instanceof FilterNode) {

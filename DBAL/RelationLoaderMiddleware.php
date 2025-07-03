@@ -3,15 +3,32 @@ namespace DBAL;
 
 use DBAL\QueryBuilder\MessageInterface;
 
+/**
+ * Clase/Interfaz RelationLoaderMiddleware
+ */
 class RelationLoaderMiddleware implements MiddlewareInterface
 {
+/** @var mixed */
     private $currentTable;
+/** @var mixed */
     private $relations = [];
+
+/**
+ * __invoke
+ * @param MessageInterface $msg
+ * @return void
+ */
 
     public function __invoke(MessageInterface $msg): void
     {
         // no-op
     }
+
+/**
+ * table
+ * @param string $table
+ * @return self
+ */
 
     public function table(string $table): self
     {
@@ -21,6 +38,17 @@ class RelationLoaderMiddleware implements MiddlewareInterface
         }
         return $this;
     }
+
+/**
+ * hasOne
+ * @param string $name
+ * @param string $table
+ * @param string $localKey
+ * @param string $foreignKey
+ * @param callable $on
+ * @param string $joinType
+ * @return self
+ */
 
     public function hasOne(string $name, string $table, string $localKey, string $foreignKey, callable $on = null, string $joinType = 'left'): self
     {
@@ -41,6 +69,17 @@ class RelationLoaderMiddleware implements MiddlewareInterface
         return $this;
     }
 
+/**
+ * hasMany
+ * @param string $name
+ * @param string $table
+ * @param string $localKey
+ * @param string $foreignKey
+ * @param callable $on
+ * @param string $joinType
+ * @return self
+ */
+
     public function hasMany(string $name, string $table, string $localKey, string $foreignKey, callable $on = null, string $joinType = 'left'): self
     {
         if ($on === null) {
@@ -60,6 +99,17 @@ class RelationLoaderMiddleware implements MiddlewareInterface
         return $this;
     }
 
+/**
+ * belongsTo
+ * @param string $name
+ * @param string $table
+ * @param string $localKey
+ * @param string $foreignKey
+ * @param callable $on
+ * @param string $joinType
+ * @return self
+ */
+
     public function belongsTo(string $name, string $table, string $localKey, string $foreignKey, callable $on = null, string $joinType = 'left'): self
     {
         if ($on === null) {
@@ -78,6 +128,12 @@ class RelationLoaderMiddleware implements MiddlewareInterface
         ];
         return $this;
     }
+
+/**
+ * getRelations
+ * @param string $table
+ * @return array
+ */
 
     public function getRelations(string $table): array
     {

@@ -4,10 +4,22 @@ namespace DBAL;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Message;
 
+/**
+ * Clase/Interfaz GlobalFilterMiddleware
+ */
 class GlobalFilterMiddleware implements MiddlewareInterface
 {
+/** @var mixed */
     private $tableFilters = [];
+/** @var mixed */
     private $globalFilters = [];
+
+/**
+ * __construct
+ * @param array $tableFilters
+ * @param array $globalFilters
+ * @return void
+ */
 
     public function __construct(array $tableFilters = [], array $globalFilters = [])
     {
@@ -18,6 +30,13 @@ class GlobalFilterMiddleware implements MiddlewareInterface
             $this->globalFilters[] = $f;
         }
     }
+
+/**
+ * addFilter
+ * @param mixed $table
+ * @param callable $filter
+ * @return self
+ */
 
     public function addFilter($table, callable $filter): self
     {
@@ -31,6 +50,12 @@ class GlobalFilterMiddleware implements MiddlewareInterface
         }
         return $this;
     }
+
+/**
+ * __invoke
+ * @param MessageInterface $msg
+ * @return void
+ */
 
     public function __invoke(MessageInterface $msg): void
     {
@@ -54,6 +79,13 @@ class GlobalFilterMiddleware implements MiddlewareInterface
         }
     }
 
+/**
+ * apply
+ * @param MessageInterface $dest
+ * @param MessageInterface $src
+ * @return void
+ */
+
     private function apply(MessageInterface $dest, MessageInterface $src): void
     {
         if (!($dest instanceof Message) || !($src instanceof Message)) {
@@ -67,6 +99,12 @@ class GlobalFilterMiddleware implements MiddlewareInterface
         $prop->setAccessible(true);
         $prop->setValue($dest, $src->getValues());
     }
+
+/**
+ * extractTables
+ * @param string $sql
+ * @return array
+ */
 
     private function extractTables(string $sql): array
     {

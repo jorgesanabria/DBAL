@@ -1,10 +1,22 @@
 <?php
 namespace DBAL\QueryBuilder\Node;
 
+/**
+ * Clase/Interfaz Node
+ */
 abstract class Node implements NodeInterface
 {
+/** @var mixed */
 	protected $isEmpty;
+/** @var mixed */
 	protected $childs = [];
+/**
+ * appendChild
+ * @param NodeInterface $node
+ * @param mixed $name
+ * @return mixed
+ */
+
 	public function appendChild(NodeInterface $node, $name = null)
 	{
 		if ($name === null)
@@ -12,10 +24,22 @@ abstract class Node implements NodeInterface
 		$this->childs[$name] = $node;
 		return $name;
 	}
+/**
+ * hasChild
+ * @param mixed $name
+ * @return mixed
+ */
+
 	public function hasChild($name)
 	{
 		return isset($this->childs[$name]);
 	}
+/**
+ * getChild
+ * @param mixed $name
+ * @return mixed
+ */
+
 	public function getChild($name)
 	{
 		$node = null;
@@ -26,6 +50,12 @@ abstract class Node implements NodeInterface
 		}
 		return $node;
 	}
+/**
+ * removeChild
+ * @param mixed $name
+ * @return mixed
+ */
+
 	public function removeChild($name)
 	{
 		$node = null;
@@ -37,14 +67,29 @@ abstract class Node implements NodeInterface
 		}
 		return $node;
 	}
+/**
+ * allChildren
+ * @return mixed
+ */
+
 	public function allChildren()
 	{
 		return $this->childs;
 	}
+/**
+ * isEmpty
+ * @return mixed
+ */
+
 	public function isEmpty()
 	{
 		return $this->isEmpty;
 	}
+/**
+ * __clone
+ * @return mixed
+ */
+
 	public function __clone()
 	{
 		foreach ($this->childs as $key=>$node)

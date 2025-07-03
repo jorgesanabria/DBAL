@@ -4,10 +4,20 @@ namespace DBAL\QueryBuilder;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Node\FilterNode;
 
+/**
+ * Clase/Interfaz DynamicFilterBuilder
+ */
 class DynamicFilterBuilder
 {
+/** @var mixed */
        protected $stack = [];
+/** @var mixed */
        protected $nextOperator = MessageInterface::SEPARATOR_AND;
+
+/**
+ * __construct
+ * @return void
+ */
 
        public function __construct()
        {
@@ -15,10 +25,22 @@ class DynamicFilterBuilder
                $this->stack[] = $root;
        }
 
+/**
+ * current
+ * @return mixed
+ */
+
        protected function current()
        {
                return $this->stack[count($this->stack) - 1];
        }
+
+/**
+ * __call
+ * @param mixed $name
+ * @param mixed $arguments
+ * @return mixed
+ */
 
        public function __call($name, $arguments)
        {
@@ -29,6 +51,13 @@ class DynamicFilterBuilder
                $this->current()->appendChild($node);
                return $this;
        }
+
+/**
+ * group
+ * @param callable $callback
+ * @param mixed $operator
+ * @return mixed
+ */
 
        protected function group(callable $callback, $operator)
        {
@@ -41,15 +70,32 @@ class DynamicFilterBuilder
                return $this;
        }
 
+/**
+ * andGroup
+ * @param callable $callback
+ * @return mixed
+ */
+
        public function andGroup(callable $callback)
        {
                return $this->group($callback, MessageInterface::SEPARATOR_AND);
        }
 
+/**
+ * orGroup
+ * @param callable $callback
+ * @return mixed
+ */
+
        public function orGroup(callable $callback)
        {
                return $this->group($callback, MessageInterface::SEPARATOR_OR);
        }
+
+/**
+ * andNext
+ * @return mixed
+ */
 
        public function andNext()
        {
@@ -57,16 +103,31 @@ class DynamicFilterBuilder
                return $this;
        }
 
+/**
+ * orNext
+ * @return mixed
+ */
+
        public function orNext()
        {
                $this->nextOperator = MessageInterface::SEPARATOR_OR;
                return $this;
        }
 
+/**
+ * toNode
+ * @return mixed
+ */
+
        public function toNode()
        {
                return $this->stack[0];
        }
+
+/**
+ * toArray
+ * @return mixed
+ */
 
        public function toArray()
        {

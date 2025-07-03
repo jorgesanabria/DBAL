@@ -3,12 +3,25 @@ namespace DBAL;
 
 use DBAL\QueryBuilder\MessageInterface;
 
+/**
+ * Clase/Interfaz DevelopmentErrorMiddleware
+ */
 class DevelopmentErrorMiddleware implements MiddlewareInterface
 {
+/** @var mixed */
     private $console;
+/** @var mixed */
     private $persistPath;
+/** @var mixed */
     private $theme;
+/** @var mixed */
     private $fontSize;
+
+/**
+ * __construct
+ * @param array $options
+ * @return void
+ */
 
     public function __construct(array $options = [])
     {
@@ -27,10 +40,22 @@ class DevelopmentErrorMiddleware implements MiddlewareInterface
         set_exception_handler([$this, 'handleException']);
     }
 
+/**
+ * __invoke
+ * @param MessageInterface $msg
+ * @return void
+ */
+
     public function __invoke(MessageInterface $msg): void
     {
         // no-op
     }
+
+/**
+ * handleException
+ * @param \Throwable $e
+ * @return void
+ */
 
     public function handleException(\Throwable $e): void
     {
@@ -49,6 +74,12 @@ class DevelopmentErrorMiddleware implements MiddlewareInterface
         $this->persist($html);
         exit(1);
     }
+
+/**
+ * renderHtml
+ * @param \Throwable $e
+ * @return string
+ */
 
     private function renderHtml(\Throwable $e): string
     {
@@ -90,15 +121,31 @@ class DevelopmentErrorMiddleware implements MiddlewareInterface
 </body></html>";
     }
 
+/**
+ * css
+ * @return string
+ */
+
     private function css(): string
     {
         return "body{font-family:Arial,sans-serif;margin:20px;}body.light{background:#fff;color:#000;}body.dark{background:#000;color:#fff}.font-small{font-size:14px}.font-medium{font-size:18px}.font-large{font-size:22px}pre{white-space:pre-wrap}.location{margin-bottom:10px;font-style:italic}.code{background:#f5f5f5;padding:10px}";
     }
 
+/**
+ * js
+ * @return string
+ */
+
     private function js(): string
     {
         return "function setTheme(t){document.body.classList.remove('light','dark');document.body.classList.add(t)}function setFont(s){document.body.classList.remove('font-small','font-medium','font-large');document.body.classList.add('font-'+s)}";
     }
+
+/**
+ * persist
+ * @param string $html
+ * @return void
+ */
 
     private function persist(string $html): void
     {

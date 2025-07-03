@@ -1,6 +1,9 @@
 <?php
 namespace DBAL\QueryBuilder;
 
+/**
+ * Clase/Interfaz MessageInterface
+ */
 interface MessageInterface
 {
 	const SEPARATOR_SPACE = ' ';

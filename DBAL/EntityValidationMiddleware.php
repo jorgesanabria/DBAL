@@ -5,18 +5,37 @@ use InvalidArgumentException;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\RelationDefinition;
 
+/**
+ * Clase/Interfaz EntityValidationMiddleware
+ */
 class EntityValidationMiddleware implements EntityValidationInterface
 {
+/** @var mixed */
     private $rules = [];
+/** @var mixed */
     private $relations = [];
 
+/** @var mixed */
     private $currentTable;
+/** @var mixed */
     private $currentField;
+
+/**
+ * __invoke
+ * @param MessageInterface $msg
+ * @return void
+ */
 
     public function __invoke(MessageInterface $msg): void
     {
         // no-op
     }
+
+/**
+ * table
+ * @param string $table
+ * @return self
+ */
 
     public function table(string $table): self
     {
@@ -29,6 +48,12 @@ class EntityValidationMiddleware implements EntityValidationInterface
         }
         return $this;
     }
+
+/**
+ * field
+ * @param string $field
+ * @return self
+ */
 
     public function field(string $field): self
     {
@@ -76,16 +101,32 @@ class EntityValidationMiddleware implements EntityValidationInterface
         return $relation;
     }
 
+/**
+ * getRelations
+ * @param string $table
+ * @return array
+ */
+
     public function getRelations(string $table): array
     {
         return $this->relations[$table] ?? [];
     }
+
+/**
+ * required
+ * @return self
+ */
 
     public function required(): self
     {
         $this->rules[$this->currentTable][$this->currentField]['required'] = true;
         return $this;
     }
+
+/**
+ * string
+ * @return self
+ */
 
     public function string(): self
     {
@@ -96,6 +137,11 @@ class EntityValidationMiddleware implements EntityValidationInterface
         });
     }
 
+/**
+ * integer
+ * @return self
+ */
+
     public function integer(): self
     {
         return $this->addValidator(function ($value) {
@@ -104,6 +150,12 @@ class EntityValidationMiddleware implements EntityValidationInterface
             }
         });
     }
+
+/**
+ * maxLength
+ * @param int $length
+ * @return self
+ */
 
     public function maxLength(int $length): self
     {
@@ -114,6 +166,11 @@ class EntityValidationMiddleware implements EntityValidationInterface
         });
     }
 
+/**
+ * email
+ * @return self
+ */
+
     public function email(): self
     {
         return $this->addValidator(function ($value) {
@@ -123,11 +180,24 @@ class EntityValidationMiddleware implements EntityValidationInterface
         });
     }
 
+/**
+ * addValidator
+ * @param callable $validator
+ * @return self
+ */
+
     private function addValidator(callable $validator): self
     {
         $this->rules[$this->currentTable][$this->currentField]['validators'][] = $validator;
         return $this;
     }
+
+/**
+ * beforeInsert
+ * @param string $table
+ * @param array $fields
+ * @return void
+ */
 
     public function beforeInsert(string $table, array $fields): void
     {
@@ -148,6 +218,13 @@ class EntityValidationMiddleware implements EntityValidationInterface
         }
     }
 
+/**
+ * beforeUpdate
+ * @param string $table
+ * @param array $fields
+ * @return void
+ */
+
     public function beforeUpdate(string $table, array $fields): void
     {
         if (!isset($this->rules[$table])) {
@@ -162,6 +239,13 @@ class EntityValidationMiddleware implements EntityValidationInterface
             }
         }
     }
+
+/**
+ * getRelation
+ * @param string $table
+ * @param string $name
+ * @return ?RelationDefinition
+ */
 
     public function getRelation(string $table, string $name): ?RelationDefinition
     {

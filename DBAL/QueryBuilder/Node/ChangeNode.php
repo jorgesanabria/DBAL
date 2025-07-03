@@ -4,19 +4,43 @@ namespace DBAL\QueryBuilder\Node;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Message;
 
+/**
+ * Clase/Interfaz ChangeNode
+ */
 class ChangeNode extends NotImplementedNode
 {
+/** @var mixed */
         protected $isEmpty = false;
+/** @var mixed */
         protected $fields = [];
+/** @var mixed */
         protected $rows = null;
+/**
+ * setFields
+ * @param array $fields
+ * @return mixed
+ */
+
         public function setFields(array $fields)
         {
                 $this->fields = $fields;
         }
+/**
+ * setRows
+ * @param array $rows
+ * @return mixed
+ */
+
         public function setRows(array $rows)
         {
                 $this->rows = $rows;
         }
+/**
+ * send
+ * @param MessageInterface $message
+ * @return mixed
+ */
+
         public function send(MessageInterface $message)
         {
                 $msg = null;
