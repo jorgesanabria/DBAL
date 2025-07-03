@@ -334,3 +334,13 @@ $table = (new SchemaTableBuilder('users'))
 $sql = $table->build();
 // "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"
 ```
+After creating the table, additional columns may be appended using `addColumn()`.
+
+```php
+$table->addColumn('age', function ($c) {
+    $c->integer();
+});
+
+$sql = $table->build();
+// "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER)"
+```

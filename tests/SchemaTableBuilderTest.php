@@ -31,4 +31,30 @@ class SchemaTableBuilderTest extends TestCase
             $table->build()
         );
     }
+
+    public function testColumnWithStringType()
+    {
+        $table = new SchemaTableBuilder('products');
+        $table->column('id', 'INTEGER');
+        $table->column('name', 'TEXT');
+        $this->assertEquals(
+            'CREATE TABLE products (id INTEGER, name TEXT)',
+            $table->build()
+        );
+    }
+
+    public function testAddColumnAfterBuild()
+    {
+        $table = new SchemaTableBuilder('logs');
+        $table->column('id', 'INTEGER');
+        $this->assertEquals(
+            'CREATE TABLE logs (id INTEGER)',
+            $table->build()
+        );
+        $table->addColumn('msg', 'TEXT');
+        $this->assertEquals(
+            'CREATE TABLE logs (id INTEGER, msg TEXT)',
+            $table->build()
+        );
+    }
 }
