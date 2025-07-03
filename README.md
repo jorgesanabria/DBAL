@@ -1,6 +1,12 @@
 # DBAL
 
 A lightweight Database Abstraction Layer for PHP.
+## What's New
+- ActiveRecord support with dynamic properties
+- Caching middleware with pluggable storage
+- Transaction and Unit of Work middlewares
+- ABM event hooks to listen for inserts, updates or deletes
+- Improved documentation and error pages
 
 ## Installation
 
@@ -351,3 +357,33 @@ $errors = new DBAL\DevelopmentErrorMiddleware([
 $crud = (new DBAL\Crud($pdo))
     ->withMiddleware($errors);
 ```
+
+### Cache middleware
+
+`CacheMiddleware` stores the result of SELECT statements and invalidates the cache when data changes. The package includes in-memory and SQLite storage adapters.
+
+### Active record
+
+`ActiveRecordMiddleware` decorates rows with an object capable of tracking modified fields. Calling `$record->update()` only persists changes.
+
+### Transaction and unit of work
+
+`TransactionMiddleware` exposes helpers to start, commit or roll back transactions. `UnitOfWorkMiddleware` batches multiple operations and applies them atomically via `commit()`.  
+
+### ABM event middleware
+
+`AbmEventMiddleware` lets you execute callbacks after inserts, bulk inserts, updates or deletes to implement custom hooks.
+
+## Practical use cases
+
+- **Online book stores**: manage books and orders with validation and caching.
+- **Cinema ticketing**: control screenings and seat reservations with transactional safety.
+- **Logistics microservices**: build lightweight APIs that share filters and schemas across services.
+
+DBAL integrates easily with minimal frameworks like Slim and Lumen or even plain PHP scripts. Additional examples and API reference can be found in the [docs](docs/) folder.
+
+## Expanding DBAL
+
+Middlewares are simple classes that implement `MiddlewareInterface`. Create your own to add behaviours such as auditing or soft deletes and attach them with `withMiddleware()`.
+
+
