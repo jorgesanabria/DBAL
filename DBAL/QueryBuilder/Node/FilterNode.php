@@ -4,25 +4,45 @@ namespace DBAL\QueryBuilder\Node;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Message;
 
-class FilterNode extends NotImplementedNode
+class FilterNode extends Node
 {
-	protected static $filters = [];
-	protected $isEmpty = false;
-	protected $parts;
-	public function __construct(array $parts)
-	{
-		$this->parts = $parts;
-	}
-	public function send(MessageInterface $message)
-	{
-		$msg = new Message($message->type());
-		foreach ($this->parts as $condition=>$values) {
-			$msg = self::filtering($condition, $values, $msg);
-		}
-		if (sizeof($this->parts) > 1)
-			$msg = $msg->insertBefore('(')->insertAfter(')');
-		return ($msg->getLength() > 0)? $message->join($msg, MessageInterface::SEPARATOR_AND) : $message;
-	}
+        protected static $filters = [];
+        protected $isEmpty = false;
+        protected $parts;
+        protected $operator;
+        public function __construct(array $parts = [], $operator = MessageInterface::SEPARATOR_AND)
+        {
+                $this->parts = $parts;
+                $this->operator = $operator;
+        }
+        public function getParts()
+        {
+                return $this->parts;
+        }
+        public function addCondition($name, $value)
+        {
+                $this->parts[$name] = $value;
+                return $this;
+        }
+        public function appendChild(NodeInterface $node, $name = null)
+        {
+                if ($node instanceof self)
+                        $name = parent::appendChild($node, $name);
+                return $name;
+        }
+        public function send(MessageInterface $message)
+        {
+                $msg = new Message($message->type());
+                foreach ($this->parts as $condition=>$values) {
+                        $msg = self::filtering($condition, $values, $msg);
+                }
+                foreach ($this->allChildren() as $child) {
+                        $msg = $child->send($msg);
+                }
+                if ((count($this->parts) + count($this->allChildren())) > 1)
+                        $msg = $msg->insertBefore('(')->insertAfter(')');
+                return ($msg->getLength() > 0)? $message->join($msg, $this->operator) : $message;
+        }
 	public static function filter($name, callable $callback)
 	{
 		self::$filters[$name] = $callback;

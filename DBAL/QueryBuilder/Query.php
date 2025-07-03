@@ -62,10 +62,13 @@ class Query extends QueryNode
                        if (is_callable($filter)) {
                                $builder = new DynamicFilterBuilder();
                                $filter($builder);
-                               $filter = $builder->toArray();
+                               $filter = $builder->toNode();
                        }
-                       if (is_array($filter))
+                       if ($filter instanceof FilterNode) {
+                               $clon->getChild('where')->appendChild($filter);
+                       } elseif (is_array($filter)) {
                                $clon->getChild('where')->appendChild(new FilterNode($filter));
+                       }
                }
                return $clon;
        }
