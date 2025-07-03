@@ -1,7 +1,6 @@
 <?php
 namespace DBAL\QueryBuilder;
 
-use DBAL\Entity;
 use DBAL\ResultIterator;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Message;
@@ -19,17 +18,19 @@ use DBAL\QueryBuilder\Node\GroupNode;
 use DBAL\QueryBuilder\Node\OrderNode;
 use DBAL\QueryBuilder\Node\LimitNode;
 use DBAL\QueryBuilder\Node\ChangeNode;
+use DBAL\QueryBuilder\DynamicFilterBuilder;
 
 class Query extends QueryNode
 {
 	public function from(...$tables)
 	{
 		$clon = clone $this;
-		foreach ($tables as $table) {
-			if (!$table instanceof TableNode)
-				$_table = new TableNode($table);
-			$clon->getChild('tables')->appendChild($_table, $table);
-		}
+               foreach ($tables as $table) {
+                       $_table = ($table instanceof TableNode)
+                               ? $table
+                               : new TableNode($table);
+                       $clon->getChild('tables')->appendChild($_table);
+               }
 		return $clon;
 	}
 	protected function join($type, $table, array $on = [])
@@ -54,13 +55,20 @@ class Query extends QueryNode
 		$clon->join(JoinNode::RIGHT_JOIN, $table, $on);
 		return $clon;
 	}
-	public function where(array ...$filters)
-	{
-		$clon = clone $this;
-		foreach ($filters as $filter) 
-			$clon->getChild('where')->appendChild(new FilterNode($filter));
-		return $clon;
-	}
+       public function where(...$filters)
+       {
+               $clon = clone $this;
+               foreach ($filters as $filter) {
+                       if (is_callable($filter)) {
+                               $builder = new DynamicFilterBuilder();
+                               $filter($builder);
+                               $filter = $builder->toArray();
+                       }
+                       if (is_array($filter))
+                               $clon->getChild('where')->appendChild(new FilterNode($filter));
+               }
+               return $clon;
+       }
 	public function having(array ...$filters)
 	{
 		$clon = clone $this;

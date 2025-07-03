@@ -1,0 +1,14 @@
+{
+    "name": "jorgesanabria/dbal",
+    "description": "Simple DBAL for PHP",
+    "type": "library",
+    "license": "GPL-3.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "DBAL\\": "DBAL/"
+        }
+    },
+    "require": {
+        "php": ">=7.0"
+    }
+}

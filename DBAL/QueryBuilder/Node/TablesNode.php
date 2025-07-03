@@ -8,13 +8,12 @@ use DBAL\QueryBuilder\Node\NodeInterface;
 class TablesNode extends Node
 {
 	protected $isEmpty = false;
-	public function send(MessageInterface $message)
-	{
-		$msg = new Message($message->type());
-		foreach ($this->allChildren() as $child) {
-			$_msg = $child->send($msg);
-			$msg = $msg->join($_msg, MessageInterface::SEPARATOR_COMMA);
-		}
+        public function send(MessageInterface $message)
+        {
+                $msg = new Message($message->type());
+                foreach ($this->allChildren() as $child) {
+                        $msg = $child->send($msg);
+                }
 		if ($message->type() == MessageInterface::MESSAGE_TYPE_SELECT) {
 			$message = $message->join($msg->insertBefore('FROM'));
 		} else if ($message->type() == MessageInterface::MESSAGE_TYPE_INSERT) {

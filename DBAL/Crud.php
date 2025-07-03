@@ -37,11 +37,11 @@ class Crud extends Query
 		$stm->execute($message->getValues());
 		return $stm->rowCount();
 	}
-	public function delete()
-	{
-		$message = $this->buildInsert($fields);
-		$stm = $this->connection->prepare($message->readMessage());
-		$stm->execute($message->getValues());
-		return $stm->rowCount();
-	}
+       public function delete()
+       {
+               $message = $this->buildDelete();
+               $stm = $this->connection->prepare($message->readMessage());
+               $stm->execute($message->getValues());
+               return $stm->rowCount();
+       }
 }
