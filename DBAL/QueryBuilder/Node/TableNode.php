@@ -8,20 +8,16 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class TableNode extends NotImplementedNode
 {
-/** @var mixed */
-	protected $isEmpty = false;
-/** @var mixed */
-	protected $table;
+        protected bool $isEmpty = false;
 /**
  * __construct
  * @param mixed $table
  * @return void
  */
 
-	public function __construct($table)
-	{
-		$this->table = $table;
-	}
+        public function __construct(private mixed $table)
+        {
+        }
 /**
  * send
  * @param MessageInterface $message

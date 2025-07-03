@@ -9,10 +9,8 @@ use DBAL\QueryBuilder\Message;
  */
 class GlobalFilterMiddleware implements MiddlewareInterface
 {
-/** @var mixed */
-    private $tableFilters = [];
-/** @var mixed */
-    private $globalFilters = [];
+    private array $tableFilters = [];
+    private array $globalFilters = [];
 
 /**
  * __construct

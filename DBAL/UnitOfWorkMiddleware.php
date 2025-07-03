@@ -9,14 +9,10 @@ use Exception;
  */
 class UnitOfWorkMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterface
 {
-/** @var mixed */
-    private $tx;
-/** @var mixed */
-    private $news = [];
-/** @var mixed */
-    private $dirty = [];
-/** @var mixed */
-    private $delete = [];
+    private TransactionMiddleware $tx;
+    private array $news = [];
+    private array $dirty = [];
+    private array $delete = [];
 
 /**
  * __construct
@@ -24,10 +20,8 @@ class UnitOfWorkMiddleware implements MiddlewareInterface, CrudAwareMiddlewareIn
  * @return void
  */
 
-    public function __construct(TransactionMiddleware $tx)
-    {
-        $this->tx = $tx;
-    }
+    public function __construct(private TransactionMiddleware $tx)
+    {    }
 
 /**
  * __invoke

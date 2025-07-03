@@ -8,8 +8,7 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class FirstLastMiddleware implements MiddlewareInterface
 {
-/** @var mixed */
-    private $crud;
+    private Crud $crud;
 
 /**
  * __invoke

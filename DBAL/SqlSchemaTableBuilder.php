@@ -8,14 +8,10 @@ use PDO;
  */
 class SqlSchemaTableBuilder
 {
-/** @var mixed */
-    private $pdo;
-/** @var mixed */
-    private $table;
-/** @var mixed */
-    private $create = true;
-/** @var mixed */
-    private $definitions = [];
+    private PDO $pdo;
+    private string $table;
+    private bool $create = true;
+    private array $definitions = [];
 
 /**
  * __construct
@@ -25,13 +21,9 @@ class SqlSchemaTableBuilder
  * @return void
  */
 
-    public function __construct(PDO $pdo, string $table, bool $create = true)
+    public function __construct(private PDO $pdo, private string $table, private bool $create = true)
     {
-        $this->pdo = $pdo;
-        $this->table = $table;
-        $this->create = $create;
     }
-
 /**
  * column
  * @param string $name

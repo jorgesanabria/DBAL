@@ -6,10 +6,9 @@ namespace DBAL\Schema;
  */
 class SchemaTableBuilder
 {
-/** @var mixed */
-    private $name;
+    private string $name;
     /** @var SchemaColumnBuilder[] */
-    private $columns = [];
+    private array $columns = [];
 
 /**
  * __construct
@@ -17,10 +16,8 @@ class SchemaTableBuilder
  * @return void
  */
 
-    public function __construct(string $name)
-    {
-        $this->name = $name;
-    }
+    public function __construct(private string $name)
+    {    }
 
 /**
  * column

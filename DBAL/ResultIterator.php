@@ -8,26 +8,16 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class ResultIterator implements \Iterator, \JsonSerializable
 {
-/** @var mixed */
-        protected $pdo;
-/** @var mixed */
-        protected $message;
-/** @var mixed */
-        protected $result;
-/** @var mixed */
-        protected $i;
-/** @var mixed */
-        protected $stm;
-/** @var mixed */
-        protected $rows = [];
-/** @var mixed */
-        protected $mappers;
-/** @var mixed */
-        protected $middlewares;
-/** @var mixed */
-        protected $relations;
-/** @var mixed */
-        protected $eagerRelations;
+        protected \PDO $pdo;
+        protected MessageInterface $message;
+        protected mixed $result;
+        protected int $i;
+        protected ?\PDOStatement $stm;
+        protected array $rows = [];
+        protected array $mappers;
+        protected array $middlewares;
+        protected array $relations;
+        protected array $eagerRelations;
 /**
  * __construct
  * @param \PDO $pdo
@@ -39,14 +29,15 @@ class ResultIterator implements \Iterator, \JsonSerializable
  * @return void
  */
 
-        public function __construct(\PDO $pdo, MessageInterface $message, array $mappers = [], array $middlewares = [], array $relations = [], array $eagerRelations = [])
-        {
-                $this->pdo = $pdo;
-                $this->message = $message;
-                $this->mappers = $mappers;
-                $this->middlewares = $middlewares;
-                $this->relations = $relations;
-                $this->eagerRelations = $eagerRelations;
+        public function __construct(
+                protected \PDO $pdo,
+                protected MessageInterface $message,
+                protected array $mappers = [],
+                protected array $middlewares = [],
+                protected array $relations = [],
+                protected array $eagerRelations = []
+        ) {
+                $this->i = 0;
         }
 /**
  * rewind

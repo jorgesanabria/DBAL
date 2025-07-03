@@ -10,18 +10,12 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class ResultGenerator
 {
-/** @var mixed */
-    private $pdo;
-/** @var mixed */
-    private $message;
-/** @var mixed */
-    private $mappers;
-/** @var mixed */
-    private $middlewares;
-/** @var mixed */
-    private $relations;
-/** @var mixed */
-    private $eagerRelations;
+    private PDO $pdo;
+    private MessageInterface $message;
+    private array $mappers;
+    private array $middlewares;
+    private array $relations;
+    private array $eagerRelations;
 
 /**
  * __construct
@@ -34,14 +28,14 @@ class ResultGenerator
  * @return void
  */
 
-    public function __construct(PDO $pdo, MessageInterface $message, array $mappers = [], array $middlewares = [], array $relations = [], array $eagerRelations = [])
-    {
-        $this->pdo = $pdo;
-        $this->message = $message;
-        $this->mappers = $mappers;
-        $this->middlewares = $middlewares;
-        $this->relations = $relations;
-        $this->eagerRelations = $eagerRelations;
+    public function __construct(
+        private PDO $pdo,
+        private MessageInterface $message,
+        private array $mappers = [],
+        private array $middlewares = [],
+        private array $relations = [],
+        private array $eagerRelations = []
+    ) {
     }
 
 /**

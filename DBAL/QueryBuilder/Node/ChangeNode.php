@@ -10,11 +10,9 @@ use DBAL\QueryBuilder\Message;
 class ChangeNode extends NotImplementedNode
 {
 /** @var mixed */
-        protected $isEmpty = false;
-/** @var mixed */
-        protected $fields = [];
-/** @var mixed */
-        protected $rows = null;
+        protected bool $isEmpty = false;
+        protected array $fields = [];
+        protected ?array $rows = null;
 /**
  * setFields
  * @param array $fields

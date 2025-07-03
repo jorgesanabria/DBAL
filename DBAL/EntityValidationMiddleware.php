@@ -20,8 +20,18 @@ use DBAL\Attributes\BelongsTo;
  */
 class EntityValidationMiddleware implements EntityValidationInterface
 {
-    private $rules = [];
-    private $relations = [];
+    private array $rules = [];
+    private array $relations = [];
+
+    private string $currentTable;
+    private string $currentField;
+
+/**
+ * __invoke
+ * @param MessageInterface $msg
+ * @return void
+ */
+
 
     public function __invoke(MessageInterface $msg): void
     {

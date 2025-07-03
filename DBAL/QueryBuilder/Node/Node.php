@@ -6,10 +6,8 @@ namespace DBAL\QueryBuilder\Node;
  */
 abstract class Node implements NodeInterface
 {
-/** @var mixed */
-	protected $isEmpty;
-/** @var mixed */
-	protected $childs = [];
+        protected bool $isEmpty;
+        protected array $childs = [];
 /**
  * appendChild
  * @param NodeInterface $node

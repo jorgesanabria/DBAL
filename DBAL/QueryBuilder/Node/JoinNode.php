@@ -9,17 +9,13 @@ use DBAL\QueryBuilder\Message;
  */
 class JoinNode extends NotImplementedNode
 {
-	const INNER_JOIN = 'INNER JOIN';
-	const LEFT_JOIN = 'LEFT JOIN';
-	const RIGHT_JOIN = 'RIGHT JOIN';
-/** @var mixed */
-	protected $isEmpty = false;
-/** @var mixed */
-	protected $table;
-/** @var mixed */
-	protected $type;
-/** @var mixed */
-	protected $on = [];
+        const INNER_JOIN = 'INNER JOIN';
+        const LEFT_JOIN = 'LEFT JOIN';
+        const RIGHT_JOIN = 'RIGHT JOIN';
+        protected bool $isEmpty = false;
+        protected string $table;
+        protected string $type;
+        protected array $on = [];
 /**
  * __construct
  * @param mixed $table

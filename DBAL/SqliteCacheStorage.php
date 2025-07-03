@@ -8,8 +8,7 @@ use PDO;
  */
 class SqliteCacheStorage implements CacheStorageInterface
 {
-/** @var mixed */
-    private $pdo;
+    private PDO $pdo;
 
 /**
  * __construct

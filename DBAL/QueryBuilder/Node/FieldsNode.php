@@ -10,8 +10,7 @@ use DBAL\QueryBuilder\Node\NodeInterface;
  */
 class FieldsNode extends Node
 {
-/** @var mixed */
-	protected $isEmpty = false;
+        protected bool $isEmpty = false;
 /**
  * send
  * @param MessageInterface $message

@@ -8,12 +8,9 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class LimitNode extends NotImplementedNode
 {
-/** @var mixed */
-	protected $isEmpty = false;
-/** @var mixed */
-	protected $limit = null;
-/** @var mixed */
-	protected $offset = null;
+        protected bool $isEmpty = false;
+        protected ?int $limit = null;
+        protected ?int $offset = null;
 /**
  * setLimit
  * @param mixed $limit
