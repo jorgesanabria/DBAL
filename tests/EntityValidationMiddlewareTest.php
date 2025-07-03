@@ -68,4 +68,19 @@ class EntityValidationMiddlewareTest extends TestCase
         $this->assertArrayHasKey('profile', $rels);
         $this->assertInstanceOf(DBAL\RelationDefinition::class, $rels['profile']);
     }
+
+    public function testRelationShortcut()
+    {
+        $mw = (new EntityValidationMiddleware())
+            ->table('users')
+                ->relation('profile', 'hasOne', 'profiles', 'id', 'user_id');
+
+        $rel = $mw->getRelation('users', 'profile');
+        $this->assertInstanceOf(RelationDefinition::class, $rel);
+        $this->assertEquals('hasOne', $rel->getType());
+        $this->assertEquals('profiles', $rel->getTable());
+        $this->assertEquals([
+            ['users.id', '=', 'profiles.user_id']
+        ], $rel->getConditions());
+    }
 }

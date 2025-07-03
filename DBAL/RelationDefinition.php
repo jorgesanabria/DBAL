@@ -27,6 +27,13 @@ class RelationDefinition
         return $this;
     }
 
+    public function belongsTo(string $table): self
+    {
+        $this->type = 'belongsTo';
+        $this->table = $table;
+        return $this;
+    }
+
     public function on(string $left, string $operator, string $right): self
     {
         $this->conditions[] = [$left, $operator, $right];

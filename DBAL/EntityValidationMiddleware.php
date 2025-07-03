@@ -42,10 +42,37 @@ class EntityValidationMiddleware implements EntityValidationInterface
         return $this;
     }
 
-    public function relation(string $name): RelationDefinition
-    {
+    public function relation(
+        string $name,
+        string $type = null,
+        string $table = null,
+        string $localKey = null,
+        string $foreignKey = null
+    ): RelationDefinition {
         $relation = new RelationDefinition($name);
         $this->relations[$this->currentTable][$name] = $relation;
+
+        if ($type !== null && $table !== null && $localKey !== null && $foreignKey !== null) {
+            switch ($type) {
+                case 'hasOne':
+                    $relation->hasOne($table);
+                    break;
+                case 'hasMany':
+                    $relation->hasMany($table);
+                    break;
+                case 'belongsTo':
+                    $relation->belongsTo($table);
+                    break;
+                default:
+                    throw new InvalidArgumentException('Invalid relation type');
+            }
+            $relation->on(
+                "{$this->currentTable}.{$localKey}",
+                '=',
+                "{$table}.{$foreignKey}"
+            );
+        }
+
         return $relation;
     }
 
