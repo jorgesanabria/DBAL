@@ -52,6 +52,11 @@ class EntityValidationMiddleware implements EntityValidationInterface
         return $this;
     }
 
+    public function getRelations(string $table): array
+    {
+        return $this->relations[$table] ?? [];
+    }
+
     public function required(): self
     {
         $this->rules[$this->currentTable][$this->currentField]['required'] = true;

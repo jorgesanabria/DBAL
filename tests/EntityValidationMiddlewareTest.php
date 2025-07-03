@@ -54,4 +54,22 @@ class EntityValidationMiddlewareTest extends TestCase
         $count = $crud->where(['id__eq' => $id])->update(['name' => 'Caro']);
         $this->assertEquals(1, $count);
     }
+
+    public function testGetRelations()
+    {
+        $mw = (new EntityValidationMiddleware())
+            ->table('users')
+                ->relation('profile', 'hasOne', 'profiles', 'id', 'user_id');
+
+        $expected = [
+            'profile' => [
+                'type' => 'hasOne',
+                'table' => 'profiles',
+                'localKey' => 'id',
+                'foreignKey' => 'user_id',
+            ],
+        ];
+
+        $this->assertEquals($expected, $mw->getRelations('users'));
+    }
 }
