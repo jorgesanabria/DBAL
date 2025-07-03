@@ -72,6 +72,13 @@ class ResultIterator implements \Iterator, \JsonSerializable
                         if (!in_array($name, $this->eagerRelations)) {
                                 $pdo = $this->pdo;
                                 $middlewares = $this->middlewares;
+                                if (!array_key_exists($rel['localKey'], $result)) {
+                                        throw new \RuntimeException(sprintf(
+                                                'Missing local key %s for relation %s',
+                                                $rel['localKey'],
+                                                $name
+                                        ));
+                                }
                                 $value = $result[$rel['localKey']];
                                 $loader = function () use ($pdo, $middlewares, $rel, $value) {
                                         $crud = new Crud($pdo);
