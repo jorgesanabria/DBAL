@@ -10,6 +10,7 @@ class Crud extends Query
         protected $mappers = [];
         protected $middlewares = [];
         protected $tables = [];
+        protected $with = [];
         public function __construct(\PDO $connection)
         {
                 $this->connection = $connection;
@@ -37,6 +38,25 @@ class Crud extends Query
                 return $clon;
         }
 
+        public function with(...$relations)
+        {
+                $clon = clone $this;
+                $defs = $clon->collectRelations($clon->primaryTable());
+                foreach ($relations as $rel) {
+                        if (isset($defs[$rel])) {
+                                $def = $defs[$rel];
+                                $join = $def['on'];
+                                if (($def['joinType'] ?? 'left') === 'inner') {
+                                        $clon = $clon->innerJoin($def['table'], $join);
+                                } else {
+                                        $clon = $clon->leftJoin($def['table'], $join);
+                                }
+                                $clon->with[] = $rel;
+                        }
+                }
+                return $clon;
+        }
+
         private function primaryTable()
         {
                 return $this->tables[0] ?? '';
@@ -46,10 +66,28 @@ class Crud extends Query
                 foreach ($this->middlewares as $mw)
                         $mw($message);
         }
+        private function collectRelations($table)
+        {
+                $relations = [];
+                foreach ($this->middlewares as $mw) {
+                        if (is_object($mw) && method_exists($mw, 'getRelations')) {
+                                $relations += $mw->getRelations($table);
+                        }
+                }
+                return $relations;
+        }
         public function select(...$fields)
         {
                 $message = $this->buildSelect(...$fields);
-                return new ResultIterator($this->connection, $message, $this->mappers, $this->middlewares);
+                $relations = $this->collectRelations($this->primaryTable());
+                return new ResultIterator(
+                        $this->connection,
+                        $message,
+                        $this->mappers,
+                        $this->middlewares,
+                        $relations,
+                        $this->with
+                );
         }
         public function insert(array $fields)
         {
