@@ -272,23 +272,22 @@ $profile = $user['profile'];
 echo $profile['photo'];
 ```
 
-### Transaction and Unit of Work middlewares
+### Global filter middleware
 
-`TransactionMiddleware` exposes helpers to control database transactions while `UnitOfWorkMiddleware` batches operations to be executed atomically.
+`GlobalFilterMiddleware` can automatically append extra conditions to every SELECT statement. Filters can be declared globally or per table and work together with other middlewares.
 
 ```php
-$tx  = new DBAL\TransactionMiddleware($pdo);
-$uow = new DBAL\UnitOfWorkMiddleware($tx);
+use DBAL\GlobalFilterMiddleware;
+
+$mw = new GlobalFilterMiddleware([], [
+    function ($m) {
+        return stripos($m->readMessage(), 'WHERE') !== false
+            ? $m->replace('WHERE', 'WHERE deleted = 0 AND')
+            : $m->insertAfter('WHERE deleted = 0');
+    }
+]);
 
 $crud = (new DBAL\Crud($pdo))
     ->from('users')
-    ->withMiddleware($uow)
-    ->withMiddleware($tx);
-
-$crud->registerNew('users', ['name' => 'Alice']);
-$crud->commit();
-
-$crud->begin();
-$crud->insert(['name' => 'Bob']);
-$crud->rollback();
+    ->withMiddleware($mw);
 ```
