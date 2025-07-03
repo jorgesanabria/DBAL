@@ -271,3 +271,23 @@ $user = iterator_to_array($crud->where(['id' => 1])->select())[0];
 $profile = $user['profile'];
 echo $profile['photo'];
 ```
+
+### Global filter middleware
+
+`GlobalFilterMiddleware` can automatically append extra conditions to every SELECT statement. Filters can be declared globally or per table and work together with other middlewares.
+
+```php
+use DBAL\GlobalFilterMiddleware;
+
+$mw = new GlobalFilterMiddleware([], [
+    function ($m) {
+        return stripos($m->readMessage(), 'WHERE') !== false
+            ? $m->replace('WHERE', 'WHERE deleted = 0 AND')
+            : $m->insertAfter('WHERE deleted = 0');
+    }
+]);
+
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($mw);
+```
