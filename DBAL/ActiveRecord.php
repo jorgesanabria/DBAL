@@ -1,17 +1,37 @@
 <?php
 namespace DBAL;
 
+/**
+ * Clase/Interfaz ActiveRecord
+ */
 class ActiveRecord implements \JsonSerializable
 {
+/** @var mixed */
         private $crud;
+/** @var mixed */
         private $original = [];
+/** @var mixed */
         private $modified = [];
+
+/**
+ * __construct
+ * @param Crud $crud
+ * @param array $data
+ * @return void
+ */
 
         public function __construct(Crud $crud, array $data)
         {
                 $this->crud = $crud;
                 $this->original = $data;
         }
+
+/**
+ * __call
+ * @param mixed $name
+ * @param mixed $arguments
+ * @return mixed
+ */
 
         public function __call($name, $arguments)
         {
@@ -29,6 +49,12 @@ class ActiveRecord implements \JsonSerializable
                 throw new \BadMethodCallException(sprintf('Method %s does not exist', $name));
         }
 
+/**
+ * __get
+ * @param mixed $name
+ * @return mixed
+ */
+
         public function __get($name)
         {
                 return array_key_exists($name, $this->modified)
@@ -36,10 +62,22 @@ class ActiveRecord implements \JsonSerializable
                         : ($this->original[$name] ?? null);
         }
 
+/**
+ * __set
+ * @param mixed $name
+ * @param mixed $value
+ * @return mixed
+ */
+
         public function __set($name, $value)
         {
                 $this->modified[$name] = $value;
         }
+
+/**
+ * update
+ * @return mixed
+ */
 
         public function update()
         {
@@ -62,6 +100,11 @@ class ActiveRecord implements \JsonSerializable
                 $this->modified = [];
                 return $count;
         }
+
+/**
+ * jsonSerialize
+ * @return mixed
+ */
 
         public function jsonSerialize()
         {

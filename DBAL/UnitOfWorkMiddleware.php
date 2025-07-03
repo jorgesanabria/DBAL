@@ -4,37 +4,84 @@ namespace DBAL;
 use DBAL\QueryBuilder\MessageInterface;
 use Exception;
 
+/**
+ * Clase/Interfaz UnitOfWorkMiddleware
+ */
 class UnitOfWorkMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterface
 {
+/** @var mixed */
     private $tx;
+/** @var mixed */
     private $news = [];
+/** @var mixed */
     private $dirty = [];
+/** @var mixed */
     private $delete = [];
+
+/**
+ * __construct
+ * @param TransactionMiddleware $tx
+ * @return void
+ */
 
     public function __construct(TransactionMiddleware $tx)
     {
         $this->tx = $tx;
     }
 
+/**
+ * __invoke
+ * @param MessageInterface $msg
+ * @return void
+ */
+
     public function __invoke(MessageInterface $msg): void
     {
         // no-op
     }
+
+/**
+ * registerNew
+ * @param string $table
+ * @param array $data
+ * @return void
+ */
 
     public function registerNew(string $table, array $data): void
     {
         $this->news[] = ['table' => $table, 'data' => $data];
     }
 
+/**
+ * registerDirty
+ * @param string $table
+ * @param array $data
+ * @param array $where
+ * @return void
+ */
+
     public function registerDirty(string $table, array $data, array $where): void
     {
         $this->dirty[] = ['table' => $table, 'data' => $data, 'where' => $where];
     }
 
+/**
+ * registerDelete
+ * @param string $table
+ * @param array $where
+ * @return void
+ */
+
     public function registerDelete(string $table, array $where): void
     {
         $this->delete[] = ['table' => $table, 'where' => $where];
     }
+
+/**
+ * commit
+ * @param Crud $crud
+ * @return void
+ */
 
     public function commit(Crud $crud): void
     {
@@ -57,6 +104,11 @@ class UnitOfWorkMiddleware implements MiddlewareInterface, CrudAwareMiddlewareIn
             $this->clear();
         }
     }
+
+/**
+ * clear
+ * @return void
+ */
 
     private function clear(): void
     {

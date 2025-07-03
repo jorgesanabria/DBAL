@@ -3,9 +3,19 @@ namespace DBAL;
 
 use PDO;
 
+/**
+ * Clase/Interfaz SqliteCacheStorage
+ */
 class SqliteCacheStorage implements CacheStorageInterface
 {
+/** @var mixed */
     private $pdo;
+
+/**
+ * __construct
+ * @param string $file
+ * @return void
+ */
 
     public function __construct(string $file)
     {
@@ -13,6 +23,12 @@ class SqliteCacheStorage implements CacheStorageInterface
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->exec('CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value BLOB)');
     }
+
+/**
+ * get
+ * @param string $key
+ * @return mixed
+ */
 
     public function get(string $key)
     {
@@ -22,11 +38,24 @@ class SqliteCacheStorage implements CacheStorageInterface
         return $row ? unserialize($row['value']) : null;
     }
 
+/**
+ * set
+ * @param string $key
+ * @param mixed $value
+ * @return void
+ */
+
     public function set(string $key, $value): void
     {
         $stmt = $this->pdo->prepare('REPLACE INTO cache(key, value) VALUES(?, ?)');
         $stmt->execute([$key, serialize($value)]);
     }
+
+/**
+ * delete
+ * @param string $key
+ * @return void
+ */
 
     public function delete(string $key = null): void
     {

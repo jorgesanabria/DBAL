@@ -1,21 +1,45 @@
 <?php
 namespace DBAL\Schema;
 
+/**
+ * Clase/Interfaz SchemaTableBuilder
+ */
 class SchemaTableBuilder
 {
+/** @var mixed */
     private $name;
     /** @var SchemaColumnBuilder[] */
     private $columns = [];
+
+/**
+ * __construct
+ * @param string $name
+ * @return void
+ */
 
     public function __construct(string $name)
     {
         $this->name = $name;
     }
 
+/**
+ * column
+ * @param string $name
+ * @param mixed $typeOrCallback
+ * @return self
+ */
+
     public function column(string $name, $typeOrCallback): self
     {
         return $this->addColumn($name, $typeOrCallback);
     }
+
+/**
+ * addColumn
+ * @param string $name
+ * @param mixed $typeOrCallback
+ * @return self
+ */
 
     public function addColumn(string $name, $typeOrCallback): self
     {
@@ -28,6 +52,11 @@ class SchemaTableBuilder
         $this->columns[] = $builder;
         return $this;
     }
+
+/**
+ * build
+ * @return string
+ */
 
     public function build(): string
     {

@@ -5,9 +5,18 @@ use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Message;
 use DBAL\QueryBuilder\NodeInterface;
 
+/**
+ * Clase/Interfaz QueryNode
+ */
 class QueryNode extends Node
 {
+/** @var mixed */
 	protected $isEmpty = false;
+/**
+ * __construct
+ * @return void
+ */
+
 	public function __construct()
 	{
 		$this->appendChild(new TablesNode, 'tables');
@@ -20,6 +29,12 @@ class QueryNode extends Node
 		$this->appendChild(new LimitNode, 'limit');
 		$this->appendChild(new ChangeNode, 'change');
 	}
+/**
+ * send
+ * @param MessageInterface $message
+ * @return mixed
+ */
+
 	public function send(MessageInterface $message)
 	{
 		return self::build($this, $message);

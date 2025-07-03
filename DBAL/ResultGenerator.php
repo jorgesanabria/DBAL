@@ -5,14 +5,34 @@ use Generator;
 use PDO;
 use DBAL\QueryBuilder\MessageInterface;
 
+/**
+ * Clase/Interfaz ResultGenerator
+ */
 class ResultGenerator
 {
+/** @var mixed */
     private $pdo;
+/** @var mixed */
     private $message;
+/** @var mixed */
     private $mappers;
+/** @var mixed */
     private $middlewares;
+/** @var mixed */
     private $relations;
+/** @var mixed */
     private $eagerRelations;
+
+/**
+ * __construct
+ * @param PDO $pdo
+ * @param MessageInterface $message
+ * @param array $mappers
+ * @param array $middlewares
+ * @param array $relations
+ * @param array $eagerRelations
+ * @return void
+ */
 
     public function __construct(PDO $pdo, MessageInterface $message, array $mappers = [], array $middlewares = [], array $relations = [], array $eagerRelations = [])
     {
@@ -24,6 +44,12 @@ class ResultGenerator
         $this->eagerRelations = $eagerRelations;
     }
 
+/**
+ * applyMappers
+ * @param mixed $row
+ * @return mixed
+ */
+
     private function applyMappers($row)
     {
         foreach ($this->mappers as $mapper) {
@@ -31,6 +57,12 @@ class ResultGenerator
         }
         return $row;
     }
+
+/**
+ * applyLazyRelations
+ * @param mixed $row
+ * @return mixed
+ */
 
     private function applyLazyRelations($row)
     {
@@ -65,6 +97,12 @@ class ResultGenerator
         }
         return $row;
     }
+
+/**
+ * getIterator
+ * @param callable $callback
+ * @return Generator
+ */
 
     public function getIterator(callable $callback = null): Generator
     {

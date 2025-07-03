@@ -3,12 +3,27 @@ namespace DBAL;
 
 use PDO;
 
+/**
+ * Clase/Interfaz SqlSchemaTableBuilder
+ */
 class SqlSchemaTableBuilder
 {
+/** @var mixed */
     private $pdo;
+/** @var mixed */
     private $table;
+/** @var mixed */
     private $create = true;
+/** @var mixed */
     private $definitions = [];
+
+/**
+ * __construct
+ * @param PDO $pdo
+ * @param string $table
+ * @param bool $create
+ * @return void
+ */
 
     public function __construct(PDO $pdo, string $table, bool $create = true)
     {
@@ -16,6 +31,13 @@ class SqlSchemaTableBuilder
         $this->table = $table;
         $this->create = $create;
     }
+
+/**
+ * column
+ * @param string $name
+ * @param string $type
+ * @return self
+ */
 
     public function column(string $name, string $type = null): self
     {
@@ -29,6 +51,13 @@ class SqlSchemaTableBuilder
         return $this;
     }
 
+/**
+ * addColumn
+ * @param string $name
+ * @param string $type
+ * @return self
+ */
+
     public function addColumn(string $name, string $type = null): self
     {
         if (!$this->create) {
@@ -41,6 +70,12 @@ class SqlSchemaTableBuilder
         return $this;
     }
 
+/**
+ * dropColumn
+ * @param string $name
+ * @return self
+ */
+
     public function dropColumn(string $name): self
     {
         if (!$this->create) {
@@ -48,6 +83,11 @@ class SqlSchemaTableBuilder
         }
         return $this;
     }
+
+/**
+ * execute
+ * @return void
+ */
 
     public function execute(): void
     {

@@ -3,6 +3,9 @@ namespace DBAL\QueryBuilder\Node;
 
 use DBAL\QueryBuilder\MessageInterface;
 
+/**
+ * Clase/Interfaz NodeInterface
+ */
 interface NodeInterface
 {
 	/**

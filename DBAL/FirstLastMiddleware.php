@@ -3,14 +3,30 @@ namespace DBAL;
 
 use DBAL\QueryBuilder\MessageInterface;
 
+/**
+ * Clase/Interfaz FirstLastMiddleware
+ */
 class FirstLastMiddleware implements MiddlewareInterface
 {
+/** @var mixed */
     private $crud;
+
+/**
+ * __invoke
+ * @param MessageInterface $msg
+ * @return void
+ */
 
     public function __invoke(MessageInterface $msg): void
     {
         // no-op
     }
+
+/**
+ * attach
+ * @param Crud $crud
+ * @return Crud
+ */
 
     public function attach(Crud $crud): Crud
     {
@@ -18,6 +34,12 @@ class FirstLastMiddleware implements MiddlewareInterface
         $this->crud = $crud;
         return $crud;
     }
+
+/**
+ * first
+ * @param mixed $...$fields
+ * @return mixed
+ */
 
     public function first(...$fields)
     {
@@ -28,6 +50,13 @@ class FirstLastMiddleware implements MiddlewareInterface
         return $rows[0];
     }
 
+/**
+ * firstOrDefault
+ * @param mixed $default
+ * @param mixed $...$fields
+ * @return mixed
+ */
+
     public function firstOrDefault($default = null, ...$fields)
     {
         $rows = iterator_to_array($this->crud->limit(1)->select(...$fields));
@@ -37,6 +66,12 @@ class FirstLastMiddleware implements MiddlewareInterface
         return $rows[0];
     }
 
+/**
+ * last
+ * @param mixed $...$fields
+ * @return mixed
+ */
+
     public function last(...$fields)
     {
         $rows = iterator_to_array($this->crud->select(...$fields));
@@ -45,6 +80,13 @@ class FirstLastMiddleware implements MiddlewareInterface
         }
         return $rows[count($rows) - 1];
     }
+
+/**
+ * lastOrDefault
+ * @param mixed $default
+ * @param mixed $...$fields
+ * @return mixed
+ */
 
     public function lastOrDefault($default = null, ...$fields)
     {

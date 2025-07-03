@@ -3,12 +3,27 @@ namespace DBAL;
 
 use DBAL\QueryBuilder\MessageInterface;
 
+/**
+ * Clase/Interfaz ActiveRecordMiddleware
+ */
 class ActiveRecordMiddleware implements MiddlewareInterface
 {
+/**
+ * __invoke
+ * @param MessageInterface $msg
+ * @return void
+ */
+
         public function __invoke(MessageInterface $msg): void
         {
                 // no-op
         }
+
+/**
+ * attach
+ * @param Crud $crud
+ * @return Crud
+ */
 
         public function attach(Crud $crud): Crud
         {

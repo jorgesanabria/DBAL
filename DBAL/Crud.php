@@ -7,30 +7,62 @@ use DBAL\RelationDefinition;
 use DBAL\AbmEventInterface;
 use Generator;
 
+/**
+ * Clase/Interfaz Crud
+ */
 class Crud extends Query
 {
+/** @var mixed */
         protected $connection;
+/** @var mixed */
         protected $mappers = [];
+/** @var mixed */
         protected $middlewares = [];
+/** @var mixed */
         protected $tables = [];
+/** @var mixed */
         protected $with = [];
+/**
+ * __construct
+ * @param \PDO $connection
+ * @return void
+ */
+
         public function __construct(\PDO $connection)
         {
                 $this->connection = $connection;
                 parent::__construct();
         }
+/**
+ * map
+ * @param callable $callback
+ * @return mixed
+ */
+
         public function map(callable $callback)
         {
                 $clon = clone $this;
                 $clon->mappers[] = $callback;
                 return $clon;
         }
+/**
+ * withMiddleware
+ * @param callable $mw
+ * @return mixed
+ */
+
         public function withMiddleware(callable $mw)
         {
                 $clon = clone $this;
                 $clon->middlewares[] = $mw;
                 return $clon;
         }
+
+/**
+ * from
+ * @param mixed $...$tables
+ * @return mixed
+ */
 
         public function from(...$tables)
         {
@@ -40,6 +72,12 @@ class Crud extends Query
                 }
                 return $clon;
         }
+
+/**
+ * with
+ * @param mixed $...$relations
+ * @return mixed
+ */
 
         public function with(...$relations)
         {
@@ -71,15 +109,32 @@ class Crud extends Query
                 return $clon;
         }
 
+/**
+ * primaryTable
+ * @return mixed
+ */
+
         private function primaryTable()
         {
                 return $this->tables[0] ?? '';
         }
+/**
+ * runMiddlewares
+ * @param MessageInterface $message
+ * @return mixed
+ */
+
         protected function runMiddlewares(MessageInterface $message)
         {
                 foreach ($this->middlewares as $mw)
                         $mw($message);
         }
+/**
+ * collectRelations
+ * @param mixed $table
+ * @return mixed
+ */
+
         private function collectRelations($table)
         {
                 $relations = [];
@@ -90,6 +145,12 @@ class Crud extends Query
                 }
                 return $relations;
         }
+/**
+ * select
+ * @param mixed $...$fields
+ * @return mixed
+ */
+
         public function select(...$fields)
         {
                 $message = $this->buildSelect(...$fields);
@@ -103,6 +164,12 @@ class Crud extends Query
                         $this->with
                 );
         }
+
+/**
+ * stream
+ * @param mixed $...$args
+ * @return mixed
+ */
 
         public function stream(...$args)
         {
@@ -122,6 +189,12 @@ class Crud extends Query
                 );
                 return $generator->getIterator($callback);
         }
+/**
+ * insert
+ * @param array $fields
+ * @return mixed
+ */
+
         public function insert(array $fields)
         {
                 foreach ($this->middlewares as $mw) {
@@ -141,6 +214,12 @@ class Crud extends Query
                 }
                 return $id;
         }
+/**
+ * bulkInsert
+ * @param array $rows
+ * @return mixed
+ */
+
         public function bulkInsert(array $rows)
         {
                 foreach ($this->middlewares as $mw) {
@@ -162,6 +241,12 @@ class Crud extends Query
                 }
                 return $count;
         }
+/**
+ * update
+ * @param array $fields
+ * @return mixed
+ */
+
         public function update(array $fields)
         {
                 foreach ($this->middlewares as $mw) {
@@ -181,6 +266,11 @@ class Crud extends Query
                 }
                 return $count;
         }
+/**
+ * delete
+ * @return mixed
+ */
+
        public function delete()
        {
                $message = $this->buildDelete();
@@ -195,6 +285,13 @@ class Crud extends Query
                }
                return $count;
        }
+
+/**
+ * __call
+ * @param mixed $name
+ * @param mixed $arguments
+ * @return mixed
+ */
 
        public function __call($name, $arguments)
        {
