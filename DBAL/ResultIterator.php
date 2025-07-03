@@ -10,6 +10,7 @@ class ResultIterator implements \Iterator, \JsonSerializable
         protected $result;
         protected $i;
         protected $stm;
+        protected $rows = [];
         protected $mappers;
         protected $middlewares;
         protected $relations;
@@ -27,22 +28,43 @@ class ResultIterator implements \Iterator, \JsonSerializable
         {
                 foreach ($this->middlewares as $mw)
                         $mw($this->message);
+
+                foreach ($this->middlewares as $mw) {
+                        if (method_exists($mw, 'fetch')) {
+                                $cached = $mw->fetch($this->message);
+                                if ($cached !== null) {
+                                        $this->rows = $cached;
+                                        $this->i = 0;
+                                        $this->result = $this->rows[0] ?? false;
+                                        return;
+                                }
+                        }
+                }
+
                 $this->stm = $this->pdo->prepare($this->message->readMessage());
                 $this->stm->execute($this->message->getValues());
-                $this->result = $this->stm->fetch();
+                $this->rows = $this->stm->fetchAll();
+
+                foreach ($this->middlewares as $mw) {
+                        if (method_exists($mw, 'save')) {
+                                $mw->save($this->message, $this->rows);
+                        }
+                }
+
                 $this->i = 0;
+                $this->result = $this->rows[0] ?? false;
         }
-	public function valid()
-	{
-		return $this->result !== false;
-	}
-	public function key()
-	{
-		return $this->i;
-	}
+        public function valid()
+        {
+                return $this->i < count($this->rows);
+        }
+        public function key()
+        {
+                return $this->i;
+        }
         public function current()
         {
-                $result = $this->result;
+                $result = $this->rows[$this->i];
                 foreach ($this->mappers as $mapper)
                         $result = call_user_func_array($mapper, [$result]);
 
@@ -70,14 +92,14 @@ class ResultIterator implements \Iterator, \JsonSerializable
                 }
                 return $result;
         }
-	public function next()
-	{
-		$this->result = $this->stm->fetch();
-		$this->i++;
-	}
-	public function jsonSerialize()
-	{
-		$this->rewind();
-		return $this->stm->fetchAll();
-	}
+        public function next()
+        {
+                $this->i++;
+                $this->result = $this->rows[$this->i] ?? false;
+        }
+        public function jsonSerialize()
+        {
+                $this->rewind();
+                return $this->rows;
+        }
 }
