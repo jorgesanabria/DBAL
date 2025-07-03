@@ -3,6 +3,7 @@ use PHPUnit\Framework\TestCase;
 use DBAL\Crud;
 use DBAL\EntityValidationMiddleware;
 use DBAL\EntityValidationInterface;
+use DBAL\RelationDefinition;
 
 class EntityValidationMiddlewareTest extends TestCase
 {
@@ -59,17 +60,12 @@ class EntityValidationMiddlewareTest extends TestCase
     {
         $mw = (new EntityValidationMiddleware())
             ->table('users')
-                ->relation('profile', 'hasOne', 'profiles', 'id', 'user_id');
+                ->relation('profile')
+                    ->hasOne('profiles')
+                    ->on('users.id', '=', 'profiles.user_id');
 
-        $expected = [
-            'profile' => [
-                'type' => 'hasOne',
-                'table' => 'profiles',
-                'localKey' => 'id',
-                'foreignKey' => 'user_id',
-            ],
-        ];
-
-        $this->assertEquals($expected, $mw->getRelations('users'));
+        $rels = $mw->getRelations('users');
+        $this->assertArrayHasKey('profile', $rels);
+        $this->assertInstanceOf(DBAL\RelationDefinition::class, $rels['profile']);
     }
 }

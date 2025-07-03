@@ -187,7 +187,9 @@ $validation = (new DBAL\EntityValidationMiddleware())
     ->table('users')
         ->field('name')->required()->string()->maxLength(50)
         ->field('email')->required()->email()
-    ->relation('profile', 'hasOne', 'profiles', 'id', 'user_id');
+        ->relation('profile')
+            ->hasOne('profiles')
+            ->on('users.id', '=', 'profiles.user_id');
 
 $crud = (new DBAL\Crud($pdo))
     ->from('users')

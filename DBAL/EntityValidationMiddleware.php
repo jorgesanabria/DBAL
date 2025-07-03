@@ -3,6 +3,7 @@ namespace DBAL;
 
 use InvalidArgumentException;
 use DBAL\QueryBuilder\MessageInterface;
+use DBAL\RelationDefinition;
 
 class EntityValidationMiddleware implements EntityValidationInterface
 {
@@ -41,15 +42,16 @@ class EntityValidationMiddleware implements EntityValidationInterface
         return $this;
     }
 
-    public function relation(string $name, string $type, string $table, string $localKey, string $foreignKey): self
+    public function relation(string $name): RelationDefinition
     {
-        $this->relations[$this->currentTable][$name] = [
-            'type' => $type,
-            'table' => $table,
-            'localKey' => $localKey,
-            'foreignKey' => $foreignKey,
-        ];
-        return $this;
+        $relation = new RelationDefinition($name);
+        $this->relations[$this->currentTable][$name] = $relation;
+        return $relation;
+    }
+
+    public function getRelations(string $table): array
+    {
+        return $this->relations[$table] ?? [];
     }
 
     public function getRelations(string $table): array
@@ -137,5 +139,10 @@ class EntityValidationMiddleware implements EntityValidationInterface
                 $validator($value);
             }
         }
+    }
+
+    public function getRelation(string $table, string $name): ?RelationDefinition
+    {
+        return $this->relations[$table][$name] ?? null;
     }
 }

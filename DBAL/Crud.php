@@ -3,6 +3,7 @@ namespace DBAL;
 
 use DBAL\QueryBuilder\Query;
 use DBAL\QueryBuilder\MessageInterface;
+use DBAL\RelationDefinition;
 
 class Crud extends Query
 {
@@ -43,16 +44,27 @@ class Crud extends Query
                 $clon = clone $this;
                 $defs = $clon->collectRelations($clon->primaryTable());
                 foreach ($relations as $rel) {
-                        if (isset($defs[$rel])) {
-                                $def = $defs[$rel];
+                        if (!isset($defs[$rel])) {
+                                continue;
+                        }
+                        $def = $defs[$rel];
+                        if ($def instanceof RelationDefinition) {
+                                $conds = [];
+                                foreach ($def->getConditions() as $c) {
+                                        if ($c[1] === '=') {
+                                                $conds[] = [$c[0] . '__eqf' => $c[2]];
+                                        }
+                                }
+                                $clon = $clon->leftJoin($def->getTable(), ...$conds);
+                        } else {
                                 $join = $def['on'];
                                 if (($def['joinType'] ?? 'left') === 'inner') {
                                         $clon = $clon->innerJoin($def['table'], $join);
                                 } else {
                                         $clon = $clon->leftJoin($def['table'], $join);
                                 }
-                                $clon->with[] = $rel;
                         }
+                        $clon->with[] = $rel;
                 }
                 return $clon;
         }
