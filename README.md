@@ -335,3 +335,13 @@ $crud->alterTable('items')
     ->addColumn('price REAL')
     ->execute();
 ```
+
+### Development error middleware
+
+`DevelopmentErrorMiddleware` installs an exception handler that displays a basic HTML page whenever an uncaught exception happens. The page supports light and dark themes and allows switching between small, medium and large fonts. In console mode the middleware can optionally output the error to `STDERR`. Rendered pages are stored in a timestamped folder so they can be reviewed later.
+
+```php
+$errors = new DBAL\DevelopmentErrorMiddleware(true, __DIR__.'/errors');
+$crud = (new DBAL\Crud($pdo))
+    ->withMiddleware($errors);
+```
