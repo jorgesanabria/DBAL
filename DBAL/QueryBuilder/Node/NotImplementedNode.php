@@ -3,10 +3,11 @@ namespace DBAL\QueryBuilder\Node;
 
 abstract class NotImplementedNode implements NodeInterface
 {
-	public function appendChild(NodeInterface $node, $name = null)
-	{
-		return $name;
-	}
+        protected $isEmpty = true;
+        public function appendChild(NodeInterface $node, $name = null)
+        {
+                return $name;
+        }
 	public function hasChild($name)
 	{
 		return false;
