@@ -81,16 +81,33 @@ class UnitOfWorkMiddleware implements MiddlewareInterface, CrudAwareMiddlewareIn
 
     public function commit(Crud $crud): void
     {
+        $getConn = fn () => $this->connection;
+        $getMw   = fn () => $this->middlewares;
+        $pdo = $getConn->call($crud);
+        $middlewares = $getMw->call($crud);
+
         $this->tx->begin();
         try {
             foreach ($this->news as $n) {
-                $crud->from($n['table'])->insert($n['data']);
+                $c = new Crud($pdo);
+                foreach ($middlewares as $mw) {
+                    $c = $c->withMiddleware($mw);
+                }
+                $c->from($n['table'])->insert($n['data']);
             }
             foreach ($this->dirty as $u) {
-                $crud->from($u['table'])->where($u['where'])->update($u['data']);
+                $c = new Crud($pdo);
+                foreach ($middlewares as $mw) {
+                    $c = $c->withMiddleware($mw);
+                }
+                $c->from($u['table'])->where($u['where'])->update($u['data']);
             }
             foreach ($this->delete as $d) {
-                $crud->from($d['table'])->where($d['where'])->delete();
+                $c = new Crud($pdo);
+                foreach ($middlewares as $mw) {
+                    $c = $c->withMiddleware($mw);
+                }
+                $c->from($d['table'])->where($d['where'])->delete();
             }
             $this->tx->commit();
         } catch (Exception $e) {
