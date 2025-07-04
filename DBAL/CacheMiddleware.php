@@ -14,10 +14,8 @@ class CacheMiddleware implements MiddlewareInterface
 {
     /**
      * Storage backend used to persist cached query results.
-     *
-     * @var CacheStorageInterface
      */
-    private $storage;
+    private CacheStorageInterface $storage;
 
     /**
      * Initialise the middleware.
@@ -25,9 +23,9 @@ class CacheMiddleware implements MiddlewareInterface
      * @param CacheStorageInterface|null $storage Optional custom cache storage
      *        implementation. If omitted an in-memory cache is used.
      */
-    public function __construct(CacheStorageInterface $storage = null)
+    public function __construct(?CacheStorageInterface $storage = null)
     {
-        $this->storage = $storage ?: new MemoryCacheStorage();
+        $this->storage = $storage ?? new MemoryCacheStorage();
     }
 
 /**
