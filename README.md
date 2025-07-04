@@ -355,6 +355,30 @@ $total = $crud->count();
 $highestId = $crud->max('id');
 $lowestId = $crud->min('id');
 $totalAge = $crud->sum('age');
+$averageAge = $crud->average('age');
+$statuses = $crud->distinct('status');
+```
+```sql
+SELECT AVG(age) AS a FROM users;
+SELECT DISTINCT status AS d FROM users;
+```
+
+### Rx middleware
+
+`RxMiddleware` adds utilities inspired by RxJS to transform streams of rows.
+
+```php
+$rx = new DBAL\RxMiddleware();
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($rx);
+
+$names = iterator_to_array($rx->map($crud, fn($r) => $r['name'], 'name'));
+$active = iterator_to_array($rx->filter($crud, fn($r) => $r['active'] == 1));
+$total = $rx->reduce($crud, fn($a, $r) => $a + $r['age'], 0, 'age');
+```
+```sql
+SELECT name, active, age FROM users;
 ```
 
 ### Entity validation middleware
