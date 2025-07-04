@@ -6,6 +6,7 @@ use DBAL\QueryBuilder\Query;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\RelationDefinition;
 use DBAL\AbmEventInterface;
+use DBAL\AfterExecuteMiddlewareInterface;
 use Generator;
 
 /**
@@ -142,10 +143,19 @@ class Crud extends Query
  * @return mixed
  */
 
-        protected function runMiddlewares(MessageInterface $message)
+        protected function runMiddlewares(MessageInterface $message, float $time = null)
         {
-                foreach ($this->middlewares as $mw)
-                        $mw($message);
+                if ($time === null) {
+                        foreach ($this->middlewares as $mw) {
+                                $mw($message);
+                        }
+                } else {
+                        foreach ($this->middlewares as $mw) {
+                                if ($mw instanceof AfterExecuteMiddlewareInterface) {
+                                        $mw->afterExecute($message, $time);
+                                }
+                        }
+                }
         }
 /**
  * collectRelations
@@ -256,13 +266,16 @@ class Crud extends Query
                 $message = $this->buildInsert($fields);
                 $this->runMiddlewares($message);
                 $stm = $this->connection->prepare($message->readMessage());
+                $start = microtime(true);
                 $stm->execute($message->getValues());
+                $time = microtime(true) - $start;
                 $id = $this->connection->lastInsertId();
                 foreach ($this->middlewares as $mw) {
                         if ($mw instanceof AbmEventInterface) {
                                 $mw->afterInsert($this->primaryTable(), $fields, $id);
                         }
                 }
+                $this->runMiddlewares($message, $time);
                 return $id;
         }
     /**
@@ -289,13 +302,16 @@ class Crud extends Query
                 $message = $this->buildBulkInsert($rows);
                 $this->runMiddlewares($message);
                 $stm = $this->connection->prepare($message->readMessage());
+                $start = microtime(true);
                 $stm->execute($message->getValues());
+                $time = microtime(true) - $start;
                 $count = $stm->rowCount();
                 foreach ($this->middlewares as $mw) {
                         if ($mw instanceof AbmEventInterface) {
                                 $mw->afterBulkInsert($this->primaryTable(), $rows, $count);
                         }
                 }
+                $this->runMiddlewares($message, $time);
                 return $count;
         }
     /**
@@ -320,13 +336,16 @@ class Crud extends Query
                 $message = $this->buildUpdate($fields);
                 $this->runMiddlewares($message);
                 $stm = $this->connection->prepare($message->readMessage());
+                $start = microtime(true);
                 $stm->execute($message->getValues());
+                $time = microtime(true) - $start;
                 $count = $stm->rowCount();
                 foreach ($this->middlewares as $mw) {
                         if ($mw instanceof AbmEventInterface) {
                                 $mw->afterUpdate($this->primaryTable(), $fields, $count);
                         }
                 }
+                $this->runMiddlewares($message, $time);
                 return $count;
         }
     /**
@@ -344,13 +363,16 @@ class Crud extends Query
                $message = $this->buildDelete();
                $this->runMiddlewares($message);
                $stm = $this->connection->prepare($message->readMessage());
+               $start = microtime(true);
                $stm->execute($message->getValues());
+               $time = microtime(true) - $start;
                $count = $stm->rowCount();
                foreach ($this->middlewares as $mw) {
                        if ($mw instanceof AbmEventInterface) {
                                $mw->afterDelete($this->primaryTable(), $count);
                        }
                }
+               $this->runMiddlewares($message, $time);
                return $count;
        }
 

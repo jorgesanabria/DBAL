@@ -530,6 +530,23 @@ $record->update(); // only changed fields are written
 
 `AbmEventMiddleware` lets you execute callbacks after inserts, bulk inserts, updates or deletes to implement custom hooks.
 
+### Query timing middleware
+
+`QueryTimingMiddleware` records how long each query takes. Attach it to a `Crud`
+instance and inspect the timings afterwards.
+
+```php
+$timer = new DBAL\QueryTimingMiddleware();
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($timer);
+
+$crud->insert(['name' => 'A']);
+iterator_to_array($crud->select());
+
+print_r($timer->getTimings());
+```
+
 ## Real use cases
 
 DBAL is primarily intended for building microservices, powering small scripts and supporting lightweight sites. The following examples illustrate possible ways to use the library in different domains:

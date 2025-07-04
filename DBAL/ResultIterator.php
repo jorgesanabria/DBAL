@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace DBAL;
 
 use DBAL\QueryBuilder\MessageInterface;
+use DBAL\AfterExecuteMiddlewareInterface;
 
 /**
  * Clase/Interfaz ResultIterator
@@ -58,12 +59,20 @@ class ResultIterator implements \Iterator, \JsonSerializable
                 }
 
                 $this->stm = $this->pdo->prepare($this->message->readMessage());
+                $start = microtime(true);
                 $this->stm->execute($this->message->getValues());
+                $time = microtime(true) - $start;
                 $this->rows = $this->stm->fetchAll(\PDO::FETCH_ASSOC);
 
                 foreach ($this->middlewares as $mw) {
                         if (method_exists($mw, 'save')) {
                                 $mw->save($this->message, $this->rows);
+                        }
+                }
+
+                foreach ($this->middlewares as $mw) {
+                        if ($mw instanceof AfterExecuteMiddlewareInterface) {
+                                $mw->afterExecute($this->message, $time);
                         }
                 }
 
