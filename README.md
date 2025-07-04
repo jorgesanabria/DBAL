@@ -2,11 +2,26 @@
 
 A lightweight Database Abstraction Layer for PHP.
 ## What's New
+- Requires **PHP 8.1** and uses attributes for entity validation and relations
 - ActiveRecord support with dynamic properties
 - Caching middleware with pluggable storage
 - Transaction and Unit of Work middlewares
 - ABM event hooks to listen for inserts, updates or deletes
 - Improved documentation and error pages
+
+
+## Features
+- Fluent query builder for CRUD operations
+- Dynamic filters via magic methods
+- Streaming and iterator-based results
+- Lazy and eager loading of relations
+- Middleware system with caching, transactions, validation and more
+- Schema builder and migration helpers
+- Attribute based entity validation and relation definition
+- Relation loader middleware for programmatic relations
+- First/Last and Linq helpers
+- ActiveRecord objects for tracked updates
+- Development error pages and global filters
 
 ## Installation
 
@@ -287,8 +302,8 @@ relations can be used by future lazy or eager loading features.
 
 ### Relationships and eager loading
 
-Relationships are defined in the validation middleware. Once set up, relations
-can be eagerly loaded via `with()` and are available lazily on demand.
+Relationships are defined in the validation middleware using PHP 8.1 attributes.
+Once set up, relations can be eagerly loaded via `with()` and are available lazily on demand.
 
 ```php
 class User {
@@ -321,6 +336,26 @@ $user = iterator_to_array($crud->where(['id' => 1])->select())[0];
 $profile = $user['profile'];
 echo $profile['photo'];
 ```
+
+### Relation loader middleware
+
+If you prefer configuring relations programmatically, `RelationLoaderMiddleware`
+offers a fluent API.
+
+```php
+$rel = (new DBAL\RelationLoaderMiddleware())
+    ->table('users')
+    ->hasOne('profile', 'profiles', 'id', 'user_id');
+
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($rel)
+    ->with('profile');
+
+$users = iterator_to_array($crud->select());
+```
+
+Lazy loading works the same and the related records are fetched only when needed.
 
 ### Global filter middleware
 
