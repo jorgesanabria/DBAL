@@ -288,3 +288,46 @@ foreach ($timing->getTimings() as $info) {
 
 Each middleware implements `MiddlewareInterface` and can be combined freely.
 
+## Adding dynamic methods
+
+Custom middlewares may also expose helper functions that become available
+through `Crud::__call()`. Implement `CrudAwareMiddlewareInterface` alongside
+`MiddlewareInterface` and define any extra methods your application requires.
+
+```php
+use DBAL\Crud;
+use DBAL\CrudAwareMiddlewareInterface;
+use DBAL\MiddlewareInterface;
+use DBAL\QueryBuilder\Node\FieldNode;
+use DBAL\QueryBuilder\Node\OrderNode;
+use DBAL\QueryBuilder\MessageInterface;
+
+class DefaultSortMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterface
+{
+    public function __invoke(MessageInterface $msg): void
+    {
+        // no-op
+    }
+
+    // This method is called dynamically through Crud::__call()
+    public function applyDefaultSort(Crud $crud): Crud
+    {
+        $crud->removeChild('order');
+        $crud->appendChild(new OrderNode());
+        $crud->getChild('order')->appendChild(new FieldNode('created_at DESC'));
+        return $crud;
+    }
+}
+
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware(new DefaultSortMiddleware());
+
+// applyDefaultSort() is resolved on the middleware
+$rows = $crud->applyDefaultSort()->select('id', 'name');
+```
+
+When the method is invoked, the current `Crud` instance is passed as the first
+argument automatically. This pattern allows middlewares to register domain
+specific helpers and keep your queries concise.
+
