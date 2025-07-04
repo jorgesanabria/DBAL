@@ -24,8 +24,8 @@ class ActiveRecord implements \JsonSerializable
 
 /**
  * __call
- * @param mixed $name
- * @param mixed $arguments
+ * @param string $name
+ * @param array $arguments
  * @return mixed
  */
 
@@ -47,8 +47,8 @@ class ActiveRecord implements \JsonSerializable
 
 /**
  * __get
- * @param mixed $name
- * @return mixed
+ * @param string $name
+ * @return mixed|null
  */
 
     public function __get(string $name): mixed
@@ -60,9 +60,9 @@ class ActiveRecord implements \JsonSerializable
 
 /**
  * __set
- * @param mixed $name
+ * @param string $name
  * @param mixed $value
- * @return mixed
+ * @return void
  */
 
     public function __set(string $name, mixed $value): void
@@ -72,7 +72,7 @@ class ActiveRecord implements \JsonSerializable
 
 /**
  * update
- * @return mixed
+ * @return int
  */
 
     public function update(): int
@@ -104,7 +104,7 @@ class ActiveRecord implements \JsonSerializable
 
 /**
  * jsonSerialize
- * @return mixed
+ * @return array
  */
 
     public function jsonSerialize(): array

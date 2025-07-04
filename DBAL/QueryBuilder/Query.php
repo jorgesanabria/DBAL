@@ -28,8 +28,8 @@ class Query extends QueryNode
 {
 /**
  * from
- * @param mixed $...$tables
- * @return mixed
+ * @param string|TableNode ...$tables
+ * @return self
  */
 
 	public function from(...$tables)
@@ -45,10 +45,10 @@ class Query extends QueryNode
 	}
 /**
  * join
- * @param mixed $type
- * @param mixed $table
- * @param array $on
- * @return mixed
+ * @param string $type
+ * @param string|TableNode $table
+ * @param array<int,FilterNode|array|callable> $on
+ * @return void
  */
 
         protected function join($type, $table, array $on = [])
@@ -69,9 +69,9 @@ class Query extends QueryNode
         }
 /**
  * innerJoin
- * @param mixed $table
- * @param mixed $...$on
- * @return mixed
+ * @param string|TableNode $table
+ * @param mixed ...$on
+ * @return self
  */
 
         public function innerJoin($table, ...$on)
@@ -82,9 +82,9 @@ class Query extends QueryNode
         }
 /**
  * leftJoin
- * @param mixed $table
- * @param mixed $...$on
- * @return mixed
+ * @param string|TableNode $table
+ * @param mixed ...$on
+ * @return self
  */
 
         public function leftJoin($table, ...$on)
@@ -95,9 +95,9 @@ class Query extends QueryNode
         }
 /**
  * rightJoin
- * @param mixed $table
- * @param mixed $...$on
- * @return mixed
+ * @param string|TableNode $table
+ * @param mixed ...$on
+ * @return self
  */
 
         public function rightJoin($table, ...$on)
@@ -108,8 +108,8 @@ class Query extends QueryNode
         }
 /**
  * where
- * @param mixed $...$filters
- * @return mixed
+ * @param mixed ...$filters
+ * @return self
  */
 
         public function where(...$filters)
@@ -137,8 +137,8 @@ class Query extends QueryNode
         }
 /**
  * having
- * @param array $...$filters
- * @return mixed
+ * @param array ...$filters
+ * @return self
  */
 
 	public function having(array ...$filters)
@@ -150,8 +150,8 @@ class Query extends QueryNode
 	}
 /**
  * group
- * @param mixed $...$fields
- * @return mixed
+ * @param mixed ...$fields
+ * @return self
  */
 
         public function group(...$fields)
@@ -163,8 +163,8 @@ class Query extends QueryNode
         }
 /**
  * groupBy
- * @param mixed $...$fields
- * @return mixed
+ * @param mixed ...$fields
+ * @return self
  */
 
         public function groupBy(...$fields)
@@ -174,9 +174,9 @@ class Query extends QueryNode
         }
 /**
  * order
- * @param mixed $type
+ * @param string $type
  * @param array $fields
- * @return mixed
+ * @return self
  */
 
         public function order($type, array $fields)
@@ -188,8 +188,8 @@ class Query extends QueryNode
 	}
 /**
  * desc
- * @param mixed $...$fields
- * @return mixed
+ * @param mixed ...$fields
+ * @return self
  */
 
 	public function desc(...$fields)
@@ -199,8 +199,8 @@ class Query extends QueryNode
 	}
 /**
  * asc
- * @param mixed $...$fields
- * @return mixed
+ * @param mixed ...$fields
+ * @return self
  */
 
 	public function asc(...$fields)
@@ -210,8 +210,8 @@ class Query extends QueryNode
 	}
 /**
  * limit
- * @param mixed $limit
- * @return mixed
+ * @param int $limit
+ * @return self
  */
 
 	public function limit($limit)
@@ -222,8 +222,8 @@ class Query extends QueryNode
 	}
 /**
  * offset
- * @param mixed $offset
- * @return mixed
+ * @param int $offset
+ * @return self
  */
 
 	public function offset($offset)
@@ -234,8 +234,8 @@ class Query extends QueryNode
 	}
 /**
  * buildSelect
- * @param mixed $...$fields
- * @return mixed
+ * @param mixed ...$fields
+ * @return MessageInterface
  */
 
 	public function buildSelect(...$fields)
@@ -261,7 +261,7 @@ class Query extends QueryNode
 /**
  * buildInsert
  * @param array $fields
- * @return mixed
+ * @return MessageInterface
  */
 
         public function buildInsert(array $fields)
@@ -275,7 +275,7 @@ class Query extends QueryNode
 /**
  * buildBulkInsert
  * @param array $rows
- * @return mixed
+ * @return MessageInterface
  */
 
         public function buildBulkInsert(array $rows)
@@ -289,7 +289,7 @@ class Query extends QueryNode
 /**
  * buildUpdate
  * @param array $fields
- * @return mixed
+ * @return MessageInterface
  */
 
         public function buildUpdate(array $fields)

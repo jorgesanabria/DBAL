@@ -12,7 +12,7 @@ class MemoryCacheStorage implements CacheStorageInterface
 /**
  * get
  * @param string $key
- * @return mixed
+ * @return mixed|null
  */
 
     public function get(string $key)

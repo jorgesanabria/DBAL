@@ -125,7 +125,7 @@ class ResultIterator implements \Iterator, \JsonSerializable
         }
 /**
  * rewind
- * @return mixed
+ * @return array
  */
 
         #[\ReturnTypeWillChange]
@@ -169,7 +169,7 @@ class ResultIterator implements \Iterator, \JsonSerializable
         }
 /**
  * valid
- * @return mixed
+ * @return array
  */
 
         #[\ReturnTypeWillChange]
@@ -243,8 +243,8 @@ class ResultIterator implements \Iterator, \JsonSerializable
 
 /**
  * groupBy
- * @param mixed $key
- * @return mixed
+ * @param string|callable $key
+ * @return array
  */
 
         public function groupBy($key)

@@ -85,11 +85,11 @@ class ResultGenerator
 
 /**
  * applyMappers
- * @param mixed $row
- * @return mixed
+ * @param array $row
+ * @return array
  */
 
-    private function applyMappers($row)
+    private function applyMappers(array $row)
     {
         foreach ($this->mappers as $mapper) {
             $row = $mapper($row);
@@ -99,11 +99,11 @@ class ResultGenerator
 
 /**
  * applyLazyRelations
- * @param mixed $row
- * @return mixed
+ * @param array $row
+ * @return array
  */
 
-    private function applyLazyRelations($row)
+    private function applyLazyRelations(array $row)
     {
         foreach ($this->relations as $name => $rel) {
             if (in_array($name, $this->eagerRelations)) {

@@ -32,7 +32,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
 /**
  * any
  * @param Crud $crud
- * @param mixed $...$filters
+ * @param mixed ...$filters
  * @return bool
  */
 
@@ -45,7 +45,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
 /**
  * none
  * @param Crud $crud
- * @param mixed $...$filters
+ * @param mixed ...$filters
  * @return bool
  */
 
@@ -57,7 +57,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
 /**
  * all
  * @param Crud $crud
- * @param mixed $...$filters
+ * @param mixed ...$filters
  * @return bool
  */
 
@@ -74,7 +74,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
 /**
  * notAll
  * @param Crud $crud
- * @param mixed $...$filters
+ * @param mixed ...$filters
  * @return bool
  */
 
@@ -86,7 +86,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
 /**
  * count
  * @param Crud $crud
- * @param mixed $...$filters
+ * @param mixed ...$filters
  * @return int
  */
 
@@ -114,7 +114,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
  * max
  * @param Crud $crud
  * @param string $field
- * @return mixed
+ * @return mixed|null
  */
 
     public function max(Crud $crud, string $field)
@@ -128,7 +128,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
  * min
  * @param Crud $crud
  * @param string $field
- * @return mixed
+ * @return mixed|null
  */
 
     public function min(Crud $crud, string $field)

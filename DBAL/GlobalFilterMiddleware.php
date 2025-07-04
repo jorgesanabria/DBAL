@@ -32,7 +32,7 @@ class GlobalFilterMiddleware implements MiddlewareInterface
 
 /**
  * addFilter
- * @param mixed $table
+ * @param string|null $table
  * @param callable $filter
  * @return self
  */
