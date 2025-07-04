@@ -7,6 +7,7 @@ DBAL is a lightweight Database Abstraction Layer written in PHP. It builds upon 
 * **integration.md** – examples of integrating DBAL with frameworks such as Slim and Lumen or plain PHP.
 * **examples.md** – practical use cases for book stores, cinemas and logistic APIs.
 * **hooks.md** – helper functions for quickly setting up middlewares.
+* **twitter-tutorial.md** – building a microblogging platform example.
 
 - **Simple query builder**: compose SQL statements through a chainable API.
 - **Dynamic filters**: use magic methods or callbacks to create complex filtering logic.

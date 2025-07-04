@@ -557,7 +557,7 @@ DBAL is primarily intended for building microservices, powering small scripts an
 
 These example domains are merely illustrative—developers are free to decide where and how to apply the library.
 
-DBAL integrates easily with minimal frameworks like Slim and Lumen or even plain PHP scripts. Additional examples and API reference can be found in the [docs](docs/) folder.
+DBAL integrates easily with minimal frameworks like Slim and Lumen or even plain PHP scripts. Additional examples, including a microblogging tutorial, can be found in the [docs](docs/) folder.
 
 ## Bookstore example
 
