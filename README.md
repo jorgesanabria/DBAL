@@ -126,13 +126,19 @@ $crud->where(['name__startWith' => 'Al']);
 
 ### Grouping, ordering and limiting
 
+Use `group()` or `groupBy()` to add a `GROUP BY` clause. The `having()` method
+lets you filter aggregated results. Ordering can be controlled with `order()`,
+`asc()` or `desc()`, while `limit()` and `offset()` constrain the amount of
+rows returned.
+
 ```php
 $rows = $crud
-    ->groupBy('status')
-    ->order('DESC', ['created_at'])
+    ->group('status')
+    ->having(['COUNT(*)__gt' => 1])
+    ->desc('created_at')
     ->limit(10)
     ->offset(20)
-    ->select();
+    ->select('status', 'COUNT(*) AS total');
 ```
 
 ### Mappers
@@ -159,6 +165,20 @@ $byStatus = $users->groupBy('status');
 $byLetter = $users->groupBy(function ($row) {
     return $row['name'][0];
 });
+```
+
+### Pagination
+
+Combine `limit()` and `offset()` to retrieve a specific page of results:
+
+```php
+$page    = 2;
+$perPage = 20;
+
+$rows = $crud
+    ->limit($perPage)
+    ->offset(($page - 1) * $perPage)
+    ->select();
 ```
 
 ### Streaming results
