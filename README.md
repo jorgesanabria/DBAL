@@ -548,6 +548,17 @@ $books = $mw->query($odata);
 //     ...
 // ]
 ```
+
+### GraphQL middleware
+
+`GraphQLMiddleware` executes GraphQL queries and mutations using a `Crud` instance. It exposes a `read` query and `insert`, `update` and `delete` mutations. See [`docs/graphql.md`](docs/graphql.md) for more information.
+
+```php
+$mw   = new DBAL\GraphQLMiddleware();
+$crud = $mw->attach((new DBAL\Crud($pdo))->from('books'));
+
+$result = $mw->handle('{ read { id, title } }');
+```
 ### Schema middleware
 
 `SchemaMiddleware` provides a fluent API to create or modify tables via the `Crud` instance.

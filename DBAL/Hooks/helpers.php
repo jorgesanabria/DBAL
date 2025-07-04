@@ -16,6 +16,7 @@ use DBAL\SchemaMiddleware;
 use DBAL\EntityValidationMiddleware;
 use DBAL\AbmEventMiddleware;
 use DBAL\ODataMiddleware;
+use DBAL\GraphQLMiddleware;
 
 /**
  * Create a Crud instance bound to a table.
@@ -162,5 +163,17 @@ function useOData(Crud $crud): array
 {
     $mw = new ODataMiddleware();
     $crud = $crud->withMiddleware($mw);
+    return [$crud, $mw];
+}
+
+/**
+ * Attach the GraphQL middleware and return it.
+ *
+ * @return array{Crud, GraphQLMiddleware}
+ */
+function useGraphQL(Crud $crud): array
+{
+    $mw = new GraphQLMiddleware();
+    $crud = $mw->attach($crud);
     return [$crud, $mw];
 }
