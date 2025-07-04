@@ -38,7 +38,8 @@ class ResultIterator implements \Iterator, \JsonSerializable
  * @return mixed
  */
 
-        public function rewind()
+        #[\ReturnTypeWillChange]
+        public function rewind(): void
         {
                 foreach ($this->middlewares as $mw)
                         $mw($this->message);
@@ -73,7 +74,8 @@ class ResultIterator implements \Iterator, \JsonSerializable
  * @return mixed
  */
 
-        public function valid()
+        #[\ReturnTypeWillChange]
+        public function valid(): bool
         {
                 return $this->i < count($this->rows);
         }
@@ -82,7 +84,8 @@ class ResultIterator implements \Iterator, \JsonSerializable
  * @return mixed
  */
 
-        public function key()
+        #[\ReturnTypeWillChange]
+        public function key(): mixed
         {
                 return $this->i;
         }
@@ -91,7 +94,8 @@ class ResultIterator implements \Iterator, \JsonSerializable
  * @return mixed
  */
 
-        public function current()
+        #[\ReturnTypeWillChange]
+        public function current(): mixed
         {
                 $result = $this->rows[$this->i];
                 foreach ($this->mappers as $mapper)
@@ -133,7 +137,8 @@ class ResultIterator implements \Iterator, \JsonSerializable
  * @return mixed
  */
 
-        public function next()
+        #[\ReturnTypeWillChange]
+        public function next(): void
         {
                 $this->i++;
                 $this->result = $this->rows[$this->i] ?? false;
@@ -143,7 +148,8 @@ class ResultIterator implements \Iterator, \JsonSerializable
  * @return mixed
  */
 
-        public function jsonSerialize()
+        #[\ReturnTypeWillChange]
+        public function jsonSerialize(): mixed
         {
                 $this->rewind();
                 return $this->rows;
