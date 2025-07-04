@@ -200,6 +200,19 @@ $crud->stream(function ($row) {
 }, 'id', 'name');
 ```
 
+### Fetch all results
+
+`Crud::fetchAll()` is a convenience method that returns an array with all rows
+from a query.
+
+```php
+$rows = $crud->fetchAll('id', 'name');
+
+foreach ($rows as $row) {
+    echo $row['name'];
+}
+```
+
 ### Middlewares
 
 Middlewares allow you to intercept query execution for tasks like logging or
@@ -354,7 +367,7 @@ foreach ($users as $user) {
 }
 
 // Lazy load
-$user = iterator_to_array($crud->where(['id' => 1])->select())[0];
+$user = $crud->where(['id' => 1])->fetchAll()[0];
 $profile = $user['profile'];
 echo $profile['photo'];
 ```
@@ -374,7 +387,7 @@ $crud = (new DBAL\Crud($pdo))
     ->withMiddleware($rel)
     ->with('profile');
 
-$users = iterator_to_array($crud->select());
+$users = $crud->fetchAll();
 ```
 
 Lazy loading works the same and the related records are fetched only when needed.
@@ -495,7 +508,7 @@ $pdo->exec('INSERT INTO users(name) VALUES ("Alice")');
 $crud = (new DBAL\Crud($pdo))->from('users');
 $ar   = (new DBAL\ActiveRecordMiddleware())->attach($crud);
 
-$record = iterator_to_array($ar->where(['id__eq' => 1])->select())[0];
+$record = $ar->where(['id__eq' => 1])->fetchAll()[0];
 $record->name = 'Alice2'; // or $record->set__name('Alice2');
 $record->update(); // only changed fields are written
 ```
