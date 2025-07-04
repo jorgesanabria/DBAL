@@ -5,6 +5,22 @@ DBAL ships with several optional middlewares that can be attached to a `Crud` in
 ## ActiveRecordMiddleware
 Provides `ActiveRecord` objects with dynamic getters and setters. Use `$record->update()` to persist modified fields.
 
+## EntityCastMiddleware
+Casts query results into instances of a specified class and inspects its attribute
+annotations to configure relations for eager loading. Attach the middleware and
+register the class mapped to a table:
+
+```php
+$caster = (new DBAL\EntityCastMiddleware())
+    ->register('users', UserEntity::class);
+
+$crud = (new DBAL\Crud($pdo))->from('users');
+$crud = $caster->attach($crud, 'users');
+```
+
+Relations defined with `#[HasOne]`, `#[HasMany]` or `#[BelongsTo]` on the class
+properties will be available for lazy or eager loading via `with()`.
+
 ## CacheMiddleware
 
 `CacheMiddleware` stores the rows returned by SELECT statements. By default it
