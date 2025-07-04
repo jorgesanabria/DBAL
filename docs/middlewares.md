@@ -53,11 +53,19 @@ request. Whenever an insert, update or delete is executed through the attached
 `Crud` instance the cache is flushed to keep results consistent.
 
 If you need persistence across requests you can provide a different storage
-backend. DBAL includes a `SqliteCacheStorage` adapter:
+backend. DBAL includes adapters for SQLite, Redis and Memcached:
 
 ```php
 $cache = new DBAL\CacheMiddleware(
     new DBAL\SqliteCacheStorage(__DIR__ . '/cache.sqlite')
+);
+// or
+$cache = new DBAL\CacheMiddleware(
+    new DBAL\RedisCacheStorage($redis)
+);
+// or
+$cache = new DBAL\CacheMiddleware(
+    new DBAL\MemcachedCacheStorage($memcached)
 );
 $crud = (new DBAL\Crud($pdo))
     ->from('users')
@@ -141,6 +149,9 @@ $crud->commit();
 
 ## CrudEventMiddleware
 Allows executing callbacks after insert, bulk insert, update or delete operations.
+
+## QueueEventMiddleware
+Publishes CRUD events to an external message queue like Kafka. Construct it with a callable publisher and the target topic.
 
 ## FirstLastMiddleware
 Adds `first()`, `firstOrDefault()`, `last()` and `lastOrDefault()` to quickly fetch a single row.

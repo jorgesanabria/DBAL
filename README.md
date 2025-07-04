@@ -4,9 +4,10 @@ A lightweight Database Abstraction Layer for PHP.
 ## What's New
 - Requires **PHP 8.1** and uses attributes for entity validation and relations
 - ActiveRecord support with dynamic properties
-- Caching middleware with pluggable storage
+- Caching middleware with pluggable storage (includes Redis and Memcached adapters)
 - Transaction and Unit of Work middlewares
 - CRUD event hooks to listen for inserts, updates or deletes
+- Queue middleware to publish events to systems like Kafka
 - Improved documentation and error pages
 
 
@@ -584,7 +585,7 @@ $crud = (new DBAL\Crud($pdo))
 
 ### Cache middleware
 
-`CacheMiddleware` caches the result of SELECT statements and clears the cache when data changes. It defaults to the in-memory `MemoryCacheStorage`, but you can use the provided `SqliteCacheStorage` or any custom `CacheStorageInterface` implementation.
+`CacheMiddleware` caches the result of SELECT statements and clears the cache when data changes. It defaults to the in-memory `MemoryCacheStorage`, but adapters for `Redis` and `Memcached` are also available alongside the `SqliteCacheStorage`. Any custom `CacheStorageInterface` implementation can be used.
 
 ### Active record
 
@@ -612,6 +613,10 @@ $record->update(); // only changed fields are written
 ### CRUD event middleware
 
 `CrudEventMiddleware` lets you execute callbacks after inserts, bulk inserts, updates or deletes to implement custom hooks.
+
+### Queue event middleware
+
+`QueueEventMiddleware` publishes CRUD events to an external message queue like Kafka. Provide a callable that sends messages and the target topic when constructing the middleware.
 
 ### Query timing middleware
 
