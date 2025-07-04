@@ -15,6 +15,7 @@ use DBAL\QueryBuilder\Node\JoinNode;
 use DBAL\QueryBuilder\Node\WhereNode;
 use DBAL\QueryBuilder\Node\HavingNode;
 use DBAL\QueryBuilder\Node\FilterNode;
+use DBAL\QueryBuilder\FilterOp;
 use DBAL\QueryBuilder\Node\GroupNode;
 use DBAL\QueryBuilder\Node\OrderNode;
 use DBAL\QueryBuilder\Node\LimitNode;
@@ -130,7 +131,16 @@ class Query extends QueryNode
                                         $clone->getChild('where')->appendChild($filter);
                                 }
                         } elseif (is_array($filter)) {
-                                $clone->getChild('where')->appendChild(new FilterNode($filter));
+                                $parts = [];
+                                foreach ($filter as $field => $value) {
+                                        if (!str_contains((string)$field, '__') && is_array($value) && isset($value[0]) && $value[0] instanceof FilterOp) {
+                                                $op = array_shift($value);
+                                                $parts[$field . '__' . $op->value] = count($value) <= 1 ? ($value[0] ?? null) : $value;
+                                        } else {
+                                                $parts[$field] = $value;
+                                        }
+                                }
+                                $clone->getChild('where')->appendChild(new FilterNode($parts));
                         }
                 }
                 return $clone;

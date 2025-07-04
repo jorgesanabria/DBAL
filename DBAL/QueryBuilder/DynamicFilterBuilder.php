@@ -4,6 +4,7 @@ namespace DBAL\QueryBuilder;
 
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Node\FilterNode;
+use DBAL\QueryBuilder\FilterOp;
 
 /**
  * Clase/Interfaz DynamicFilterBuilder
@@ -45,6 +46,16 @@ class DynamicFilterBuilder
        {
                $node = new FilterNode([
                        $name => (count($arguments) <= 1) ? ($arguments[0] ?? null) : $arguments
+               ], $this->nextOperator);
+               $this->nextOperator = MessageInterface::SEPARATOR_AND;
+               $this->current()->appendChild($node);
+               return $this;
+       }
+
+       public function condition(string $field, FilterOp $op, ...$arguments)
+       {
+               $node = new FilterNode([
+                       sprintf('%s__%s', $field, $op->value) => (count($arguments) <= 1) ? ($arguments[0] ?? null) : $arguments
                ], $this->nextOperator);
                $this->nextOperator = MessageInterface::SEPARATOR_AND;
                $this->current()->appendChild($node);

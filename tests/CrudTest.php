@@ -21,13 +21,13 @@ class CrudTest extends TestCase
         $id = $crud->insert(['name' => 'Alice']);
         $this->assertEquals(1, $id);
 
-        $row = iterator_to_array($crud->where(['id__eq' => $id])->select())[0];
+        $row = iterator_to_array($crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, $id]])->select())[0];
         $this->assertEquals('Alice', $row['name']);
 
-        $count = $crud->where(['id__eq' => $id])->update(['name' => 'Bob']);
+        $count = $crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, $id]])->update(['name' => 'Bob']);
         $this->assertEquals(1, $count);
 
-        $count = $crud->where(['id__eq' => $id])->delete();
+        $count = $crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, $id]])->delete();
         $this->assertEquals(1, $count);
     }
 }

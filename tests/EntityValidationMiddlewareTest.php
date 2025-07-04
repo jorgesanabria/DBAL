@@ -63,7 +63,7 @@ class EntityValidationMiddlewareTest extends TestCase
         $crud = $this->createCrud($pdo);
         $id = $crud->insert(['name' => 'Bob', 'email' => 'bob@example.com']);
         $this->expectException(InvalidArgumentException::class);
-        $crud->where(['id__eq' => $id])->update(['email' => 'not-an-email']);
+        $crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, $id]])->update(['email' => 'not-an-email']);
     }
 
     public function testUpdateValidData()
@@ -71,7 +71,7 @@ class EntityValidationMiddlewareTest extends TestCase
         $pdo = $this->createPdo();
         $crud = $this->createCrud($pdo);
         $id = $crud->insert(['name' => 'Carol', 'email' => 'carol@example.com']);
-        $count = $crud->where(['id__eq' => $id])->update(['name' => 'Caro']);
+        $count = $crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, $id]])->update(['name' => 'Caro']);
         $this->assertEquals(1, $count);
     }
 

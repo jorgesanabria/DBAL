@@ -21,8 +21,8 @@ class QueryTimingMiddlewareTest extends TestCase
 
         $id = $crud->insert(['name' => 'A']);
         iterator_to_array($crud->select());
-        $crud->where(['id__eq' => $id])->update(['name' => 'B']);
-        $crud->where(['id__eq' => $id])->delete();
+        $crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, $id]])->update(['name' => 'B']);
+        $crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, $id]])->delete();
 
         $timings = $mw->getTimings();
         $this->assertCount(4, $timings);

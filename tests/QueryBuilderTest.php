@@ -15,7 +15,7 @@ class QueryBuilderTest extends TestCase
 
     public function testWhereFilter()
     {
-        $query = (new Query())->from('users')->where(['id__eq' => 1]);
+        $query = (new Query())->from('users')->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, 1]]);
         $msg = $query->buildSelect();
         $this->assertEquals('SELECT * FROM users WHERE id = ?', $msg->readMessage());
         $this->assertEquals([1], $msg->getValues());
@@ -25,7 +25,7 @@ class QueryBuilderTest extends TestCase
     {
         $query = (new Query())->from('users')->where(function ($f) {
             $f->orGroup(function ($g) {
-                $g->name__eq('Alice')->orNext()->name__eq('Bob');
+                $g->condition('name', \DBAL\QueryBuilder\FilterOp::EQ, 'Alice')->orNext()->condition('name', \DBAL\QueryBuilder\FilterOp::EQ, 'Bob');
             });
         });
         $msg = $query->buildSelect();
@@ -36,9 +36,9 @@ class QueryBuilderTest extends TestCase
     {
         $query = (new Query())->from('users')->where(function ($f) {
             $f->orGroup(function ($g) {
-                $g->name__eq('Alice')->orNext()->name__eq('Bob');
+                $g->condition('name', \DBAL\QueryBuilder\FilterOp::EQ, 'Alice')->orNext()->condition('name', \DBAL\QueryBuilder\FilterOp::EQ, 'Bob');
             })->andGroup(function ($g) {
-                $g->status__eq('active');
+                $g->condition('status', \DBAL\QueryBuilder\FilterOp::EQ, 'active');
             });
         });
         $msg = $query->buildSelect();
@@ -50,7 +50,7 @@ class QueryBuilderTest extends TestCase
         $query = (new Query())
             ->from('users u')
             ->leftJoin('profiles p', function ($j) {
-                $j->{'u.id__eqf'}('p.user_id');
+                $j->condition('u.id', \DBAL\QueryBuilder\FilterOp::EQF, 'p.user_id');
             });
         $msg = $query->buildSelect();
         $this->assertEquals('SELECT * FROM users u LEFT JOIN profiles p ON u.id = p.user_id', $msg->readMessage());

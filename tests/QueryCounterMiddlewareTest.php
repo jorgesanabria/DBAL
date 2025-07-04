@@ -25,10 +25,10 @@ class QueryCounterMiddlewareTest extends TestCase
         $crud->insert(['name' => 'A']);
         $this->assertEquals(2, $counter->getQueryCount());
 
-        $crud->where(['id__eq' => 1])->update(['name' => 'B']);
+        $crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, 1]])->update(['name' => 'B']);
         $this->assertEquals(3, $counter->getQueryCount());
 
-        $crud->where(['id__eq' => 1])->delete();
+        $crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, 1]])->delete();
         $this->assertEquals(4, $counter->getQueryCount());
     }
 }

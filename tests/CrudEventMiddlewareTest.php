@@ -28,8 +28,8 @@ class CrudEventMiddlewareTest extends TestCase
 
         $id = $crud->insert(['name' => 'A']);
         $crud->bulkInsert([['name' => 'B']]);
-        $crud->where(['id__eq' => $id])->update(['name' => 'C']);
-        $crud->where(['id__eq' => $id])->delete();
+        $crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, $id]])->update(['name' => 'C']);
+        $crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, $id]])->delete();
 
         $this->assertCount(4, $events);
         $this->assertEquals('insert', $events[0][0]);
