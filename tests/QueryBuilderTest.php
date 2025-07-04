@@ -97,7 +97,7 @@ class QueryBuilderTest extends TestCase
             ]);
         $msg = $query->buildSelect();
         $this->assertEquals(
-            'SELECT * FROM users WHERE name LIKE ? AND code not in (?, ?) AND deleted_at IS NULL',
+            'SELECT * FROM users WHERE (name LIKE ? AND code not in (?, ?) AND deleted_at IS NULL)',
             $msg->readMessage()
         );
         $this->assertEquals(['Al%', 'A', 'B'], $msg->getValues());
