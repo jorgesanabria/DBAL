@@ -16,21 +16,30 @@ class Crud extends Query
         protected array $middlewares = [];
         protected array $tables = [];
         protected array $with = [];
-/**
- * __construct
- * @param \PDO $connection
- * @return void
- */
+    /**
+     * Creates a new CRUD helper bound to a PDO connection.
+     *
+     * The connection is stored for later use by the query builder
+     * and will be used by every CRUD operation executed through this
+     * instance.
+     *
+     * @param \PDO $connection Database connection used for all queries.
+     */
 
         public function __construct(protected \PDO $connection)
         {
                 parent::__construct();
         }
-/**
- * map
- * @param callable $callback
- * @return mixed
- */
+    /**
+     * Registers a mapper callback to transform each fetched row.
+     *
+     * The mapper will be executed when results are iterated in
+     * {@see select()} or {@see stream()}.
+     *
+     * @param callable $callback Callback that receives a row array and
+     *                           returns the transformed value.
+     * @return self  New instance containing the mapper.
+     */
 
         public function map(callable $callback)
         {
@@ -38,11 +47,15 @@ class Crud extends Query
                 $clon->mappers[] = $callback;
                 return $clon;
         }
-/**
- * withMiddleware
- * @param callable $mw
- * @return mixed
- */
+    /**
+     * Adds a middleware that will intercept query execution.
+     *
+     * Middlewares receive the {@link MessageInterface} before the SQL
+     * statement is executed and may alter it or perform additional work.
+     *
+     * @param callable $mw Middleware callable or object.
+     * @return self       New instance that contains the middleware.
+     */
 
         public function withMiddleware(callable $mw)
         {
@@ -51,11 +64,16 @@ class Crud extends Query
                 return $clon;
         }
 
-/**
- * from
- * @param mixed $...$tables
- * @return mixed
- */
+    /**
+     * Defines the table or tables from which records will be selected.
+     *
+     * The method clones the current query object, appends the table names
+     * to the underlying query builder and tracks the first table as the
+     * primary table for insert/update/delete operations.
+     *
+     * @param string ...$tables List of tables or table nodes.
+     * @return self             New instance configured with the tables.
+     */
 
         public function from(...$tables)
         {
@@ -66,11 +84,17 @@ class Crud extends Query
                 return $clon;
         }
 
-/**
- * with
- * @param mixed $...$relations
- * @return mixed
- */
+    /**
+     * Eagerly loads relations defined by middlewares.
+     *
+     * For each requested relation the corresponding JOIN clause is
+     * added to the query using the definitions provided by registered
+     * middlewares. The method returns a new instance with the relation
+     * names stored so that lazy loading can be performed later.
+     *
+     * @param string ...$relations Names of relations to join.
+     * @return self                New instance prepared with the joins.
+     */
 
         public function with(...$relations)
         {
@@ -138,11 +162,16 @@ class Crud extends Query
                 }
                 return $relations;
         }
-/**
- * select
- * @param mixed $...$fields
- * @return mixed
- */
+    /**
+     * Executes a SELECT query and returns a lazy iterator.
+     *
+     * The returned {@link ResultIterator} will run registered middlewares
+     * when iteration starts and apply any mapper callbacks to each row.
+     *
+     * @param string|array ...$fields Fields to select. If empty all fields
+     *                                from the primary table are returned.
+     * @return ResultIterator Iterator over the query results.
+     */
 
         public function select(...$fields)
         {
@@ -158,11 +187,17 @@ class Crud extends Query
                 );
         }
 
-/**
- * stream
- * @param mixed $...$args
- * @return mixed
- */
+    /**
+     * Streams the result of a SELECT query using a generator.
+     *
+     * Middlewares are executed when the returned generator starts
+     * yielding values. Optionally a callback can be provided to handle
+     * each row as soon as it is fetched.
+     *
+     * @param callable|string ...$args Either a callback followed by fields
+     *                                 or only the list of fields to select.
+     * @return Generator Generator yielding mapped rows.
+     */
 
         public function stream(...$args)
         {
@@ -182,11 +217,18 @@ class Crud extends Query
                 );
                 return $generator->getIterator($callback);
         }
-/**
- * insert
- * @param array $fields
- * @return mixed
- */
+    /**
+     * Inserts a single row into the primary table.
+     *
+     * Validation middlewares implementing
+     * {@link EntityValidationInterface} are executed before the
+     * statement is built. All registered middlewares then receive the
+     * generated message prior to execution. After the insert the
+     * {@link AbmEventInterface} hooks are triggered.
+     *
+     * @param array $fields Associative array of column values to insert.
+     * @return mixed        The value returned by PDO::lastInsertId().
+     */
 
         public function insert(array $fields)
         {
@@ -207,11 +249,17 @@ class Crud extends Query
                 }
                 return $id;
         }
-/**
- * bulkInsert
- * @param array $rows
- * @return mixed
- */
+    /**
+     * Inserts multiple rows in a single statement.
+     *
+     * Each row is validated using any registered
+     * {@link EntityValidationInterface} middlewares. After the SQL is
+     * generated all middlewares are executed once and finally the
+     * {@link AbmEventInterface} bulk insert hook is triggered.
+     *
+     * @param array $rows Array of associative arrays representing rows.
+     * @return int        Number of inserted rows reported by PDO.
+     */
 
         public function bulkInsert(array $rows)
         {
@@ -234,11 +282,17 @@ class Crud extends Query
                 }
                 return $count;
         }
-/**
- * update
- * @param array $fields
- * @return mixed
- */
+    /**
+     * Updates records in the primary table using the current filters.
+     *
+     * Validation middlewares are invoked prior to building the SQL.
+     * After the UPDATE statement is created, all middlewares receive the
+     * message and may modify it. After execution the appropriate
+     * {@link AbmEventInterface} hook is called.
+     *
+     * @param array $fields Column values to update.
+     * @return int          Number of affected rows.
+     */
 
         public function update(array $fields)
         {
@@ -259,10 +313,15 @@ class Crud extends Query
                 }
                 return $count;
         }
-/**
- * delete
- * @return mixed
- */
+    /**
+     * Deletes records matching the current filters.
+     *
+     * All registered middlewares receive the DELETE message prior to
+     * execution. After the statement is executed the delete event from
+     * {@link AbmEventInterface} is triggered.
+     *
+     * @return int Number of affected rows.
+     */
 
        public function delete()
        {
@@ -279,12 +338,21 @@ class Crud extends Query
                return $count;
        }
 
-/**
- * __call
- * @param mixed $name
- * @param mixed $arguments
- * @return mixed
- */
+    /**
+     * Forwards unknown method calls to registered middlewares.
+     *
+     * If a middleware object exposes a method with the given name, it is
+     * invoked. When the middleware implements
+     * {@link CrudAwareMiddlewareInterface} the current Crud instance is
+     * prepended to the arguments.
+     *
+     * @param string $name      Method name being called.
+     * @param array  $arguments Arguments passed to the method.
+     * @return mixed            Result returned by the middleware method.
+     *
+     * @throws \BadMethodCallException When no middleware implements the
+     *                                  requested method.
+     */
 
        public function __call($name, $arguments)
        {
