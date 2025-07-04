@@ -4,6 +4,7 @@ namespace DBAL\QueryBuilder\Node;
 
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Message;
+use DBAL\QueryBuilder\JoinType;
 
 /**
  * Node that builds SQL JOIN clauses.
@@ -15,28 +16,25 @@ use DBAL\QueryBuilder\Message;
  */
 class JoinNode extends NotImplementedNode
 {
-        const INNER_JOIN = 'INNER JOIN';
-        const LEFT_JOIN = 'LEFT JOIN';
-        const RIGHT_JOIN = 'RIGHT JOIN';
         /** @var bool */
         protected bool $isEmpty = false;
 
         /** @var string Table expression or name to join */
         protected string $table;
 
-        /** @var string Join type, one of the class constants */
-        protected string $type;
+        /** @var JoinType Join type */
+        protected JoinType $type;
 
         /** @var FilterNode[] Conditions used in the ON clause */
         protected array $on = [];
         /**
          * Constructor.
          *
-         * @param string              $table Table expression to join.
-         * @param string              $type  Join type, defaults to INNER_JOIN.
-         * @param array<int,FilterNode|array> $on List of conditions for the ON clause.
+         * @param string                    $table Table expression to join.
+         * @param JoinType                  $type  Join type, defaults to JoinType::INNER.
+         * @param array<int,FilterNode|array> $on  List of conditions for the ON clause.
          */
-        public function __construct($table, $type = JoinNode::INNER_JOIN, array $on = [])
+        public function __construct($table, JoinType $type = JoinType::INNER, array $on = [])
         {
                 $this->table = $table;
                 $this->type  = $type;
@@ -59,7 +57,7 @@ class JoinNode extends NotImplementedNode
          */
         public function send(MessageInterface $message)
         {
-                $msg = new Message($message->type(), sprintf('%s %s', $this->type, $this->table));
+                $msg = new Message($message->type(), sprintf('%s %s', $this->type->value, $this->table));
                 if (sizeof($this->on) > 0) {
                         $onMsg = new Message($message->type());
                         foreach ($this->on as $filter) {
