@@ -162,6 +162,20 @@ Appends extra filters automatically to every SELECT statement.
 ## SchemaMiddleware
 Creates or alters tables through a fluent schema builder.
 
+## QueryCounterMiddleware
+Counts how many queries are executed by a `Crud`. Attach the middleware and call `getQueryCount()` to read the total.
+
+```php
+$counter = new DBAL\QueryCounterMiddleware();
+$crud = (new DBAL\Crud($pdo))
+    ->from('items')
+    ->withMiddleware($counter);
+
+$crud->select();
+$queries = $counter->getQueryCount(); // 1
+```
+
+
 ## DevelopmentErrorMiddleware
 Installs an exception handler that displays a friendly HTML page when an
 uncaught exception occurs. The constructor accepts:
