@@ -6,6 +6,7 @@ use Generator;
 use PDO;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\AfterExecuteMiddlewareInterface;
+use DBAL\RelationDefinition;
 
 /**
  * Clase/Interfaz ResultGenerator
@@ -60,24 +61,40 @@ class ResultGenerator
             if (!in_array($name, $this->eagerRelations)) {
                 $pdo = $this->pdo;
                 $middlewares = $this->middlewares;
-                if (!array_key_exists($rel['localKey'], $row)) {
+                if ($rel instanceof RelationDefinition) {
+                    $cond = $rel->getConditions()[0] ?? null;
+                    if (!$cond || $cond[1] !== '=') {
+                        continue;
+                    }
+                    $localKey = explode('.', $cond[0])[1] ?? $cond[0];
+                    $foreignKey = explode('.', $cond[2])[1] ?? $cond[2];
+                    $table = $rel->getTable();
+                    $type = $rel->getType();
+                } else {
+                    $localKey = $rel['localKey'];
+                    $foreignKey = $rel['foreignKey'];
+                    $table = $rel['table'];
+                    $type = $rel['type'];
+                }
+
+                if (!array_key_exists($localKey, $row)) {
                     throw new \RuntimeException(sprintf(
                         'Missing local key %s for relation %s',
-                        $rel['localKey'],
+                        $localKey,
                         $name
                     ));
                 }
-                $value = $row[$rel['localKey']];
-                $loader = function () use ($pdo, $middlewares, $rel, $value) {
+                $value = $row[$localKey];
+                $loader = function () use ($pdo, $middlewares, $table, $foreignKey, $type, $value) {
                     $crud = new Crud($pdo);
                     foreach ($middlewares as $mw) {
                         $crud = $crud->withMiddleware($mw);
                     }
-                    $crud = $crud->from($rel['table'])->where([
-                        $rel['foreignKey'] . '__eq' => $value,
+                    $crud = $crud->from($table)->where([
+                        $foreignKey . '__eq' => $value,
                     ]);
                     $rows = iterator_to_array($crud->select());
-                    if (in_array($rel['type'], ['hasOne', 'belongsTo'])) {
+                    if (in_array($type, ['hasOne', 'belongsTo'])) {
                         return $rows[0] ?? null;
                     }
                     return $rows;

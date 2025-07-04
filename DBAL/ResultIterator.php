@@ -4,6 +4,7 @@ namespace DBAL;
 
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\AfterExecuteMiddlewareInterface;
+use DBAL\RelationDefinition;
 
 /**
  * Clase/Interfaz ResultIterator
@@ -115,29 +116,63 @@ class ResultIterator implements \Iterator, \JsonSerializable
                         if (!in_array($name, $this->eagerRelations)) {
                                 $pdo = $this->pdo;
                                 $middlewares = $this->middlewares;
-                                if (!array_key_exists($rel['localKey'], $result)) {
-                                        throw new \RuntimeException(sprintf(
-                                                'Missing local key %s for relation %s',
-                                                $rel['localKey'],
-                                                $name
-                                        ));
+
+                                if ($rel instanceof RelationDefinition) {
+                                        $cond = $rel->getConditions()[0] ?? null;
+                                        if (!$cond || $cond[1] !== '=') {
+                                                continue;
+                                        }
+                                        $localKey = explode('.', $cond[0])[1] ?? $cond[0];
+                                        $foreignKey = explode('.', $cond[2])[1] ?? $cond[2];
+                                        $table = $rel->getTable();
+                                        $type = $rel->getType();
+                                } else {
+                                        $localKey = $rel['localKey'];
+                                        $foreignKey = $rel['foreignKey'];
+                                        $table = $rel['table'];
+                                        $type = $rel['type'];
                                 }
-                                $value = $result[$rel['localKey']];
-                                $loader = function () use ($pdo, $middlewares, $rel, $value) {
+
+                                if (is_array($result)) {
+                                        if (!array_key_exists($localKey, $result)) {
+                                                throw new \RuntimeException(sprintf(
+                                                        'Missing local key %s for relation %s',
+                                                        $localKey,
+                                                        $name
+                                                ));
+                                        }
+                                        $value = $result[$localKey];
+                                } else {
+                                        if (!isset($result->$localKey)) {
+                                                throw new \RuntimeException(sprintf(
+                                                        'Missing local key %s for relation %s',
+                                                        $localKey,
+                                                        $name
+                                                ));
+                                        }
+                                        $value = $result->$localKey;
+                                }
+
+                                $loader = function () use ($pdo, $middlewares, $table, $foreignKey, $type, $value) {
                                         $crud = new Crud($pdo);
                                         foreach ($middlewares as $mw) {
                                                 $crud = $crud->withMiddleware($mw);
                                         }
-                                        $crud = $crud->from($rel['table'])->where([
-                                                $rel['foreignKey'].'__eq' => $value
+                                        $crud = $crud->from($table)->where([
+                                                $foreignKey.'__eq' => $value
                                         ]);
                                         $rows = iterator_to_array($crud->select());
-                                        if (in_array($rel['type'], ['hasOne', 'belongsTo'])) {
+                                        if (in_array($type, ['hasOne', 'belongsTo'])) {
                                                 return $rows[0] ?? null;
                                         }
                                         return $rows;
                                 };
-                                $result[$name] = new LazyRelation($loader);
+
+                                if (is_array($result)) {
+                                        $result[$name] = new LazyRelation($loader);
+                                } else {
+                                        $result->$name = new LazyRelation($loader);
+                                }
                         }
                 }
                 return $result;
