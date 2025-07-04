@@ -21,6 +21,19 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals([1], $msg->getValues());
     }
 
+    public function testWhereArrayConditionsAreJoinedWithAnd()
+    {
+        $query = (new Query())
+            ->from('users')
+            ->where([
+                'name' => [\DBAL\QueryBuilder\FilterOp::EQ, 'Alice'],
+                'status' => [\DBAL\QueryBuilder\FilterOp::EQ, 'active'],
+            ]);
+        $msg = $query->buildSelect();
+        $this->assertEquals('SELECT * FROM users WHERE (name = ? AND status = ?)', $msg->readMessage());
+        $this->assertEquals(['Alice', 'active'], $msg->getValues());
+    }
+
     public function testWhereOrGroup()
     {
         $query = (new Query())->from('users')->where(function ($f) {

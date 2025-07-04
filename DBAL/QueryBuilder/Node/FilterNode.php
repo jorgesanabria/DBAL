@@ -158,32 +158,32 @@ class FilterNode extends Node
 
 FilterNode::filter(FilterOp::EQ, function($field, $value, $message)
 {
-	return $message->insertAfter(sprintf('%s = ?', $field), MessageInterface::SEPARATOR_OR)->addValues((array) $value);
+        return $message->insertAfter(sprintf('%s = ?', $field), MessageInterface::SEPARATOR_AND)->addValues((array) $value);
 });
 
 FilterNode::filter(FilterOp::NE, function($field, $value, $message)
 {
-	return $message->insertAfter(sprintf('%s != ?', $field), MessageInterface::SEPARATOR_OR)->addValues((array) $value);
+        return $message->insertAfter(sprintf('%s != ?', $field), MessageInterface::SEPARATOR_AND)->addValues((array) $value);
 });
 
 FilterNode::filter(FilterOp::GT, function($field, $value, $message)
 {
-	return $message->insertAfter(sprintf('%s > ?', $field), MessageInterface::SEPARATOR_OR)->addValues((array) $value);
+        return $message->insertAfter(sprintf('%s > ?', $field), MessageInterface::SEPARATOR_AND)->addValues((array) $value);
 });
 
 FilterNode::filter(FilterOp::LT, function($field, $value, $message)
 {
-	return $message->insertAfter(sprintf('%s < ?', $field), MessageInterface::SEPARATOR_OR)->addValues((array) $value);
+        return $message->insertAfter(sprintf('%s < ?', $field), MessageInterface::SEPARATOR_AND)->addValues((array) $value);
 });
 
 FilterNode::filter(FilterOp::GE, function($field, $value, $message)
 {
-	return $message->insertAfter(sprintf('%s >= ?', $field), MessageInterface::SEPARATOR_OR)->addValues((array) $value);
+        return $message->insertAfter(sprintf('%s >= ?', $field), MessageInterface::SEPARATOR_AND)->addValues((array) $value);
 });
 
 FilterNode::filter(FilterOp::LE, function($field, $value, $message)
 {
-	return $message->insertAfter(sprintf('%s <= ?', $field), MessageInterface::SEPARATOR_OR)->addValues((array) $value);
+        return $message->insertAfter(sprintf('%s <= ?', $field), MessageInterface::SEPARATOR_AND)->addValues((array) $value);
 });
 
 FilterNode::filter(FilterOp::IN, function($field, $values, $message)
@@ -196,50 +196,50 @@ FilterNode::filter(FilterOp::IN, function($field, $values, $message)
                         ->addValues($values->getValues());
         }
 	$q = array_fill(0, sizeof((array) $values), '?');
-	return $message->insertAfter(sprintf('%s in (%s)', $field, implode(', ', $q)), MessageInterface::SEPARATOR_OR)->addValues((array) $values);
+        return $message->insertAfter(sprintf('%s in (%s)', $field, implode(', ', $q)), MessageInterface::SEPARATOR_AND)->addValues((array) $values);
 });
 
 FilterNode::filter(FilterOp::BETWEEN, function($field, $values, $message)
 {
-        return $message->insertAfter(sprintf('( %s between ? AND ? )', $field), MessageInterface::SEPARATOR_OR)->addValues((array) $values);
+        return $message->insertAfter(sprintf('( %s between ? AND ? )', $field), MessageInterface::SEPARATOR_AND)->addValues((array) $values);
 });
 
 FilterNode::filter(FilterOp::EQF, function($field, $value, $message)
 {
-        return $message->insertAfter(sprintf('%s = %s', $field, $value), MessageInterface::SEPARATOR_OR);
+        return $message->insertAfter(sprintf('%s = %s', $field, $value), MessageInterface::SEPARATOR_AND);
 });
 
 FilterNode::filter(FilterOp::LIKE, function($field, $value, $msg) {
-        return $msg->insertAfter(sprintf('%s LIKE ?', $field), MessageInterface::SEPARATOR_OR)
+        return $msg->insertAfter(sprintf('%s LIKE ?', $field), MessageInterface::SEPARATOR_AND)
                    ->addValues([$value]);
 });
 
 FilterNode::filter(FilterOp::STARTS_WITH, function ($field, $value, $msg) {
-        return $msg->insertAfter(sprintf('%s LIKE ?', $field), MessageInterface::SEPARATOR_OR)
+        return $msg->insertAfter(sprintf('%s LIKE ?', $field), MessageInterface::SEPARATOR_AND)
                    ->addValues([$value . '%']);
 });
 
 FilterNode::filter(FilterOp::ENDS_WITH, function ($field, $value, $msg) {
-        return $msg->insertAfter(sprintf('%s LIKE ?', $field), MessageInterface::SEPARATOR_OR)
+        return $msg->insertAfter(sprintf('%s LIKE ?', $field), MessageInterface::SEPARATOR_AND)
                    ->addValues(['%' . $value]);
 });
 
 FilterNode::filter(FilterOp::CONTAINS, function ($field, $value, $msg) {
-        return $msg->insertAfter(sprintf('%s LIKE ?', $field), MessageInterface::SEPARATOR_OR)
+        return $msg->insertAfter(sprintf('%s LIKE ?', $field), MessageInterface::SEPARATOR_AND)
                    ->addValues(['%' . $value . '%']);
 });
 
 FilterNode::filter(FilterOp::NOT_LIKE, function ($field, $value, $msg) {
-        return $msg->insertAfter(sprintf('%s NOT LIKE ?', $field), MessageInterface::SEPARATOR_OR)
+        return $msg->insertAfter(sprintf('%s NOT LIKE ?', $field), MessageInterface::SEPARATOR_AND)
                    ->addValues([$value]);
 });
 
 FilterNode::filter(FilterOp::IS_NULL, function ($field, $value, $msg) {
-        return $msg->insertAfter(sprintf('%s IS NULL', $field), MessageInterface::SEPARATOR_OR);
+        return $msg->insertAfter(sprintf('%s IS NULL', $field), MessageInterface::SEPARATOR_AND);
 });
 
 FilterNode::filter(FilterOp::NOT_NULL, function ($field, $value, $msg) {
-        return $msg->insertAfter(sprintf('%s IS NOT NULL', $field), MessageInterface::SEPARATOR_OR);
+        return $msg->insertAfter(sprintf('%s IS NOT NULL', $field), MessageInterface::SEPARATOR_AND);
 });
 
 FilterNode::filter(FilterOp::NOT_IN, function ($field, $values, $msg) {
@@ -251,46 +251,46 @@ FilterNode::filter(FilterOp::NOT_IN, function ($field, $values, $msg) {
                         ->addValues($values->getValues());
         }
         $q = array_fill(0, sizeof((array) $values), '?');
-        return $msg->insertAfter(sprintf('%s not in (%s)', $field, implode(', ', $q)), MessageInterface::SEPARATOR_OR)
+        return $msg->insertAfter(sprintf('%s not in (%s)', $field, implode(', ', $q)), MessageInterface::SEPARATOR_AND)
                    ->addValues((array) $values);
 });
 
 FilterNode::filter(FilterOp::NOT_BETWEEN, function ($field, $values, $msg) {
-        return $msg->insertAfter(sprintf('( %s not between ? AND ? )', $field), MessageInterface::SEPARATOR_OR)
+        return $msg->insertAfter(sprintf('( %s not between ? AND ? )', $field), MessageInterface::SEPARATOR_AND)
                    ->addValues((array) $values);
 });
 
 FilterNode::filter(FilterOp::ILIKE, function ($field, $value, $msg) {
-        return $msg->insertAfter(sprintf('%s ILIKE ?', $field), MessageInterface::SEPARATOR_OR)
+        return $msg->insertAfter(sprintf('%s ILIKE ?', $field), MessageInterface::SEPARATOR_AND)
                    ->addValues([$value]);
 });
 
 FilterNode::filter(FilterOp::REGEX, function ($field, $value, $msg) {
-        return $msg->insertAfter(sprintf('%s REGEXP ?', $field), MessageInterface::SEPARATOR_OR)
+        return $msg->insertAfter(sprintf('%s REGEXP ?', $field), MessageInterface::SEPARATOR_AND)
                    ->addValues([$value]);
 });
 
 FilterNode::filter(FilterOp::EXISTS, function ($field, $value, $msg) {
         if ($value instanceof MessageInterface) {
                 $value = $value->insertBefore('(', '')->insertAfter(')', '');
-                return $msg->insertAfter('EXISTS', MessageInterface::SEPARATOR_OR)
+                return $msg->insertAfter('EXISTS', MessageInterface::SEPARATOR_AND)
                            ->insertAfter($value->readMessage(), MessageInterface::SEPARATOR_SPACE)
                            ->addValues($value->getValues());
         }
-        return $msg->insertAfter(sprintf('EXISTS (%s)', $value), MessageInterface::SEPARATOR_OR);
+        return $msg->insertAfter(sprintf('EXISTS (%s)', $value), MessageInterface::SEPARATOR_AND);
 });
 
 FilterNode::filter(FilterOp::NOT_EXISTS, function ($field, $value, $msg) {
         if ($value instanceof MessageInterface) {
                 $value = $value->insertBefore('(', '')->insertAfter(')', '');
-                return $msg->insertAfter('NOT EXISTS', MessageInterface::SEPARATOR_OR)
+                return $msg->insertAfter('NOT EXISTS', MessageInterface::SEPARATOR_AND)
                            ->insertAfter($value->readMessage(), MessageInterface::SEPARATOR_SPACE)
                            ->addValues($value->getValues());
         }
-        return $msg->insertAfter(sprintf('NOT EXISTS (%s)', $value), MessageInterface::SEPARATOR_OR);
+        return $msg->insertAfter(sprintf('NOT EXISTS (%s)', $value), MessageInterface::SEPARATOR_AND);
 });
 
 FilterNode::filter(FilterOp::BETWEEN_INCLUSIVE, function ($field, $values, $msg) {
-        return $msg->insertAfter(sprintf('( %s between ? AND ? )', $field), MessageInterface::SEPARATOR_OR)
+        return $msg->insertAfter(sprintf('( %s between ? AND ? )', $field), MessageInterface::SEPARATOR_AND)
                    ->addValues((array) $values);
 });
