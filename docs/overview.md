@@ -23,6 +23,7 @@ The documentation in this folder is organised into several topics:
 - **`odata.md`** – using `ODataMiddleware` to translate query strings into filters, ordering and pagination.
 - **`integration.md`** – integration examples for Slim, Lumen and plain PHP usage.
 - **`examples.md`** – practical scenarios such as managing a book store, handling cinema tickets or implementing a logistics API.
+- **`lazy-relations.md`** – details the `LazyRelation` helper used for on-demand loading of related rows.
 
 Each file can be read in isolation, but together they provide a comprehensive guide to DBAL.
 
