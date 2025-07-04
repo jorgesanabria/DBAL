@@ -1,5 +1,9 @@
 <?php
 namespace DBAL\Attributes;
 use Attribute;
+
+/**
+ * Validates that the property value is a string.
+ */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class StringType {}
