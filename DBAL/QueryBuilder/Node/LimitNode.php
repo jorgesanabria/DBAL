@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace DBAL\QueryBuilder\Node;
 
 use DBAL\QueryBuilder\MessageInterface;
+use DBAL\Platform\PlatformInterface;
 
 /**
  * Node that builds `LIMIT` and `OFFSET` clauses for a query.
@@ -11,6 +12,10 @@ class LimitNode extends NotImplementedNode
 {
         /** @var bool */
         protected bool $isEmpty = false;
+
+        public function __construct(private PlatformInterface $platform)
+        {
+        }
 
         /** @var int|null */
         protected ?int $limit = null;
@@ -35,17 +40,9 @@ class LimitNode extends NotImplementedNode
          * Append LIMIT/OFFSET to the query message when defined.
          */
         public function send(MessageInterface $message)
-	{
-		$msg = $message;
-		if ($this->limit === null && $this->offset === null)
-			$msg = $message;
-		else if ($this->limit !== null && $this->offset === null)
-			$msg = $message->addValues([$this->limit])->insertAfter('LIMIT ?');
-		else if ($this->limit === null && $this->offset !== null)
-			$msg = $message->addValues([$this->offset])->insertAfter('LIMIT -1 OFFSET ?');
-		else if ($this->limit !== null && $this->offset !== null)
-			$msg = $message->addValues([$this->limit, $this->offset])->insertAfter('LIMIT ? OFFSET ?');
-		$this->limit = $this->offset = null;
-		return $msg;
-	}
+        {
+                $msg = $this->platform->applyLimitOffset($message, $this->limit, $this->offset);
+                $this->limit = $this->offset = null;
+                return $msg;
+        }
 }

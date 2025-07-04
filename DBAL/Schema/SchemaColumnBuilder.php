@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace DBAL\Schema;
 
+use DBAL\Platform\PlatformInterface;
+
 /**
  * Clase/Interfaz SchemaColumnBuilder
  */
@@ -16,7 +18,7 @@ class SchemaColumnBuilder
  * @return void
  */
 
-    public function __construct(private string $name)
+    public function __construct(private string $name, private PlatformInterface $platform)
     {    }
 
 /**
@@ -79,7 +81,7 @@ class SchemaColumnBuilder
 
     public function autoIncrement(): self
     {
-        $this->constraints[] = 'AUTOINCREMENT';
+        $this->constraints[] = $this->platform->autoIncrementKeyword();
         return $this;
     }
 

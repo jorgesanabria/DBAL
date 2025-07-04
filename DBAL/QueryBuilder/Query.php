@@ -28,6 +28,10 @@ use DBAL\QueryBuilder\DynamicFilterBuilder;
  */
 class Query extends QueryNode
 {
+        public function __construct(?\DBAL\Platform\PlatformInterface $platform = null)
+        {
+                parent::__construct($platform);
+        }
 /**
  * from
  * @param string|TableNode ...$tables

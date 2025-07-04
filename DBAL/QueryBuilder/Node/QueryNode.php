@@ -5,6 +5,8 @@ namespace DBAL\QueryBuilder\Node;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Message;
 use DBAL\QueryBuilder\NodeInterface;
+use DBAL\Platform\PlatformInterface;
+use DBAL\Platform\SqlitePlatform;
 
 /**
  * Root node for building complete SQL queries.
@@ -16,21 +18,20 @@ class QueryNode extends Node
 {
         /** @var bool */
         protected bool $isEmpty = false;
-        /**
-         * Initialize all child nodes used to build queries.
-         */
-        public function __construct()
+
+        public function __construct(private ?PlatformInterface $platform = null)
         {
-		$this->appendChild(new TablesNode, 'tables');
-		$this->appendChild(new FieldsNode, 'fields');
-		$this->appendChild(new JoinsNode, 'joins');
-		$this->appendChild(new WhereNode, 'where');
-		$this->appendChild(new HavingNode, 'having');
-		$this->appendChild(new GroupNode, 'group');
-		$this->appendChild(new OrderNode, 'order');
-		$this->appendChild(new LimitNode, 'limit');
-		$this->appendChild(new ChangeNode, 'change');
-	}
+                $this->platform = $this->platform ?? new SqlitePlatform();
+                $this->appendChild(new TablesNode, 'tables');
+                $this->appendChild(new FieldsNode, 'fields');
+                $this->appendChild(new JoinsNode, 'joins');
+                $this->appendChild(new WhereNode, 'where');
+                $this->appendChild(new HavingNode, 'having');
+                $this->appendChild(new GroupNode, 'group');
+                $this->appendChild(new OrderNode, 'order');
+                $this->appendChild(new LimitNode($this->platform), 'limit');
+                $this->appendChild(new ChangeNode, 'change');
+        }
         /**
          * Generate the SQL for the configured query type.
          */

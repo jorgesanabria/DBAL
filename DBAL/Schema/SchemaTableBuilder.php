@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace DBAL\Schema;
 
+use DBAL\Platform\PlatformInterface;
+
 /**
  * Clase/Interfaz SchemaTableBuilder
  */
@@ -16,7 +18,7 @@ class SchemaTableBuilder
  * @return void
  */
 
-    public function __construct(private string $name)
+    public function __construct(private string $name, private PlatformInterface $platform)
     {    }
 
 /**
@@ -40,7 +42,7 @@ class SchemaTableBuilder
 
     public function addColumn(string $name, $typeOrCallback): self
     {
-        $builder = new SchemaColumnBuilder($name);
+        $builder = new SchemaColumnBuilder($name, $this->platform);
         if (is_callable($typeOrCallback)) {
             $typeOrCallback($builder);
         } else {
