@@ -131,7 +131,7 @@ class Crud extends Query
 
 /**
  * primaryTable
- * @return mixed
+ * @return string
  */
 
         private function primaryTable(): string
@@ -141,7 +141,7 @@ class Crud extends Query
 /**
  * runMiddlewares
  * @param MessageInterface $message
- * @return mixed
+ * @return void
  */
 
         protected function runMiddlewares(MessageInterface $message, float $time = null): void
@@ -160,8 +160,8 @@ class Crud extends Query
         }
 /**
  * collectRelations
- * @param mixed $table
- * @return mixed
+ * @param string $table
+ * @return array
  */
 
         private function collectRelations(string $table): array
@@ -254,7 +254,7 @@ class Crud extends Query
      * {@link CrudEventInterface} hooks are triggered.
      *
      * @param array $fields Associative array of column values to insert.
-     * @return mixed        The value returned by PDO::lastInsertId().
+ * @return string       The value returned by PDO::lastInsertId().
      */
 
         public function insert(array $fields): string

@@ -13,7 +13,7 @@ class EmptyNode extends NotImplementedNode
 /**
  * send
  * @param MessageInterface $message
- * @return mixed
+ * @return MessageInterface
  */
 
 	public function send(MessageInterface $message)
@@ -22,7 +22,7 @@ class EmptyNode extends NotImplementedNode
 	}
 /**
  * isEmpty
- * @return mixed
+ * @return bool
  */
 
 	public function isEmpty()

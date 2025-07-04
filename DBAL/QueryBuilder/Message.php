@@ -12,9 +12,9 @@ class Message implements MessageInterface
         protected array $values;
 /**
  * __construct
- * @param mixed $type
- * @param mixed $message
- * @param mixed $values
+ * @param int $type
+ * @param string $message
+ * @param array $values
  * @return void
  */
 
@@ -27,8 +27,8 @@ class Message implements MessageInterface
 /**
  * join
  * @param MessageInterface $message
- * @param mixed $separator
- * @return mixed
+ * @param string $separator
+ * @return self
  */
 
 	public function join(MessageInterface $message, $separator = MessageInterface::SEPARATOR_SPACE)
@@ -43,9 +43,9 @@ class Message implements MessageInterface
 	}
 /**
  * insertBefore
- * @param mixed $string
- * @param mixed $separator
- * @return mixed
+ * @param string $string
+ * @param string $separator
+ * @return self
  */
 
 	public function insertBefore($string, $separator = MessageInterface::SEPARATOR_SPACE)
@@ -59,9 +59,9 @@ class Message implements MessageInterface
 	}
 /**
  * replace
- * @param mixed $old
- * @param mixed $now
- * @return mixed
+ * @param string $old
+ * @param string $now
+ * @return self
  */
 
 	public function replace($old, $now)
@@ -72,9 +72,9 @@ class Message implements MessageInterface
 	}
 /**
  * insertAfter
- * @param mixed $string
- * @param mixed $separator
- * @return mixed
+ * @param string $string
+ * @param string $separator
+ * @return self
  */
 
 	public function insertAfter($string, $separator = MessageInterface::SEPARATOR_SPACE)
@@ -89,7 +89,7 @@ class Message implements MessageInterface
 /**
  * addValues
  * @param array $values
- * @return mixed
+ * @return self
  */
 
 	public function addValues(array $values)
@@ -100,7 +100,7 @@ class Message implements MessageInterface
 	}
 /**
  * getValues
- * @return mixed
+ * @return array
  */
 
 	public function getValues()
@@ -109,7 +109,7 @@ class Message implements MessageInterface
 	}
 /**
  * numValues
- * @return mixed
+ * @return int
  */
 
 	public function numValues()
@@ -118,7 +118,7 @@ class Message implements MessageInterface
 	}
 /**
  * getLength
- * @return mixed
+ * @return int
  */
 
 	public function getLength()
@@ -127,7 +127,7 @@ class Message implements MessageInterface
 	}
 /**
  * readMessage
- * @return mixed
+ * @return string
  */
 
 	public function readMessage()
@@ -136,7 +136,7 @@ class Message implements MessageInterface
 	}
 /**
  * type
- * @return mixed
+ * @return int
  */
 
 	public function type()

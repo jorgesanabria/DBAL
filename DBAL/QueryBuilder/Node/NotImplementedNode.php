@@ -14,8 +14,8 @@ abstract class NotImplementedNode implements NodeInterface
 /**
  * appendChild
  * @param NodeInterface $node
- * @param mixed $name
- * @return mixed
+ * @param string|null $name
+ * @return string|null
  */
 
         public function appendChild(NodeInterface $node, $name = null)
@@ -24,8 +24,8 @@ abstract class NotImplementedNode implements NodeInterface
         }
 /**
  * hasChild
- * @param mixed $name
- * @return mixed
+ * @param string $name
+ * @return bool
  */
 
 	public function hasChild($name)
@@ -34,8 +34,8 @@ abstract class NotImplementedNode implements NodeInterface
 	}
 /**
  * getChild
- * @param mixed $name
- * @return mixed
+ * @param string $name
+ * @return NodeInterface
  */
 
 	public function getChild($name)
@@ -44,8 +44,8 @@ abstract class NotImplementedNode implements NodeInterface
 	}
 /**
  * removeChild
- * @param mixed $name
- * @return mixed
+ * @param string $name
+ * @return NodeInterface
  */
 
 	public function removeChild($name)
@@ -54,7 +54,7 @@ abstract class NotImplementedNode implements NodeInterface
 	}
 /**
  * allChildren
- * @return mixed
+ * @return array
  */
 
 	public function allChildren()
@@ -63,7 +63,7 @@ abstract class NotImplementedNode implements NodeInterface
 	}
 /**
  * isEmpty
- * @return mixed
+ * @return bool
  */
 
 	public function isEmpty()

@@ -26,7 +26,7 @@ class DynamicFilterBuilder
 
 /**
  * current
- * @return mixed
+ * @return FilterNode
  */
 
        protected function current()
@@ -36,9 +36,9 @@ class DynamicFilterBuilder
 
 /**
  * __call
- * @param mixed $name
- * @param mixed $arguments
- * @return mixed
+ * @param string $name
+ * @param array $arguments
+ * @return self
  */
 
        public function __call($name, $arguments)
@@ -54,8 +54,8 @@ class DynamicFilterBuilder
 /**
  * group
  * @param callable $callback
- * @param mixed $operator
- * @return mixed
+ * @param string $operator
+ * @return self
  */
 
        protected function group(callable $callback, $operator)
@@ -72,7 +72,7 @@ class DynamicFilterBuilder
 /**
  * andGroup
  * @param callable $callback
- * @return mixed
+ * @return self
  */
 
        public function andGroup(callable $callback)
@@ -83,7 +83,7 @@ class DynamicFilterBuilder
 /**
  * orGroup
  * @param callable $callback
- * @return mixed
+ * @return self
  */
 
        public function orGroup(callable $callback)
@@ -93,7 +93,7 @@ class DynamicFilterBuilder
 
 /**
  * andNext
- * @return mixed
+ * @return self
  */
 
        public function andNext()
@@ -104,7 +104,7 @@ class DynamicFilterBuilder
 
 /**
  * orNext
- * @return mixed
+ * @return self
  */
 
        public function orNext()
@@ -115,7 +115,7 @@ class DynamicFilterBuilder
 
 /**
  * toNode
- * @return mixed
+ * @return FilterNode
  */
 
        public function toNode()
@@ -125,7 +125,7 @@ class DynamicFilterBuilder
 
 /**
  * toArray
- * @return mixed
+ * @return array
  */
 
        public function toArray()
