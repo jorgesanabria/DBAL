@@ -14,6 +14,29 @@ Wraps operations inside database transactions and exposes `begin()`, `commit()` 
 ## UnitOfWorkMiddleware
 Registers new, dirty and deleted entities and persists them in a single transaction via `commit()`.
 
+The typical workflow is:
+
+1. Create a `TransactionMiddleware` and pass it to `UnitOfWorkMiddleware`.
+2. Attach both middlewares to a `Crud` instance.
+3. Register pending inserts, updates or deletes.
+4. Call `commit()` to apply every operation atomically. The batch is executed inside the `TransactionMiddleware` and the tracked changes are cleared afterwards.
+
+```php
+$tx  = new DBAL\TransactionMiddleware($pdo);
+$uow = new DBAL\UnitOfWorkMiddleware($tx);
+
+$crud = (new DBAL\Crud($pdo))
+    ->from('items')
+    ->withMiddleware($uow)
+    ->withMiddleware($tx);
+
+$crud->registerNew('items', ['name' => 'A']);
+$crud->registerDirty('items', ['name' => 'B'], ['id' => 1]);
+$crud->registerDelete('items', ['id' => 2]);
+
+$crud->commit();
+```
+
 ## AbmEventMiddleware
 Allows executing callbacks after insert, bulk insert, update or delete operations.
 
