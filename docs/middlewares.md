@@ -115,7 +115,7 @@ $crud->registerDelete('items', ['id' => 2]);
 $crud->commit();
 ```
 
-## AbmEventMiddleware
+## CrudEventMiddleware
 Allows executing callbacks after insert, bulk insert, update or delete operations.
 
 ## FirstLastMiddleware

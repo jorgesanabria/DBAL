@@ -29,7 +29,7 @@ $crud->alterTable('books')
     ->execute();
 ```
 
-### Basic operations (ABM)
+### Basic operations (CRUD)
 ```php
 $books = (new DBAL\Crud($pdo))->from('books');
 
@@ -144,7 +144,7 @@ $crud->alterTable('reservations')
     ->execute();
 ```
 
-### Basic operations (ABM)
+### Basic operations (CRUD)
 ```php
 $reservations = (new DBAL\Crud($pdo))->from('reservations');
 
@@ -256,7 +256,7 @@ $crud->alterTable('packages')
     ->execute();
 ```
 
-### Basic operations (ABM)
+### Basic operations (CRUD)
 ```php
 $packages = (new DBAL\Crud($pdo))->from('packages');
 

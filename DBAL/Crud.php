@@ -5,7 +5,7 @@ namespace DBAL;
 use DBAL\QueryBuilder\Query;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\RelationDefinition;
-use DBAL\AbmEventInterface;
+use DBAL\CrudEventInterface;
 use DBAL\AfterExecuteMiddlewareInterface;
 use Generator;
 
@@ -45,9 +45,9 @@ class Crud extends Query
 
         public function map(callable $callback)
         {
-                $clon = clone $this;
-                $clon->mappers[] = $callback;
-                return $clon;
+                $clone = clone $this;
+                $clone->mappers[] = $callback;
+                return $clone;
         }
     /**
      * Adds a middleware that will intercept query execution.
@@ -61,9 +61,9 @@ class Crud extends Query
 
         public function withMiddleware(callable $mw)
         {
-                $clon = clone $this;
-                $clon->middlewares[] = $mw;
-                return $clon;
+                $clone = clone $this;
+                $clone->middlewares[] = $mw;
+                return $clone;
         }
 
     /**
@@ -79,11 +79,11 @@ class Crud extends Query
 
         public function from(...$tables)
         {
-                $clon = parent::from(...$tables);
+                $clone = parent::from(...$tables);
                 foreach ($tables as $table) {
-                        $clon->tables[] = $table;
+                        $clone->tables[] = $table;
                 }
-                return $clon;
+                return $clone;
         }
 
     /**
@@ -100,8 +100,8 @@ class Crud extends Query
 
         public function with(...$relations)
         {
-                $clon = clone $this;
-                $defs = $clon->collectRelations($clon->primaryTable());
+                $clone = clone $this;
+                $defs = $clone->collectRelations($clone->primaryTable());
                 foreach ($relations as $rel) {
                         if (!isset($defs[$rel])) {
                                 continue;
@@ -114,18 +114,18 @@ class Crud extends Query
                                                 $conds[] = [$c[0] . '__eqf' => $c[2]];
                                         }
                                 }
-                                $clon = $clon->leftJoin($def->getTable(), ...$conds);
+                                $clone = $clone->leftJoin($def->getTable(), ...$conds);
                         } else {
                                 $join = $def['on'];
                                 if (($def['joinType'] ?? 'left') === 'inner') {
-                                        $clon = $clon->innerJoin($def['table'], $join);
+                                        $clone = $clone->innerJoin($def['table'], $join);
                                 } else {
-                                        $clon = $clon->leftJoin($def['table'], $join);
+                                        $clone = $clone->leftJoin($def['table'], $join);
                                 }
                         }
-                        $clon->with[] = $rel;
+                        $clone->with[] = $rel;
                 }
-                return $clon;
+                return $clone;
         }
 
 /**
@@ -250,7 +250,7 @@ class Crud extends Query
      * {@link EntityValidationInterface} are executed before the
      * statement is built. All registered middlewares then receive the
      * generated message prior to execution. After the insert the
-     * {@link AbmEventInterface} hooks are triggered.
+     * {@link CrudEventInterface} hooks are triggered.
      *
      * @param array $fields Associative array of column values to insert.
      * @return mixed        The value returned by PDO::lastInsertId().
@@ -271,7 +271,7 @@ class Crud extends Query
                 $time = microtime(true) - $start;
                 $id = $this->connection->lastInsertId();
                 foreach ($this->middlewares as $mw) {
-                        if ($mw instanceof AbmEventInterface) {
+                        if ($mw instanceof CrudEventInterface) {
                                 $mw->afterInsert($this->primaryTable(), $fields, $id);
                         }
                 }
@@ -284,7 +284,7 @@ class Crud extends Query
      * Each row is validated using any registered
      * {@link EntityValidationInterface} middlewares. After the SQL is
      * generated all middlewares are executed once and finally the
-     * {@link AbmEventInterface} bulk insert hook is triggered.
+     * {@link CrudEventInterface} bulk insert hook is triggered.
      *
      * @param array $rows Array of associative arrays representing rows.
      * @return int        Number of inserted rows reported by PDO.
@@ -307,7 +307,7 @@ class Crud extends Query
                 $time = microtime(true) - $start;
                 $count = $stm->rowCount();
                 foreach ($this->middlewares as $mw) {
-                        if ($mw instanceof AbmEventInterface) {
+                        if ($mw instanceof CrudEventInterface) {
                                 $mw->afterBulkInsert($this->primaryTable(), $rows, $count);
                         }
                 }
@@ -320,7 +320,7 @@ class Crud extends Query
      * Validation middlewares are invoked prior to building the SQL.
      * After the UPDATE statement is created, all middlewares receive the
      * message and may modify it. After execution the appropriate
-     * {@link AbmEventInterface} hook is called.
+     * {@link CrudEventInterface} hook is called.
      *
      * @param array $fields Column values to update.
      * @return int          Number of affected rows.
@@ -341,7 +341,7 @@ class Crud extends Query
                 $time = microtime(true) - $start;
                 $count = $stm->rowCount();
                 foreach ($this->middlewares as $mw) {
-                        if ($mw instanceof AbmEventInterface) {
+                        if ($mw instanceof CrudEventInterface) {
                                 $mw->afterUpdate($this->primaryTable(), $fields, $count);
                         }
                 }
@@ -353,7 +353,7 @@ class Crud extends Query
      *
      * All registered middlewares receive the DELETE message prior to
      * execution. After the statement is executed the delete event from
-     * {@link AbmEventInterface} is triggered.
+     * {@link CrudEventInterface} is triggered.
      *
      * @return int Number of affected rows.
      */
@@ -368,7 +368,7 @@ class Crud extends Query
                $time = microtime(true) - $start;
                $count = $stm->rowCount();
                foreach ($this->middlewares as $mw) {
-                       if ($mw instanceof AbmEventInterface) {
+                       if ($mw instanceof CrudEventInterface) {
                                $mw->afterDelete($this->primaryTable(), $count);
                        }
                }

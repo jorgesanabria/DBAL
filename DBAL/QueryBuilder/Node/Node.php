@@ -15,7 +15,7 @@ abstract class Node implements NodeInterface
         protected bool $isEmpty;
 
         /** @var array<string|int, NodeInterface> */
-        protected array $childs = [];
+        protected array $children = [];
         /**
          * Append a child node to this node.
          *
@@ -27,9 +27,9 @@ abstract class Node implements NodeInterface
         public function appendChild(NodeInterface $node, $name = null)
         {
                 if ($name === null) {
-                        $name = (count($this->childs) > 0) ? 1 + count($this->childs) : 0;
+                        $name = (count($this->children) > 0) ? 1 + count($this->children) : 0;
                 }
-                $this->childs[$name] = $node;
+                $this->children[$name] = $node;
                 return $name;
         }
         /**
@@ -40,7 +40,7 @@ abstract class Node implements NodeInterface
          */
         public function hasChild($name)
         {
-                return isset($this->childs[$name]);
+                return isset($this->children[$name]);
         }
         /**
          * Retrieve a child node or an {@see EmptyNode} if it does not exist.
@@ -50,8 +50,8 @@ abstract class Node implements NodeInterface
          */
         public function getChild($name)
         {
-                if (isset($this->childs[$name])) {
-                        return $this->childs[$name];
+                if (isset($this->children[$name])) {
+                        return $this->children[$name];
                 }
                 return new EmptyNode();
         }
@@ -63,9 +63,9 @@ abstract class Node implements NodeInterface
          */
         public function removeChild($name)
         {
-                if (isset($this->childs[$name])) {
-                        $node = $this->childs[$name];
-                        unset($this->childs[$name]);
+                if (isset($this->children[$name])) {
+                        $node = $this->children[$name];
+                        unset($this->children[$name]);
                         return $node;
                 }
                 return new EmptyNode();
@@ -77,7 +77,7 @@ abstract class Node implements NodeInterface
          */
         public function allChildren()
         {
-                return $this->childs;
+                return $this->children;
         }
         /**
          * Indicate if this node is considered empty.
@@ -91,8 +91,8 @@ abstract class Node implements NodeInterface
          */
         public function __clone()
         {
-                foreach ($this->childs as $key => $node) {
-                        $this->childs[$key] = clone $node;
+                foreach ($this->children as $key => $node) {
+                        $this->children[$key] = clone $node;
                 }
         }
 }
