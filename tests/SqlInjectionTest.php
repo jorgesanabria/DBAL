@@ -20,7 +20,7 @@ class SqlInjectionTest extends TestCase
         $pdo = $this->createPdo();
         $crud = (new Crud($pdo))->from('items');
         $malicious = "safe'; DROP TABLE items; --";
-        $rows = iterator_to_array($crud->where(['name__eq' => $malicious])->select());
+        $rows = iterator_to_array($crud->where(['name' => [\DBAL\QueryBuilder\FilterOp::EQ, $malicious]])->select());
         $this->assertEmpty($rows);
         $count = (int)$pdo->query('SELECT COUNT(*) FROM items')->fetchColumn();
         $this->assertEquals(1, $count);

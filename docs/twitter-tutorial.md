@@ -89,7 +89,7 @@ $tweetId = $tweets->insert([
 ```php
 $timeline = $tweets
     ->leftJoin('users u', function ($on) {
-        $on->{'tweets.user_id__eqf'}('u.id');
+        $on->condition('tweets.user_id', DBAL\QueryBuilder\FilterOp::EQF, 'u.id');
     })
     ->desc('tweets.created_at')
     ->select('tweets.*', 'u.username');

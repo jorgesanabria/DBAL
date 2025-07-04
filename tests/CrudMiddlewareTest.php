@@ -24,8 +24,8 @@ class CrudMiddlewareTest extends TestCase
 
         $id = $crud->insert(['name' => 'A']);
         iterator_to_array($crud->select());
-        $crud->where(['id__eq' => $id])->update(['name' => 'B']);
-        $crud->where(['id__eq' => $id])->delete();
+        $crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, $id]])->update(['name' => 'B']);
+        $crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, $id]])->delete();
 
         $this->assertEquals(4, $count);
     }

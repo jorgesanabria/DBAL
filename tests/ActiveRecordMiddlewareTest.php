@@ -46,7 +46,7 @@ class ActiveRecordMiddlewareTest extends TestCase
         $mw = new ActiveRecordMiddleware();
         $crud = $mw->attach($crud);
 
-        $record = iterator_to_array($crud->where(['id__eq' => 1])->select())[0];
+        $record = iterator_to_array($crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, 1]])->select())[0];
         $record->set__name('Alice2');
         $record->set__email('alice@example.com');
         $record->update();

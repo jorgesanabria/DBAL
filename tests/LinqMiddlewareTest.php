@@ -24,11 +24,11 @@ class LinqMiddlewareTest extends TestCase
     {
         $crud = $this->createCrud($this->createPdo());
 
-        $this->assertTrue($crud->any(['name__eq' => 'A']));
-        $this->assertFalse($crud->any(['name__eq' => 'Z']));
-        $this->assertTrue($crud->none(['name__eq' => 'Z']));
+        $this->assertTrue($crud->any(['name' => [\DBAL\QueryBuilder\FilterOp::EQ, 'A']]));
+        $this->assertFalse($crud->any(['name' => [\DBAL\QueryBuilder\FilterOp::EQ, 'Z']]));
+        $this->assertTrue($crud->none(['name' => [\DBAL\QueryBuilder\FilterOp::EQ, 'Z']]));
 
-        $any = $crud->any(function ($f) { $f->name__eq('B'); });
+        $any = $crud->any(function ($f) { $f->condition('name', \DBAL\QueryBuilder\FilterOp::EQ, 'B'); });
         $this->assertTrue($any);
     }
 
@@ -36,18 +36,18 @@ class LinqMiddlewareTest extends TestCase
     {
         $crud = $this->createCrud($this->createPdo());
 
-        $this->assertFalse($crud->all(['active__eq' => 1]));
-        $this->assertTrue($crud->notAll(['active__eq' => 1]));
+        $this->assertFalse($crud->all(['active' => [\DBAL\QueryBuilder\FilterOp::EQ, 1]]));
+        $this->assertTrue($crud->notAll(['active' => [\DBAL\QueryBuilder\FilterOp::EQ, 1]]));
 
-        $subset = $crud->where(['active__eq' => 1]);
-        $this->assertTrue($subset->all(['active__eq' => 1]));
+        $subset = $crud->where(['active' => [\DBAL\QueryBuilder\FilterOp::EQ, 1]]);
+        $this->assertTrue($subset->all(['active' => [\DBAL\QueryBuilder\FilterOp::EQ, 1]]));
     }
 
     public function testChainedWhereIsPreserved()
     {
         $crud = $this->createCrud($this->createPdo());
 
-        $this->assertFalse($crud->where(['id__eq' => 999])->any());
+        $this->assertFalse($crud->where(['id' => [\DBAL\QueryBuilder\FilterOp::EQ, 999]])->any());
     }
 
     public function testMaxMinSum()
@@ -64,6 +64,6 @@ class LinqMiddlewareTest extends TestCase
         $crud = $this->createCrud($this->createPdo());
 
         $this->assertEquals(3, $crud->count());
-        $this->assertEquals(2, $crud->count(['active__eq' => 1]));
+        $this->assertEquals(2, $crud->count(['active' => [\DBAL\QueryBuilder\FilterOp::EQ, 1]]));
     }
 }

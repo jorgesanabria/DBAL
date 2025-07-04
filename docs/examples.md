@@ -52,8 +52,11 @@ $rows = $books
 
 ### Queries with the dynamic API
 ```php
+use DBAL\QueryBuilder\FilterOp;
 $rows = $books->where(function ($q) {
-    $q->title__like('%dune%')->andNext()->price__lt(20);
+    $q->condition('title', FilterOp::LIKE, '%dune%')
+      ->andNext()
+      ->condition('price', FilterOp::LT, 20);
 })->select('id', 'title');
 ```
 
@@ -61,7 +64,7 @@ $rows = $books->where(function ($q) {
 ```php
 $rows = $books
     ->leftJoin('authors a', function ($on) {
-        $on->{'books.author_id__eqf'}('a.id');
+        $on->condition('books.author_id', FilterOp::EQF, 'a.id');
     })
     ->select('books.title', 'a.name AS author');
 ```
@@ -112,7 +115,7 @@ $author = $book['author'];
 ```php
 $ar = (new DBAL\ActiveRecordMiddleware())->attach($books);
 
-$record = iterator_to_array($ar->where(['id__eq' => 1])->select())[0];
+$record = iterator_to_array($ar->where(['id' => [FilterOp::EQ, 1]])->select())[0];
 $record->title = 'New Title';
 $record->update();
 ```
@@ -201,7 +204,7 @@ $rows = $reservations->where(function ($q) {
 ```php
 $rows = $reservations
     ->innerJoin('screenings s', function ($on) {
-        $on->{'reservations.screening_id__eqf'}('s.id');
+        $on->condition('reservations.screening_id', FilterOp::EQF, 's.id');
     })
     ->select('s.movie', 'reservations.seat');
 ```
@@ -251,7 +254,7 @@ $screening = $res['screening'];
 ### Active Record
 ```php
 $ar  = (new DBAL\ActiveRecordMiddleware())->attach($reservations);
-$rec = iterator_to_array($ar->where(['id__eq' => 1])->select())[0];
+$rec = iterator_to_array($ar->where(['id' => [FilterOp::EQ, 1]])->select())[0];
 $rec->seat = 'B1';
 $rec->update();
 ```
@@ -306,7 +309,9 @@ $rows = $packages
 ### Queries with the dynamic API
 ```php
 $rows = $packages->where(function ($q) {
-    $q->status__eq('in_transit')->orNext()->code__startWith('PKG');
+    $q->condition('status', FilterOp::EQ, 'in_transit')
+      ->orNext()
+      ->code__startWith('PKG');
 })->select('id', 'code');
 ```
 
@@ -314,7 +319,7 @@ $rows = $packages->where(function ($q) {
 ```php
 $rows = $packages
     ->join('warehouses w', function ($on) {
-        $on->{'packages.warehouse_id__eqf'}('w.id');
+        $on->condition('packages.warehouse_id', FilterOp::EQF, 'w.id');
     })
     ->select('packages.code', 'w.name AS warehouse');
 ```
@@ -364,7 +369,7 @@ $warehouse = $pkg['warehouse'];
 ### Active Record
 ```php
 $ar  = (new DBAL\ActiveRecordMiddleware())->attach($packages);
-$rec = iterator_to_array($ar->where(['id__eq' => 1])->select())[0];
+$rec = iterator_to_array($ar->where(['id' => [FilterOp::EQ, 1]])->select())[0];
 $rec->status = 'delivered';
 $rec->update();
 ```
