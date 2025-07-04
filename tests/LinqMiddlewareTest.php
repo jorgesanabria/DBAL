@@ -57,6 +57,8 @@ class LinqMiddlewareTest extends TestCase
         $this->assertEquals(3, $crud->max('id'));
         $this->assertEquals(1, $crud->min('id'));
         $this->assertEquals(6.0, $crud->sum('id'));
+        $this->assertEquals(2.0, $crud->average('id'));
+        $this->assertEquals([1,2,3], $crud->distinct('id'));
     }
 
     public function testCount()

@@ -215,12 +215,22 @@ class Query extends QueryNode
  * @return mixed
  */
 
-	public function limit($limit)
-	{
-		$clone = clone $this;
-		$clone->getChild('limit')->setLimit($limit);
-		return $clone;
-	}
+    public function limit($limit)
+    {
+        $clone = clone $this;
+        $clone->getChild('limit')->setLimit($limit);
+        return $clone;
+    }
+
+    /**
+     * take
+     * @param int $limit
+     * @return mixed
+     */
+    public function take(int $limit)
+    {
+        return $this->limit($limit);
+    }
 /**
  * offset
  * @param mixed $offset
@@ -230,9 +240,19 @@ class Query extends QueryNode
 	public function offset($offset)
 	{
 		$clone = clone $this;
-		$clone->getChild('limit')->setOffset($offset);
-		return $clone;
-	}
+        $clone->getChild('limit')->setOffset($offset);
+        return $clone;
+    }
+
+    /**
+     * skip
+     * @param int $offset
+     * @return mixed
+     */
+    public function skip(int $offset)
+    {
+        return $this->offset($offset);
+    }
 /**
  * buildSelect
  * @param mixed $...$fields

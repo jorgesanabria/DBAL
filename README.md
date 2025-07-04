@@ -20,6 +20,7 @@ A lightweight Database Abstraction Layer for PHP.
 - Attribute based entity validation and relation definition
 - Relation loader middleware for programmatic relations ([docs](docs/middlewares.md#relationloadermiddleware))
 - First/Last and Linq helpers
+- Rx-style stream utilities
 - ActiveRecord objects for tracked updates
 - Development error pages and global filters
 
@@ -159,8 +160,8 @@ the [filters documentation](docs/filters.md).
 
 Use `group()` or `groupBy()` to add a `GROUP BY` clause. The `having()` method
 lets you filter aggregated results. Ordering can be controlled with `order()`,
-`asc()` or `desc()`, while `limit()` and `offset()` constrain the amount of
-rows returned.
+`asc()` or `desc()`, while `limit()`/`take()` and `offset()`/`skip()`
+constrain the amount of rows returned.
 
 ```php
 $rows = $crud
@@ -216,8 +217,8 @@ $page    = 2;
 $perPage = 20;
 
 $rows = $crud
-    ->limit($perPage)
-    ->offset(($page - 1) * $perPage)
+    ->take($perPage)
+    ->skip(($page - 1) * $perPage)
     ->select();
 ```
 ```sql
@@ -229,7 +230,8 @@ SELECT * FROM users LIMIT 20 OFFSET 20;
 `Crud::stream()` returns a generator that yields each row lazily. A callback can
 be provided to process rows as they are produced. See the
 [ResultIterator documentation](docs/overview.md#resultiterator) for details on
-grouping results and exporting them to JSON.
+grouping results and exporting them to JSON. The optional `RxMiddleware`
+offers `map()`, `filter()` and other helpers to transform the stream.
 
 ```php
 $generator = $crud->stream('id', 'name');
@@ -353,6 +355,30 @@ $total = $crud->count();
 $highestId = $crud->max('id');
 $lowestId = $crud->min('id');
 $totalAge = $crud->sum('age');
+$averageAge = $crud->average('age');
+$statuses = $crud->distinct('status');
+```
+```sql
+SELECT AVG(age) AS a FROM users;
+SELECT DISTINCT status AS d FROM users;
+```
+
+### Rx middleware
+
+`RxMiddleware` adds utilities inspired by RxJS to transform streams of rows.
+
+```php
+$rx = new DBAL\RxMiddleware();
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($rx);
+
+$names = iterator_to_array($rx->map($crud, fn($r) => $r['name'], 'name'));
+$active = iterator_to_array($rx->filter($crud, fn($r) => $r['active'] == 1));
+$total = $rx->reduce($crud, fn($a, $r) => $a + $r['age'], 0, 'age');
+```
+```sql
+SELECT name, active, age FROM users;
 ```
 
 ### Entity validation middleware
