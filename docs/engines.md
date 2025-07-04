@@ -7,6 +7,7 @@ DBAL uses PHP's PDO extension as its only dependency. This means it can work wit
 - **SQLite** (`SqlitePlatform`) – Default behaviour when no platform is passed. It understands SQLite's `LIMIT` syntax and uses `AUTOINCREMENT` for auto‑increment columns.
 - **PostgreSQL** (`PostgresPlatform`) – Adapts `LIMIT`/`OFFSET` clauses and sets the `SERIAL` keyword for auto‑increment fields.
 - **SQL Server** (`SqlServerPlatform`) – Uses the `OFFSET/FETCH` pattern and the `IDENTITY(1,1)` keyword.
+- **MySQL/MariaDB** (`MysqlPlatform`, `MariaDbPlatform`) – Share the same dialect, using `LIMIT` and the `AUTO_INCREMENT` keyword.
 
 Select the appropriate platform when creating a `Crud` instance:
 

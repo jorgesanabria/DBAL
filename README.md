@@ -17,7 +17,7 @@ A lightweight Database Abstraction Layer for PHP.
 - Lazy and eager loading of relations
 - Middleware system with caching, transactions, validation and more
 - Schema builder and migration helpers
-- Platform classes for SQLite, PostgreSQL and SQL Server
+- Platform classes for SQLite, PostgreSQL, SQL Server and MySQL/MariaDB
 - Attribute based entity validation and relation definition
 - Relation loader middleware for programmatic relations ([docs](docs/middlewares.md#relationloadermiddleware))
 - First/Last and Linq helpers
@@ -45,7 +45,7 @@ SELECT * FROM users;
 
 ## Database Engines
 
-DBAL relies solely on PDO, so it can connect to any engine with a PDO driver. It includes platform classes for SQLite, PostgreSQL and SQL Server. Use the appropriate platform when creating a `Crud` instance:
+DBAL relies solely on PDO, so it can connect to any engine with a PDO driver. It includes platform classes for SQLite, PostgreSQL, SQL Server and MySQL/MariaDB. Use the appropriate platform when creating a `Crud` instance:
 
 ```php
 use DBAL\Platform\PostgresPlatform;
