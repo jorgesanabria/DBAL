@@ -6,7 +6,7 @@ A lightweight Database Abstraction Layer for PHP.
 - ActiveRecord support with dynamic properties
 - Caching middleware with pluggable storage
 - Transaction and Unit of Work middlewares
-- ABM event hooks to listen for inserts, updates or deletes
+- CRUD event hooks to listen for inserts, updates or deletes
 - Improved documentation and error pages
 
 
@@ -526,9 +526,9 @@ $record->update(); // only changed fields are written
 
 `TransactionMiddleware` exposes helpers to start, commit or roll back transactions. `UnitOfWorkMiddleware` batches multiple operations and applies them atomically via `commit()`.  
 
-### ABM event middleware
+### CRUD event middleware
 
-`AbmEventMiddleware` lets you execute callbacks after inserts, bulk inserts, updates or deletes to implement custom hooks.
+`CrudEventMiddleware` lets you execute callbacks after inserts, bulk inserts, updates or deletes to implement custom hooks.
 
 ### Query timing middleware
 

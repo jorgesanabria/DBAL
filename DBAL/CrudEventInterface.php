@@ -3,9 +3,9 @@ declare(strict_types=1);
 namespace DBAL;
 
 /**
- * Clase/Interfaz AbmEventInterface
+ * Event hooks triggered after CRUD operations.
  */
-interface AbmEventInterface extends MiddlewareInterface
+interface CrudEventInterface extends MiddlewareInterface
 {
 /**
  * afterInsert

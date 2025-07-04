@@ -5,9 +5,9 @@ namespace DBAL;
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz AbmEventMiddleware
+ * Middleware that invokes callbacks after CRUD operations.
  */
-class AbmEventMiddleware implements AbmEventInterface
+class CrudEventMiddleware implements CrudEventInterface
 {
     private ?\Closure $onInsert;
     private ?\Closure $onUpdate;
