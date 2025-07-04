@@ -10,6 +10,7 @@ use PDO;
 class SqliteCacheStorage implements CacheStorageInterface
 {
     private PDO $pdo;
+    private \DBAL\QueryBuilder\Query $query;
 
 /**
  * __construct
@@ -22,6 +23,7 @@ class SqliteCacheStorage implements CacheStorageInterface
         $this->pdo = new PDO('sqlite:' . $file);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->exec('CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value BLOB)');
+        $this->query = (new \DBAL\QueryBuilder\Query())->from('cache');
     }
 
 /**
@@ -32,8 +34,9 @@ class SqliteCacheStorage implements CacheStorageInterface
 
     public function get(string $key)
     {
-        $stmt = $this->pdo->prepare('SELECT value FROM cache WHERE key = ?');
-        $stmt->execute([$key]);
+        $msg  = $this->query->where(['key' => $key])->buildSelect('value');
+        $stmt = $this->pdo->prepare($msg->readMessage());
+        $stmt->execute($msg->getValues());
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ? unserialize($row['value']) : null;
     }
@@ -47,8 +50,10 @@ class SqliteCacheStorage implements CacheStorageInterface
 
     public function set(string $key, $value): void
     {
-        $stmt = $this->pdo->prepare('REPLACE INTO cache(key, value) VALUES(?, ?)');
-        $stmt->execute([$key, serialize($value)]);
+        $msg = $this->query->buildInsert(['key' => $key, 'value' => serialize($value)]);
+        $msg = (new \DBAL\QueryBuilder\Node\ReplaceNode())->send($msg);
+        $stmt = $this->pdo->prepare($msg->readMessage());
+        $stmt->execute($msg->getValues());
     }
 
 /**
@@ -60,10 +65,13 @@ class SqliteCacheStorage implements CacheStorageInterface
     public function delete(string $key = null): void
     {
         if ($key === null) {
-            $this->pdo->exec('DELETE FROM cache');
+            $msg = $this->query->buildDelete();
+            $stmt = $this->pdo->prepare($msg->readMessage());
+            $stmt->execute($msg->getValues());
         } else {
-            $stmt = $this->pdo->prepare('DELETE FROM cache WHERE key = ?');
-            $stmt->execute([$key]);
+            $msg = $this->query->where(['key' => $key])->buildDelete();
+            $stmt = $this->pdo->prepare($msg->readMessage());
+            $stmt->execute($msg->getValues());
         }
     }
 }

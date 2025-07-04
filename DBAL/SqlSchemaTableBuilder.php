@@ -85,18 +85,14 @@ class SqlSchemaTableBuilder
             return;
         }
         if ($this->create) {
-            $sql = sprintf(
-                'CREATE TABLE IF NOT EXISTS %s (%s)',
-                $this->table,
-                implode(', ', $this->definitions)
-            );
+            $node = new \DBAL\Schema\Node\CreateTableNode($this->table, true);
         } else {
-            $sql = sprintf(
-                'ALTER TABLE %s %s',
-                $this->table,
-                implode(', ', $this->definitions)
-            );
+            $node = new \DBAL\Schema\Node\AlterTableNode($this->table);
         }
-        $this->pdo->exec($sql);
+        foreach ($this->definitions as $def) {
+            $node->appendChild(new \DBAL\Schema\Node\TableDefinitionNode($def));
+        }
+        $msg = $node->send(new \DBAL\QueryBuilder\Message());
+        $this->pdo->exec($msg->readMessage());
     }
 }
