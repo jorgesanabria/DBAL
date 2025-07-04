@@ -7,12 +7,11 @@ manually instantiating each middleware.
 ## Example
 
 ```php
-use function DBAL\Hooks\{useCrud, useCache, useTransaction, useUnitOfWork};
+use function DBAL\Hooks\{useCrud, useCache, useUnitOfWork};
 
 $pdo  = new PDO('sqlite::memory:');
 $crud = useCrud($pdo, 'items');
 $crud = useCache($crud);
-[$crud, $tx] = useTransaction($crud);
 [$crud, $uow] = useUnitOfWork($crud);
 
 $crud->registerNew('items', ['name' => 'A']);
