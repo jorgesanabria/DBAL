@@ -56,9 +56,15 @@ function useTransaction(Crud $crud): array
  */
 function useUnitOfWork(Crud $crud): array
 {
-    [$crud, $tx] = useTransaction($crud);
+    $pdo = (function () {
+        return $this->connection;
+    })->call($crud);
+
+    $tx  = new TransactionMiddleware($pdo);
     $uow = new UnitOfWorkMiddleware($tx);
-    $crud = $crud->withMiddleware($uow);
+
+    $crud = $crud->withMiddleware($uow)->withMiddleware($tx);
+
     return [$crud, $uow];
 }
 
