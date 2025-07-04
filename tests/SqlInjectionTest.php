@@ -43,4 +43,18 @@ class SqlInjectionTest extends TestCase
         $count = (int)$pdo->query('SELECT COUNT(*) FROM items')->fetchColumn();
         $this->assertEquals(1, $count);
     }
+
+    public function testODataMiddlewareIgnoresEqfInjection()
+    {
+        $pdo = $this->createPdo();
+        $mw = new ODataMiddleware();
+        $crud = $mw->attach((new Crud($pdo))->from('items'));
+        try {
+            $mw->query("$filter=id eqf '1; DROP TABLE items; --'");
+        } catch (\Throwable $e) {
+            // Ignore driver errors while testing for SQL injection
+        }
+        $count = (int)$pdo->query('SELECT COUNT(*) FROM items')->fetchColumn();
+        $this->assertEquals(1, $count);
+    }
 }
