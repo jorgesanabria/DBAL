@@ -151,4 +151,30 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
         $rows = iterator_to_array($crud->select("SUM($field) AS s"));
         return (float)($rows[0]['s'] ?? 0);
     }
+
+    /**
+     * average
+     * @param Crud $crud
+     * @param string $field
+     * @return float
+     */
+    public function average(Crud $crud, string $field): float
+    {
+        $field = $this->quoteIdentifier($field);
+        $rows = iterator_to_array($crud->select("AVG($field) AS a"));
+        return (float)($rows[0]['a'] ?? 0);
+    }
+
+    /**
+     * distinct
+     * @param Crud $crud
+     * @param string $field
+     * @return array
+     */
+    public function distinct(Crud $crud, string $field): array
+    {
+        $field = $this->quoteIdentifier($field);
+        $rows = iterator_to_array($crud->select("DISTINCT $field AS d"));
+        return array_map(fn($r) => $r['d'], $rows);
+    }
 }
