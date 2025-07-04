@@ -43,7 +43,7 @@ class Crud extends Query
      * @return self  New instance containing the mapper.
      */
 
-        public function map(callable $callback)
+        public function map(callable $callback): self
         {
                 $clone = clone $this;
                 $clone->mappers[] = $callback;
@@ -59,7 +59,7 @@ class Crud extends Query
      * @return self       New instance that contains the middleware.
      */
 
-        public function withMiddleware(callable $mw)
+        public function withMiddleware(callable $mw): self
         {
                 $clone = clone $this;
                 $clone->middlewares[] = $mw;
@@ -77,7 +77,7 @@ class Crud extends Query
      * @return self             New instance configured with the tables.
      */
 
-        public function from(...$tables)
+        public function from(...$tables): self
         {
                 $clone = parent::from(...$tables);
                 foreach ($tables as $table) {
@@ -98,7 +98,7 @@ class Crud extends Query
      * @return self                New instance prepared with the joins.
      */
 
-        public function with(...$relations)
+        public function with(...$relations): self
         {
                 $clone = clone $this;
                 $defs = $clone->collectRelations($clone->primaryTable());
@@ -133,7 +133,7 @@ class Crud extends Query
  * @return mixed
  */
 
-        private function primaryTable()
+        private function primaryTable(): string
         {
                 return $this->tables[0] ?? '';
         }
@@ -143,7 +143,7 @@ class Crud extends Query
  * @return mixed
  */
 
-        protected function runMiddlewares(MessageInterface $message, float $time = null)
+        protected function runMiddlewares(MessageInterface $message, float $time = null): void
         {
                 if ($time === null) {
                         foreach ($this->middlewares as $mw) {
@@ -163,7 +163,7 @@ class Crud extends Query
  * @return mixed
  */
 
-        private function collectRelations($table)
+        private function collectRelations(string $table): array
         {
                 $relations = [];
                 foreach ($this->middlewares as $mw) {
@@ -184,7 +184,7 @@ class Crud extends Query
      * @return ResultIterator Iterator over the query results.
      */
 
-        public function select(...$fields)
+        public function select(...$fields): ResultIterator
         {
                 $message = $this->buildSelect(...$fields);
                 $relations = $this->collectRelations($this->primaryTable());
@@ -225,7 +225,7 @@ class Crud extends Query
      * @return Generator Generator yielding mapped rows.
      */
 
-        public function stream(...$args)
+        public function stream(...$args): Generator
         {
                 $callback = null;
                 if (isset($args[0]) && is_callable($args[0])) {
@@ -256,7 +256,7 @@ class Crud extends Query
      * @return mixed        The value returned by PDO::lastInsertId().
      */
 
-        public function insert(array $fields)
+        public function insert(array $fields): string
         {
                 foreach ($this->middlewares as $mw) {
                         if ($mw instanceof EntityValidationInterface) {
@@ -290,7 +290,7 @@ class Crud extends Query
      * @return int        Number of inserted rows reported by PDO.
      */
 
-        public function bulkInsert(array $rows)
+        public function bulkInsert(array $rows): int
         {
                 foreach ($this->middlewares as $mw) {
                         if ($mw instanceof EntityValidationInterface) {
@@ -326,7 +326,7 @@ class Crud extends Query
      * @return int          Number of affected rows.
      */
 
-        public function update(array $fields)
+        public function update(array $fields): int
         {
                 foreach ($this->middlewares as $mw) {
                         if ($mw instanceof EntityValidationInterface) {
@@ -358,7 +358,7 @@ class Crud extends Query
      * @return int Number of affected rows.
      */
 
-       public function delete()
+       public function delete(): int
        {
                $message = $this->buildDelete();
                $this->runMiddlewares($message);
@@ -392,7 +392,7 @@ class Crud extends Query
      *                                  requested method.
      */
 
-       public function __call($name, $arguments)
+       public function __call(string $name, array $arguments): mixed
        {
                foreach ($this->middlewares as $mw) {
                        if (is_object($mw) && is_callable([$mw, $name])) {
