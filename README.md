@@ -401,7 +401,8 @@ $crud = (new DBAL\Crud($pdo))
 
 `ODataMiddleware` converts an OData style query string into a DBAL query. The
 middleware parses `$filter`, `$orderby`, `$top`, `$skip` and `$select`
-parameters and applies them to a `Crud` instance.
+parameters and applies them to a `Crud` instance. See
+[`docs/odata.md`](docs/odata.md) for a detailed reference.
 
 ```php
 $mw = new DBAL\ODataMiddleware();

@@ -20,6 +20,7 @@ The documentation in this folder is organised into several topics:
 
 - **`overview.md`** – this document. It introduces the library, outlines the main features and explains where to find more information.
 - **`middlewares.md`** – descriptions of the built‑in middlewares and how to create custom ones.
+- **`odata.md`** – using `ODataMiddleware` to translate query strings into filters, ordering and pagination.
 - **`integration.md`** – integration examples for Slim, Lumen and plain PHP usage.
 - **`examples.md`** – practical scenarios such as managing a book store, handling cinema tickets or implementing a logistics API.
 
