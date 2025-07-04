@@ -7,6 +7,7 @@ DBAL is a lightweight Database Abstraction Layer written in PHP. It builds upon 
 * **integration.md** – examples of integrating DBAL with frameworks such as Slim and Lumen or plain PHP.
 * **examples.md** – practical use cases for book stores, cinemas and logistic APIs.
 * **hooks.md** – helper functions for quickly setting up middlewares.
+* **filters.md** – expanding filters and hiding complex conditions.
 * **twitter-tutorial.md** – building a microblogging platform example.
 
 - **Simple query builder**: compose SQL statements through a chainable API.
@@ -29,6 +30,7 @@ The documentation in this folder is organised into several topics:
 - **`integration.md`** – integration examples for Slim, Lumen and plain PHP usage.
 - **`examples.md`** – practical scenarios such as managing a book store, handling cinema tickets or implementing a logistics API.
 - **`lazy-relations.md`** – details the `LazyRelation` helper used for on-demand loading of related rows.
+- **`filters.md`** – extending filters and simplifying queries.
 
 Each file can be read in isolation, but together they provide a comprehensive guide to DBAL.
 

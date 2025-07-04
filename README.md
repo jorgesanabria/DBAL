@@ -152,6 +152,9 @@ $crud->where(['name__startWith' => 'Al']);
 SELECT * FROM users WHERE name LIKE 'Al%%';
 ```
 
+For additional examples of extending filters and hiding complex conditions see
+the [filters documentation](docs/filters.md).
+
 ### Grouping, ordering and limiting
 
 Use `group()` or `groupBy()` to add a `GROUP BY` clause. The `having()` method
