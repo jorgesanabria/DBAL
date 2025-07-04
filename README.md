@@ -37,6 +37,9 @@ composer require jorgesanabria/dbal
 $pdo = new \PDO('mysql:host=localhost;dbname=test', 'user', 'pass');
 $crud = (new DBAL\Crud($pdo))->from('users');
 ```
+```sql
+SELECT * FROM users;
+```
 
 ### Insert records
 
@@ -46,6 +49,9 @@ $id = $crud->insert([
     'email' => 'john@example.com'
 ]);
 ```
+```sql
+INSERT INTO users (name, email) VALUES ('John', 'john@example.com');
+```
 
 ### Bulk insert
 
@@ -54,6 +60,9 @@ $count = $crud->bulkInsert([
     ['name' => 'Alice'],
     ['name' => 'Bob']
 ]);
+```
+```sql
+INSERT INTO users (name) VALUES ('Alice'), ('Bob');
 ```
 
 ### Select with `where`
@@ -67,6 +76,9 @@ foreach ($rows as $row) {
     echo $row['name'];
 }
 ```
+```sql
+SELECT id, name FROM users WHERE id > 10;
+```
 
 ### Update and delete
 
@@ -74,6 +86,10 @@ foreach ($rows as $row) {
 $crud->where(['id' => $id])->update(['name' => 'Peter']);
 
 $crud->where(['id' => $id])->delete();
+```
+```sql
+UPDATE users SET name = 'Peter' WHERE id = ?;
+DELETE FROM users WHERE id = ?;
 ```
 
 ### Joins
@@ -87,6 +103,9 @@ $result = $crud
     ->where(['p.active__eq' => 1])
     ->select('u.id', 'p.photo');
 ```
+```sql
+SELECT u.id, p.photo FROM users u LEFT JOIN profiles p ON u.id = p.user_id WHERE p.active = 1;
+```
 
 ### Dynamic filters
 
@@ -95,6 +114,9 @@ $crud->where(function ($q) {
     $q->name__startWith('Al')
        ->age__ge(21);
 });
+```
+```sql
+SELECT * FROM users WHERE name LIKE 'Al%%' AND age >= 21;
 ```
 
 Dynamic filters can also be grouped with logical operators:
@@ -107,6 +129,9 @@ $crud->where(function ($q) {
         $g->status__eq('active');
     });
 });
+```sql
+SELECT * FROM users WHERE (name = 'Alice' OR name = 'Bob') AND status = 'active';
+```
 ```
 
 ### Extending filters
@@ -122,6 +147,9 @@ FilterNode::filter('startWith', function ($field, $value, $msg) {
 });
 
 $crud->where(['name__startWith' => 'Al']);
+```
+```sql
+SELECT * FROM users WHERE name LIKE 'Al%%';
 ```
 
 ### Grouping, ordering and limiting
@@ -140,6 +168,9 @@ $rows = $crud
     ->offset(20)
     ->select('status', 'COUNT(*) AS total');
 ```
+```sql
+SELECT status, COUNT(*) AS total FROM users GROUP BY status HAVING COUNT(*) > 1 ORDER BY created_at DESC LIMIT 10 OFFSET 20;
+```
 
 ### Mappers
 
@@ -151,6 +182,9 @@ $crudWithMapper = $crud->map(function (array $row) {
 foreach ($crudWithMapper->select() as $row) {
     echo $row->name;
 }
+```
+```sql
+SELECT * FROM users;
 ```
 
 ### Grouping results
@@ -166,6 +200,9 @@ $byLetter = $users->groupBy(function ($row) {
     return $row['name'][0];
 });
 ```
+```sql
+SELECT * FROM users;
+```
 
 ### Pagination
 
@@ -179,6 +216,9 @@ $rows = $crud
     ->limit($perPage)
     ->offset(($page - 1) * $perPage)
     ->select();
+```
+```sql
+SELECT * FROM users LIMIT 20 OFFSET 20;
 ```
 
 ### Streaming results
