@@ -22,9 +22,8 @@ DBAL aims to be framework‑agnostic and has no dependencies beyond PDO. It work
 
 ## Documentation Map
 
-The documentation in this folder is organised into several topics:
-
 - **`overview.md`** – this document. It introduces the library, outlines the main features and explains where to find more information.
+- **`core.md`** – overview of the main classes and how the query builder is structured.
 - **`middlewares.md`** – descriptions of the built‑in middlewares and how to create custom ones.
 - **`odata.md`** – using `ODataMiddleware` to translate query strings into filters, ordering and pagination.
 - **`integration.md`** – integration examples for Slim, Lumen and plain PHP usage.
