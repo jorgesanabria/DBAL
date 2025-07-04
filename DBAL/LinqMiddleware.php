@@ -84,4 +84,55 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
     {
         return !$this->all($crud, ...$filters);
     }
+
+/**
+ * count
+ * @param Crud $crud
+ * @param mixed $...$filters
+ * @return int
+ */
+
+    public function count(Crud $crud, ...$filters): int
+    {
+        return $this->countRows($crud->where(...$filters));
+    }
+
+/**
+ * max
+ * @param Crud $crud
+ * @param string $field
+ * @return mixed
+ */
+
+    public function max(Crud $crud, string $field)
+    {
+        $rows = iterator_to_array($crud->select("MAX($field) AS m"));
+        return $rows[0]['m'] ?? null;
+    }
+
+/**
+ * min
+ * @param Crud $crud
+ * @param string $field
+ * @return mixed
+ */
+
+    public function min(Crud $crud, string $field)
+    {
+        $rows = iterator_to_array($crud->select("MIN($field) AS m"));
+        return $rows[0]['m'] ?? null;
+    }
+
+/**
+ * sum
+ * @param Crud $crud
+ * @param string $field
+ * @return float
+ */
+
+    public function sum(Crud $crud, string $field): float
+    {
+        $rows = iterator_to_array($crud->select("SUM($field) AS s"));
+        return (float)($rows[0]['s'] ?? 0);
+    }
 }

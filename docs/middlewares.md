@@ -21,7 +21,7 @@ Allows executing callbacks after insert, bulk insert, update or delete operation
 Adds `first()`, `firstOrDefault()`, `last()` and `lastOrDefault()` to quickly fetch a single row.
 
 ## LinqMiddleware
-Adds `any()` and `all()` methods for boolean existence checks.
+Adds `any()`, `all()`, `count()`, `max()`, `min()` and `sum()` methods for quick queries.
 
 ## EntityValidationMiddleware
 Provides a fluent API to validate data and declare relations for eager or lazy loading.
