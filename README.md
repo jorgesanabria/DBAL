@@ -360,8 +360,9 @@ $totalAge = $crud->sum('age');
 `EntityValidationMiddleware` now reads PHP attributes from entity classes:
 
 ```php
-use DBAL\Attributes\{Required, StringType, MaxLength, Email, HasOne};
+use DBAL\Attributes\{Required, StringType, MaxLength, Email, HasOne, Table};
 
+#[Table('users')]
 class User {
     #[Required]
     #[StringType]
@@ -377,7 +378,7 @@ class User {
 }
 
 $validation = (new DBAL\EntityValidationMiddleware())
-    ->register('users', User::class);
+    ->register(User::class);
 
 $crud = (new DBAL\Crud($pdo))
     ->from('users')
@@ -393,19 +394,21 @@ Relationships are defined in the validation middleware using PHP 8.1 attributes.
 Once set up, relations can be eagerly loaded via `with()` and are available lazily on demand.
 
 ```php
+#[Table('users')]
 class User {
     #[HasOne('profiles', 'id', 'user_id')]
     public $profile;
 }
 
+#[Table('profiles')]
 class Profile {
     #[BelongsTo('users', 'user_id', 'id')]
     public $user;
 }
 
 $validation = (new DBAL\EntityValidationMiddleware())
-    ->register('users', User::class)
-    ->register('profiles', Profile::class);
+    ->register(User::class)
+    ->register(Profile::class);
 
 $crud = (new DBAL\Crud($pdo))
     ->from('users')

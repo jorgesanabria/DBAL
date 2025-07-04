@@ -3,8 +3,9 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use DBAL\EntityValidationMiddleware;
 use DBAL\RelationDefinition;
-use DBAL\Attributes\HasOne;
+use DBAL\Attributes\{HasOne, Table};
 
+#[Table('users')]
 class UserRelationEntity {
     #[HasOne('profiles', 'id', 'user_id')]
     public $profile;
@@ -15,7 +16,7 @@ class RelationDefinitionTest extends TestCase
     public function testRelationBuilderStoresCondition()
     {
         $mw = (new EntityValidationMiddleware())
-            ->register('users', UserRelationEntity::class);
+            ->register(UserRelationEntity::class);
 
         $rel = $mw->getRelation('users', 'profile');
         $this->assertInstanceOf(RelationDefinition::class, $rel);

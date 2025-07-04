@@ -68,15 +68,16 @@ $rows = $books
 
 ### Joins based on relations
 ```php
-use DBAL\Attributes\BelongsTo;
+use DBAL\Attributes\{BelongsTo, Table};
 
+#[Table('books')]
 class Book {
     #[BelongsTo('authors', 'author_id', 'id')]
     public $author;
 }
 
 $validation = (new DBAL\EntityValidationMiddleware())
-    ->register('books', Book::class);
+    ->register(Book::class);
 
 $books = (new DBAL\Crud($pdo))
     ->from('books')
@@ -207,15 +208,16 @@ $rows = $reservations
 
 ### Joins based on relations
 ```php
-use DBAL\Attributes\BelongsTo;
+use DBAL\Attributes\{BelongsTo, Table};
 
+#[Table('reservations')]
 class Reservation {
     #[BelongsTo('screenings', 'screening_id', 'id')]
     public $screening;
 }
 
 $validation = (new DBAL\EntityValidationMiddleware())
-    ->register('reservations', Reservation::class);
+    ->register(Reservation::class);
 
 $reservations = (new DBAL\Crud($pdo))
     ->from('reservations')
@@ -319,15 +321,16 @@ $rows = $packages
 
 ### Joins based on relations
 ```php
-use DBAL\Attributes\BelongsTo;
+use DBAL\Attributes\{BelongsTo, Table};
 
+#[Table('packages')]
 class Package {
     #[BelongsTo('warehouses', 'warehouse_id', 'id')]
     public $warehouse;
 }
 
 $validation = (new DBAL\EntityValidationMiddleware())
-    ->register('packages', Package::class);
+    ->register(Package::class);
 
 $packages = (new DBAL\Crud($pdo))
     ->from('packages')
