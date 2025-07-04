@@ -93,16 +93,16 @@ Allows executing callbacks after insert, bulk insert, update or delete operation
 Adds `first()`, `firstOrDefault()`, `last()` and `lastOrDefault()` to quickly fetch a single row.
 
 ## LinqMiddleware
-Convenience methods for existence checks and quick aggregations:
+Adds helper methods for quick queries:
 
-- `any($filters)` returns `true` if at least one row matches.
-- `none($filters)` returns `true` when no rows match.
-- `all($filters)` returns `true` if every row matches (or no rows exist).
-- `notAll($filters)` returns `true` when at least one row does not match.
-- `count($filters)` returns the number of matching rows.
-- `max($field)` returns the maximum value of a column.
-- `min($field)` returns the minimum value of a column.
-- `sum($field)` returns the sum of a numeric column.
+- `any(...$filters)` returns `true` when at least one row matches.
+- `none(...$filters)` returns `true` when no rows match.
+- `all(...$filters)` returns `true` when every row matches or there are no rows.
+- `notAll(...$filters)` returns `true` when some rows do not match.
+- `count(...$filters)` returns the number of matching rows.
+- `max($field)` returns the maximum value of the given field.
+- `min($field)` returns the minimum value of the given field.
+- `sum($field)` returns the sum of the values in the given field.
 
 ## EntityValidationMiddleware
 Provides a fluent API to validate data and declare relations for eager or lazy loading.
