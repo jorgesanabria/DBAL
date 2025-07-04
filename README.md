@@ -376,6 +376,23 @@ $crud = (new DBAL\Crud($pdo))
     ->from('users')
     ->withMiddleware($mw);
 ```
+
+### OData middleware
+
+`ODataMiddleware` converts an OData style query string into a DBAL query. The
+middleware parses `$filter`, `$orderby`, `$top`, `$skip` and `$select`
+parameters and applies them to a `Crud` instance.
+
+```php
+$mw = new DBAL\ODataMiddleware();
+$crud = (new DBAL\Crud($pdo))
+    ->from('books')
+    ->withMiddleware($mw);
+
+$odata = '$filter=author_id eq 1 and price gt 10&$orderby=title desc&$top=5';
+$crud  = $mw->apply($crud, $odata);
+$rows  = iterator_to_array($crud->select(...$mw->getFields()));
+```
 ### Schema middleware
 
 `SchemaMiddleware` provides a fluent API to create or modify tables via the `Crud` instance.
