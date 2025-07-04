@@ -269,8 +269,8 @@ class Query extends QueryNode
  * @return MessageInterface
  */
 
-	public function buildSelect(...$fields)
-	{
+        public function buildSelect(...$fields)
+        {
 		$clone = clone $this;
 		$message = new Message(MessageInterface::MESSAGE_TYPE_SELECT);
 		if (sizeof($fields) == 0) {
@@ -302,6 +302,17 @@ class Query extends QueryNode
                 $clone->getChild('change')->setFields($fields);
                 $message = $clone->send($message);
                 return $message;
+        }
+
+        /**
+         * Build a SELECT statement intended to be used as a subquery.
+         *
+         * @param mixed ...$fields
+         * @return MessageInterface
+         */
+        public function subQuery(...$fields)
+        {
+                return $this->buildSelect(...$fields);
         }
 /**
  * buildBulkInsert
