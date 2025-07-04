@@ -18,7 +18,7 @@ A lightweight Database Abstraction Layer for PHP.
 - Middleware system with caching, transactions, validation and more
 - Schema builder and migration helpers
 - Attribute based entity validation and relation definition
-- Relation loader middleware for programmatic relations
+- Relation loader middleware for programmatic relations ([docs](docs/middlewares.md#relationloadermiddleware))
 - First/Last and Linq helpers
 - ActiveRecord objects for tracked updates
 - Development error pages and global filters
@@ -360,7 +360,7 @@ echo $profile['photo'];
 ### Relation loader middleware
 
 If you prefer configuring relations programmatically, `RelationLoaderMiddleware`
-offers a fluent API.
+offers a fluent API (see [RelationLoaderMiddleware docs](docs/middlewares.md#relationloadermiddleware)).
 
 ```php
 $rel = (new DBAL\RelationLoaderMiddleware())

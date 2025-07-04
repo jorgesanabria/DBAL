@@ -26,6 +26,42 @@ Adds `any()`, `all()`, `count()`, `max()`, `min()` and `sum()` methods for quick
 ## EntityValidationMiddleware
 Provides a fluent API to validate data and declare relations for eager or lazy loading.
 
+## RelationLoaderMiddleware
+Defines relations programmatically without PHP attributes. Use `table()` to pick
+the table being configured and `hasOne()`, `hasMany()` or `belongsTo()` to
+describe how rows relate. Each method returns the middleware for chaining.
+
+- `table($name)` sets the table currently being configured.
+- `hasOne($name, $table, $localKey, $foreignKey)` declares a one-to-one relation.
+- `hasMany($name, $table, $localKey, $foreignKey)` declares a one-to-many relation.
+- `belongsTo($name, $table, $localKey, $foreignKey)` references a parent row.
+
+```php
+$rel = (new DBAL\RelationLoaderMiddleware())
+    ->table('users')
+        ->hasOne('profile', 'profiles', 'id', 'user_id')
+        ->hasMany('posts', 'posts', 'id', 'user_id')
+    ->table('posts')
+        ->belongsTo('user', 'users', 'user_id', 'id');
+
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($rel);
+
+// Eager load
+foreach ($crud->with('profile', 'posts')->select() as $user) {
+    echo $user['profile']['bio'];
+    foreach ($user['posts'] as $post) {
+        echo $post['title'];
+    }
+}
+
+// Lazy load
+$user    = iterator_to_array($crud->where(['id' => 1])->select())[0];
+$profile = $user['profile'];
+$posts   = $user['posts'];
+```
+
 ## GlobalFilterMiddleware
 Appends extra filters automatically to every SELECT statement.
 
