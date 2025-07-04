@@ -8,16 +8,10 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class ResultIterator implements \Iterator, \JsonSerializable
 {
-        protected \PDO $pdo;
-        protected MessageInterface $message;
         protected mixed $result;
         protected int $i;
         protected ?\PDOStatement $stm;
         protected array $rows = [];
-        protected array $mappers;
-        protected array $middlewares;
-        protected array $relations;
-        protected array $eagerRelations;
 /**
  * __construct
  * @param \PDO $pdo
