@@ -9,7 +9,6 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class TransactionMiddleware implements MiddlewareInterface
 {
-    private PDO $pdo;
     private array $log = [];
     private bool $inTx = false;
 

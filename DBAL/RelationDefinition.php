@@ -6,7 +6,6 @@ namespace DBAL;
  */
 class RelationDefinition
 {
-    private string $name;
     private string $table;
     private string $type;
     private array $conditions = [];

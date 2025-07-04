@@ -10,12 +10,6 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class ResultGenerator
 {
-    private PDO $pdo;
-    private MessageInterface $message;
-    private array $mappers;
-    private array $middlewares;
-    private array $relations;
-    private array $eagerRelations;
 
 /**
  * __construct

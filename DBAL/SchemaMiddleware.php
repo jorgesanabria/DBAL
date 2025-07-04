@@ -9,7 +9,6 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class SchemaMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterface
 {
-    private PDO $pdo;
 
 /**
  * __construct

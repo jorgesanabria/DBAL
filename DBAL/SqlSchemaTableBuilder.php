@@ -8,9 +8,6 @@ use PDO;
  */
 class SqlSchemaTableBuilder
 {
-    private PDO $pdo;
-    private string $table;
-    private bool $create = true;
     private array $definitions = [];
 
 /**
