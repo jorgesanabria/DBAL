@@ -57,6 +57,19 @@ class ArrayCache implements CacheStorageInterface
 $crud = $crud->withMiddleware(new DBAL\CacheMiddleware(new ArrayCache()));
 ```
 
+## LoggingMiddleware
+Logs every executed SQL statement. The constructor accepts a PSR-3 logger or any
+callable receiving the SQL string and bound values.
+
+```php
+use Psr\Log\NullLogger;
+
+$logger = new NullLogger();
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware(new DBAL\LoggingMiddleware($logger));
+```
+
 ## TransactionMiddleware
 Wraps operations inside database transactions and exposes `begin()`, `commit()` and `rollback()` helpers.
 

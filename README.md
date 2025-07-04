@@ -216,7 +216,8 @@ foreach ($rows as $row) {
 ### Middlewares
 
 Middlewares allow you to intercept query execution for tasks like logging or
-validation.
+validation. DBAL ships with a [LoggingMiddleware](docs/middlewares.md#loggingmiddleware)
+that forwards executed SQL to any PSR-3 logger.
 
 ```php
 $crud = (new DBAL\Crud($pdo))
