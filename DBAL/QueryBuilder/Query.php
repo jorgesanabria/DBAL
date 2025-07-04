@@ -12,6 +12,7 @@ use DBAL\QueryBuilder\Node\FieldsNode;
 use DBAL\QueryBuilder\Node\FieldNode;
 use DBAL\QueryBuilder\Node\JoinsNode;
 use DBAL\QueryBuilder\Node\JoinNode;
+use DBAL\QueryBuilder\JoinType;
 use DBAL\QueryBuilder\Node\WhereNode;
 use DBAL\QueryBuilder\Node\HavingNode;
 use DBAL\QueryBuilder\Node\FilterNode;
@@ -51,7 +52,7 @@ class Query extends QueryNode
  * @return void
  */
 
-        protected function join($type, $table, array $on = [])
+        protected function join(JoinType $type, $table, array $on = [])
         {
                 $conditions = [];
                 foreach ($on as $filter) {
@@ -77,9 +78,9 @@ class Query extends QueryNode
         public function innerJoin($table, ...$on)
         {
                 $clone = clone $this;
-                $clone->join(JoinNode::INNER_JOIN, $table, $on);
+                $clone->join(JoinType::INNER, $table, $on);
                 return $clone;
-        }
+       }
 /**
  * leftJoin
  * @param string|TableNode $table
@@ -90,9 +91,9 @@ class Query extends QueryNode
         public function leftJoin($table, ...$on)
         {
                 $clone = clone $this;
-                $clone->join(JoinNode::LEFT_JOIN, $table, $on);
+                $clone->join(JoinType::LEFT, $table, $on);
                 return $clone;
-        }
+       }
 /**
  * rightJoin
  * @param string|TableNode $table
@@ -103,9 +104,9 @@ class Query extends QueryNode
         public function rightJoin($table, ...$on)
         {
                 $clone = clone $this;
-                $clone->join(JoinNode::RIGHT_JOIN, $table, $on);
+                $clone->join(JoinType::RIGHT, $table, $on);
                 return $clone;
-        }
+       }
 /**
  * where
  * @param mixed ...$filters

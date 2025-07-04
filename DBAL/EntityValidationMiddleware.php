@@ -14,6 +14,7 @@ use DBAL\Attributes\Email;
 use DBAL\Attributes\HasOne;
 use DBAL\Attributes\HasMany;
 use DBAL\Attributes\BelongsTo;
+use DBAL\Attributes\Table;
 
 /**
  * EntityValidationMiddleware parses attribute annotations on entity classes
@@ -32,12 +33,26 @@ class EntityValidationMiddleware implements EntityValidationInterface
     /**
      * Register an entity class for a given table.
      */
-    public function register(string $table, string $class): self
+    public function register(string $table, string $class = null): self
     {
+        if ($class === null && class_exists($table)) {
+            $class = $table;
+            $table = null;
+        }
+
+        $ref = new ReflectionClass($class);
+
+        if ($table === null) {
+            $attrs = $ref->getAttributes(Table::class);
+            if (!$attrs) {
+                throw new InvalidArgumentException('Table name missing and no #[Table] attribute found');
+            }
+            $table = $attrs[0]->newInstance()->name;
+        }
+
         $this->rules[$table] = [];
         $this->relations[$table] = [];
 
-        $ref = new ReflectionClass($class);
         foreach ($ref->getProperties() as $prop) {
             $field = $prop->getName();
             $rule = [
