@@ -30,8 +30,11 @@ class SchemaMiddlewareTest extends TestCase
             ->addColumn('price', 'INTEGER')
             ->execute();
 
-        $pdo->exec("INSERT INTO items (name, price) VALUES ('B', 10)");
-        $row = $pdo->query("SELECT price FROM items WHERE name = 'B'")->fetch(PDO::FETCH_ASSOC);
+        $stm = $pdo->prepare('INSERT INTO items (name, price) VALUES (?, ?)');
+        $stm->execute(['B', 10]);
+        $stm = $pdo->prepare('SELECT price FROM items WHERE name = ?');
+        $stm->execute(['B']);
+        $row = $stm->fetch(PDO::FETCH_ASSOC);
 
         $this->assertEquals(10, $row['price']);
     }

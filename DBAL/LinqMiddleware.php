@@ -97,6 +97,21 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
         return $this->countRows($crud->where(...$filters));
     }
 
+    /**
+     * Ensure that the given identifier is safe to use in a query.
+     */
+    private function quoteIdentifier(string $id): string
+    {
+        $parts = explode('.', $id);
+        foreach ($parts as $i => $p) {
+            if (!preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $p)) {
+                throw new \InvalidArgumentException("Invalid identifier: {$id}");
+            }
+            $parts[$i] = '"' . $p . '"';
+        }
+        return implode('.', $parts);
+    }
+
 /**
  * max
  * @param Crud $crud
@@ -106,6 +121,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
 
     public function max(Crud $crud, string $field)
     {
+        $field = $this->quoteIdentifier($field);
         $rows = iterator_to_array($crud->select("MAX($field) AS m"));
         return $rows[0]['m'] ?? null;
     }
@@ -119,6 +135,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
 
     public function min(Crud $crud, string $field)
     {
+        $field = $this->quoteIdentifier($field);
         $rows = iterator_to_array($crud->select("MIN($field) AS m"));
         return $rows[0]['m'] ?? null;
     }
@@ -132,6 +149,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
 
     public function sum(Crud $crud, string $field): float
     {
+        $field = $this->quoteIdentifier($field);
         $rows = iterator_to_array($crud->select("SUM($field) AS s"));
         return (float)($rows[0]['s'] ?? 0);
     }
