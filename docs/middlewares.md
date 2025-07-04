@@ -176,5 +176,23 @@ errors/
     └── script.js
 ```
 
+## QueryTimingMiddleware
+Records how long each SQL statement takes to run. The collected timings can be
+retrieved via `getTimings()`.
+
+```php
+$timing = new DBAL\QueryTimingMiddleware();
+$crud = (new DBAL\Crud($pdo))
+    ->from('items')
+    ->withMiddleware($timing);
+
+$crud->insert(['name' => 'A']);
+iterator_to_array($crud->select());
+
+foreach ($timing->getTimings() as $info) {
+    echo $info['message'] . ' took ' . $info['time'] . "s\n";
+}
+```
+
 Each middleware implements `MiddlewareInterface` and can be combined freely.
 

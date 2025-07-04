@@ -5,6 +5,7 @@ namespace DBAL;
 use Generator;
 use PDO;
 use DBAL\QueryBuilder\MessageInterface;
+use DBAL\AfterExecuteMiddlewareInterface;
 
 /**
  * Clase/Interfaz ResultGenerator
@@ -117,6 +118,7 @@ class ResultGenerator
         }
 
         $stm = $this->pdo->prepare($this->message->readMessage());
+        $start = microtime(true);
         $stm->execute($this->message->getValues());
 
         $rows = [];
@@ -130,9 +132,17 @@ class ResultGenerator
             yield $row;
         }
 
+        $time = microtime(true) - $start;
+
         foreach ($this->middlewares as $mw) {
             if (method_exists($mw, 'save')) {
                 $mw->save($this->message, $rows);
+            }
+        }
+
+        foreach ($this->middlewares as $mw) {
+            if ($mw instanceof AfterExecuteMiddlewareInterface) {
+                $mw->afterExecute($this->message, $time);
             }
         }
     }
