@@ -48,4 +48,21 @@ class LinqMiddlewareTest extends TestCase
 
         $this->assertFalse($crud->where(['id__eq' => 999])->any());
     }
+
+    public function testMaxMinSum()
+    {
+        $crud = $this->createCrud($this->createPdo());
+
+        $this->assertEquals(3, $crud->max('id'));
+        $this->assertEquals(1, $crud->min('id'));
+        $this->assertEquals(6.0, $crud->sum('id'));
+    }
+
+    public function testCount()
+    {
+        $crud = $this->createCrud($this->createPdo());
+
+        $this->assertEquals(3, $crud->count());
+        $this->assertEquals(2, $crud->count(['active__eq' => 1]));
+    }
 }
