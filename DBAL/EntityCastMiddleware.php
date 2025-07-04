@@ -76,13 +76,19 @@ class EntityCastMiddleware implements MiddlewareInterface
             return $crud->withMiddleware($this);
         }
         $class = $this->classes[$table];
-        $crud  = $crud->map(function (array $row) use ($class) {
+        $refCrud = null;
+        $crud  = $crud->map(function (array $row) use ($class, &$refCrud) {
             $obj = new $class();
             foreach ($row as $k => $v) {
                 $obj->$k = $v;
             }
+            if (in_array(ActiveRecordTrait::class, class_uses($obj))) {
+                $obj->initActiveRecord($refCrud, $row);
+            }
             return $obj;
         });
-        return $crud->withMiddleware($this);
+        $crud = $crud->withMiddleware($this);
+        $refCrud = $crud;
+        return $crud;
     }
 }

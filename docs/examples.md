@@ -116,6 +116,31 @@ $record->title = 'New Title';
 $record->update();
 ```
 
+### Entity Classes and Bulk Insert
+```php
+class BookEntity {
+    use DBAL\ActiveRecordTrait;
+    public $id;
+    public $title;
+    public $author_id;
+}
+
+$caster = (new DBAL\EntityCastMiddleware())
+    ->register('books', BookEntity::class);
+$books = $caster->attach($books, 'books');
+
+$a = new BookEntity();
+$a->title = 'Book A';
+$a->author_id = 1;
+$b = new BookEntity();
+$b->title = 'Book B';
+$b->author_id = 2;
+$books->bulkInsertObjects([$a, $b]);
+
+$a->title = 'Updated';
+$a->update();
+```
+
 ## Cinema Ticketing
 This example manages movie screenings and reservations. It demonstrates altering tables and loading related screening information.
 
