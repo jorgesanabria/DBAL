@@ -111,23 +111,29 @@ class Query extends QueryNode
  * @return mixed
  */
 
-       public function where(...$filters)
-       {
-               $clon = clone $this;
-               foreach ($filters as $filter) {
-                       if (is_callable($filter)) {
-                               $builder = new DynamicFilterBuilder();
-                               $filter($builder);
-                               $filter = $builder->toNode();
-                       }
-                       if ($filter instanceof FilterNode) {
-                               $clon->getChild('where')->appendChild($filter);
-                       } elseif (is_array($filter)) {
-                               $clon->getChild('where')->appendChild(new FilterNode($filter));
-                       }
-               }
-               return $clon;
-       }
+        public function where(...$filters)
+        {
+                $clon = clone $this;
+                foreach ($filters as $filter) {
+                        if (is_callable($filter)) {
+                                $builder = new DynamicFilterBuilder();
+                                $filter($builder);
+                                $filter = $builder->toNode();
+                        }
+                        if ($filter instanceof FilterNode) {
+                                if (count($filter->getParts()) === 0 && count($filter->allChildren()) > 1) {
+                                        foreach ($filter->allChildren() as $child) {
+                                                $clon->getChild('where')->appendChild($child);
+                                        }
+                                } else {
+                                        $clon->getChild('where')->appendChild($filter);
+                                }
+                        } elseif (is_array($filter)) {
+                                $clon->getChild('where')->appendChild(new FilterNode($filter));
+                        }
+                }
+                return $clon;
+        }
 /**
  * having
  * @param array $...$filters
