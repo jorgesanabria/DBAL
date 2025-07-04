@@ -6,7 +6,6 @@ namespace DBAL\Schema;
  */
 class SchemaTableBuilder
 {
-    private string $name;
     /** @var SchemaColumnBuilder[] */
     private array $columns = [];
 

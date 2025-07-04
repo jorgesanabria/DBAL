@@ -6,7 +6,6 @@ namespace DBAL;
  */
 class ActiveRecord implements \JsonSerializable
 {
-        private Crud $crud;
         private array $original = [];
         private array $modified = [];
 

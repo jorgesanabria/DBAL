@@ -9,7 +9,6 @@ use Exception;
  */
 class UnitOfWorkMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterface
 {
-    private TransactionMiddleware $tx;
     private array $news = [];
     private array $dirty = [];
     private array $delete = [];
