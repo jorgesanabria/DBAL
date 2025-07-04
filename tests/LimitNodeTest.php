@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use DBAL\QueryBuilder\Message;
 use DBAL\QueryBuilder\Node\LimitNode;
