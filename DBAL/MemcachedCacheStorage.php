@@ -7,10 +7,16 @@ namespace DBAL;
  */
 class MemcachedCacheStorage implements CacheStorageInterface
 {
-    private \Memcached $memcached;
+    /**
+     * Generic memcached client instance.
+     *
+     * The object is expected to expose the standard Memcached API
+     * used by this storage (get, set, delete and flush).
+     */
+    private object $memcached;
     private string $prefix;
 
-    public function __construct(\Memcached $memcached, string $prefix = 'dbal:')
+    public function __construct(object $memcached, string $prefix = 'dbal:')
     {
         $this->memcached = $memcached;
         $this->prefix    = $prefix;

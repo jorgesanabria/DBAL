@@ -9,10 +9,16 @@ namespace DBAL;
  */
 class RedisCacheStorage implements CacheStorageInterface
 {
-    private \Redis $redis;
+    /**
+     * Generic Redis client instance.
+     *
+     * The object must implement the subset of the Redis API used by this
+     * storage (get, set, del and keys).
+     */
+    private object $redis;
     private string $prefix;
 
-    public function __construct(\Redis $redis, string $prefix = 'dbal:')
+    public function __construct(object $redis, string $prefix = 'dbal:')
     {
         $this->redis = $redis;
         $this->prefix = $prefix;
