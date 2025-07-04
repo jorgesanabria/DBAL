@@ -477,7 +477,7 @@ $crud = (new DBAL\Crud($pdo))
 
 ### Cache middleware
 
-`CacheMiddleware` stores the result of SELECT statements and invalidates the cache when data changes. The package includes in-memory and SQLite storage adapters.
+`CacheMiddleware` caches the result of SELECT statements and clears the cache when data changes. It defaults to the in-memory `MemoryCacheStorage`, but you can use the provided `SqliteCacheStorage` or any custom `CacheStorageInterface` implementation.
 
 ### Active record
 
