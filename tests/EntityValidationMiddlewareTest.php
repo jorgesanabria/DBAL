@@ -5,8 +5,9 @@ use DBAL\Crud;
 use DBAL\EntityValidationMiddleware;
 use DBAL\EntityValidationInterface;
 use DBAL\RelationDefinition;
-use DBAL\Attributes\{Required, StringType, MaxLength, Email, HasOne, BelongsTo};
+use DBAL\Attributes\{Required, StringType, MaxLength, Email, HasOne, BelongsTo, Table};
 
+#[Table('users')]
 class UserEntity {
     #[Required]
     #[StringType]
@@ -21,6 +22,7 @@ class UserEntity {
     public $profile;
 }
 
+#[Table('profiles')]
 class ProfileEntity {
     #[BelongsTo('users', 'user_id', 'id')]
     public $user;
@@ -38,7 +40,7 @@ class EntityValidationMiddlewareTest extends TestCase
     private function createCrud(PDO $pdo)
     {
         $mw = (new EntityValidationMiddleware())
-            ->register('users', UserEntity::class);
+            ->register(UserEntity::class);
         return (new Crud($pdo))->from('users')->withMiddleware($mw);
     }
 
@@ -78,7 +80,7 @@ class EntityValidationMiddlewareTest extends TestCase
     public function testGetRelations()
     {
         $mw = (new EntityValidationMiddleware())
-            ->register('users', UserEntity::class);
+            ->register(UserEntity::class);
 
         $rels = $mw->getRelations('users');
         $this->assertArrayHasKey('profile', $rels);
@@ -88,7 +90,7 @@ class EntityValidationMiddlewareTest extends TestCase
     public function testRelationShortcut()
     {
         $mw = (new EntityValidationMiddleware())
-            ->register('users', UserEntity::class);
+            ->register(UserEntity::class);
 
         $rel = $mw->getRelation('users', 'profile');
         $this->assertInstanceOf(RelationDefinition::class, $rel);
