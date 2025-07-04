@@ -8,12 +8,21 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class AbmEventMiddleware implements AbmEventInterface
 {
+    private ?\Closure $onInsert;
+    private ?\Closure $onUpdate;
+    private ?\Closure $onDelete;
+    private ?\Closure $onBulkInsert;
+
     public function __construct(
-        private ?callable $onInsert = null,
-        private ?callable $onUpdate = null,
-        private ?callable $onDelete = null,
-        private ?callable $onBulkInsert = null
+        ?callable $onInsert = null,
+        ?callable $onUpdate = null,
+        ?callable $onDelete = null,
+        ?callable $onBulkInsert = null
     ) {
+        $this->onInsert = $onInsert ? \Closure::fromCallable($onInsert) : null;
+        $this->onUpdate = $onUpdate ? \Closure::fromCallable($onUpdate) : null;
+        $this->onDelete = $onDelete ? \Closure::fromCallable($onDelete) : null;
+        $this->onBulkInsert = $onBulkInsert ? \Closure::fromCallable($onBulkInsert) : null;
     }
 
 /**
