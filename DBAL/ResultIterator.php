@@ -59,7 +59,7 @@ class ResultIterator implements \Iterator, \JsonSerializable
 
                 $this->stm = $this->pdo->prepare($this->message->readMessage());
                 $this->stm->execute($this->message->getValues());
-                $this->rows = $this->stm->fetchAll();
+                $this->rows = $this->stm->fetchAll(\PDO::FETCH_ASSOC);
 
                 foreach ($this->middlewares as $mw) {
                         if (method_exists($mw, 'save')) {
