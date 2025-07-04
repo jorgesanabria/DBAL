@@ -6,7 +6,10 @@
     "autoload": {
         "psr-4": {
             "DBAL\\": "DBAL/"
-        }
+        },
+        "files": [
+            "DBAL/Hooks/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
