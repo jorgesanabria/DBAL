@@ -2,7 +2,6 @@
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use DBAL\DevelopmentErrorMiddleware;
-use ReflectionClass;
 
 class DevelopmentErrorMiddlewareTest extends TestCase
 {
