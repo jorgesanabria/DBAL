@@ -188,6 +188,21 @@ class Crud extends Query
         }
 
     /**
+     * Returns all rows from a SELECT query as an array.
+     *
+     * This is a convenience method equivalent to
+     * `iterator_to_array($this->select(...$fields))`.
+     *
+     * @param string|array ...$fields Optional fields to select.
+     * @return array                   Array with the fetched rows.
+     */
+
+        public function fetchAll(...$fields): array
+        {
+                return iterator_to_array($this->select(...$fields));
+        }
+
+    /**
      * Streams the result of a SELECT query using a generator.
      *
      * Middlewares are executed when the returned generator starts
