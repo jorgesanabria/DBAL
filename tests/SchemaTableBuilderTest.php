@@ -2,12 +2,13 @@
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use DBAL\Schema\SchemaTableBuilder;
+use DBAL\Platform\SqlitePlatform;
 
 class SchemaTableBuilderTest extends TestCase
 {
     public function testLambdaColumnDefinition()
     {
-        $table = new SchemaTableBuilder('users');
+        $table = new SchemaTableBuilder('users', new SqlitePlatform());
         $table->column('id', function ($c) {
             $c->integer()->primaryKey()->autoIncrement();
         });
@@ -22,7 +23,7 @@ class SchemaTableBuilderTest extends TestCase
 
     public function testAddColumnWithStringType()
     {
-        $table = new SchemaTableBuilder('items');
+        $table = new SchemaTableBuilder('items', new SqlitePlatform());
         $table->addColumn('id', function ($c) {
             $c->integer()->primaryKey();
         });
@@ -35,7 +36,7 @@ class SchemaTableBuilderTest extends TestCase
 
     public function testColumnWithStringType()
     {
-        $table = new SchemaTableBuilder('products');
+        $table = new SchemaTableBuilder('products', new SqlitePlatform());
         $table->column('id', 'INTEGER');
         $table->column('name', 'TEXT');
         $this->assertEquals(
@@ -46,7 +47,7 @@ class SchemaTableBuilderTest extends TestCase
 
     public function testAddColumnAfterBuild()
     {
-        $table = new SchemaTableBuilder('logs');
+        $table = new SchemaTableBuilder('logs', new SqlitePlatform());
         $table->column('id', 'INTEGER');
         $this->assertEquals(
             'CREATE TABLE logs (id INTEGER)',

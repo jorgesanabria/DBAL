@@ -29,9 +29,9 @@ class Crud extends Query
      * @param \PDO $connection Database connection used for all queries.
      */
 
-        public function __construct(protected \PDO $connection)
+        public function __construct(protected \PDO $connection, ?\DBAL\Platform\PlatformInterface $platform = null)
         {
-                parent::__construct();
+                parent::__construct($platform);
         }
     /**
      * Registers a mapper callback to transform each fetched row.
