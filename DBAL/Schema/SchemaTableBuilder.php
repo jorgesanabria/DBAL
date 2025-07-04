@@ -59,9 +59,13 @@ class SchemaTableBuilder
 
     public function build(): string
     {
-        $cols = array_map(function (SchemaColumnBuilder $col) {
-            return $col->build();
-        }, $this->columns);
-        return sprintf('CREATE TABLE %s (%s)', $this->name, implode(', ', $cols));
+        $create = new \DBAL\Schema\Node\CreateTableNode($this->name);
+        foreach ($this->columns as $col) {
+            $create->appendChild(
+                new \DBAL\Schema\Node\TableDefinitionNode($col->build())
+            );
+        }
+        $msg = $create->send(new \DBAL\QueryBuilder\Message());
+        return $msg->readMessage();
     }
 }
