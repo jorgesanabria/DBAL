@@ -2,7 +2,11 @@
 
 DBAL is a lightweight Database Abstraction Layer written in PHP. It builds upon the PDO extension to offer a fluent and expressive way to manage SQL queries while remaining easy to integrate in any project. The library exposes a `Crud` class for select, insert, update and delete operations, an extensible middleware system, and helper utilities to simplify common tasks such as transaction handling or schema updates.
 
-## Why DBAL?
+* **overview.md** – this file, quick introduction and benefits.
+* **middlewares.md** – explanation of included middlewares and how to extend them.
+* **integration.md** – examples of integrating DBAL with frameworks such as Slim and Lumen or plain PHP.
+* **examples.md** – practical use cases for book stores, cinemas and logistic APIs.
+* **hooks.md** – helper functions for quickly setting up middlewares.
 
 - **Simple query builder**: compose SQL statements through a chainable API.
 - **Dynamic filters**: use magic methods or callbacks to create complex filtering logic.

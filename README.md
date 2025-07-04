@@ -641,4 +641,28 @@ try {
 
 Middlewares are simple classes that implement `MiddlewareInterface`. Create your own to add behaviours such as auditing or soft deletes and attach them with `withMiddleware()`.
 
+## Hook Helpers
+
+Several convenience functions are available under the `DBAL\Hooks` namespace.
+These helpers configure a `Crud` instance with common middlewares.
+
+```php
+use function DBAL\Hooks\useCrud;
+use function DBAL\Hooks\useCache;
+use function DBAL\Hooks\useTransaction;
+
+$pdo = new PDO('sqlite::memory:');
+$crud = useCrud($pdo, 'items');
+$crud = useCache($crud);
+[$crud, $tx] = useTransaction($crud);
+
+$tx->begin();
+$crud->insert(['name' => 'Example']);
+$tx->commit();
+```
+
+Each `use*` function returns the configured `Crud` instance and, when
+applicable, the middleware object so you can call helper methods like
+`begin()` or `commit()`.
+
 
