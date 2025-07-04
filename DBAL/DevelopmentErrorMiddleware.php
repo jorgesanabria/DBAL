@@ -4,21 +4,36 @@ namespace DBAL;
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz DevelopmentErrorMiddleware
+ * Middleware that installs a simple error page handler for development.
+ *
+ * When an uncaught exception occurs an HTML page is rendered. The appearance
+ * can be customised using the options passed to the constructor.
  */
 class DevelopmentErrorMiddleware implements MiddlewareInterface
 {
+    /** Whether to output a text representation of the error to STDERR. */
     private bool $console;
+
+    /** Directory where rendered pages will be stored or null. */
     private ?string $persistPath;
+
+    /** Selected colour theme: "light" or "dark". */
     private string $theme;
+
+    /** Font size used for the rendered HTML page. */
     private string $fontSize;
 
-/**
- * __construct
- * @param array $options
- * @return void
- */
-
+    /**
+     * Create the middleware.
+     *
+     * Supported options:
+     *  - `console` (bool): when true a text version of the error is written to
+     *    STDERR.
+     *  - `persistPath` (string): directory where rendered pages will be stored.
+     *    If omitted no persistence takes place.
+     *  - `theme` (string): "light" or "dark".
+     *  - `fontSize` (string): "small", "medium" or "large".
+     */
     public function __construct(array $options = [])
     {
         $this->console = isset($options['console']) ? (bool)$options['console'] : false;
@@ -36,23 +51,17 @@ class DevelopmentErrorMiddleware implements MiddlewareInterface
         set_exception_handler([$this, 'handleException']);
     }
 
-/**
- * __invoke
- * @param MessageInterface $msg
- * @return void
- */
-
+    /**
+     * Part of the middleware chain; it performs no action.
+     */
     public function __invoke(MessageInterface $msg): void
     {
         // no-op
     }
 
-/**
- * handleException
- * @param \Throwable $e
- * @return void
- */
-
+    /**
+     * Render the error page and terminate execution.
+     */
     public function handleException(\Throwable $e): void
     {
         $html = $this->renderHtml($e);
@@ -137,12 +146,9 @@ class DevelopmentErrorMiddleware implements MiddlewareInterface
         return "function setTheme(t){document.body.classList.remove('light','dark');document.body.classList.add(t)}function setFont(s){document.body.classList.remove('font-small','font-medium','font-large');document.body.classList.add('font-'+s)}";
     }
 
-/**
- * persist
- * @param string $html
- * @return void
- */
-
+    /**
+     * Save the rendered HTML page to the configured directory if enabled.
+     */
     private function persist(string $html): void
     {
         if ($this->persistPath === null) {
