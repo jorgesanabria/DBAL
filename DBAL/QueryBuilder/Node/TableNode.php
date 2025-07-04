@@ -3,14 +3,27 @@ namespace DBAL\QueryBuilder\Node;
 
 use DBAL\QueryBuilder\MessageInterface;
 
+/**
+ * Clase/Interfaz TableNode
+ */
 class TableNode extends NotImplementedNode
 {
-	protected $isEmpty = false;
-	protected $table;
-	public function __construct($table)
-	{
-		$this->table = $table;
-	}
+        protected bool $isEmpty = false;
+/**
+ * __construct
+ * @param mixed $table
+ * @return void
+ */
+
+        public function __construct(private mixed $table)
+        {
+        }
+/**
+ * send
+ * @param MessageInterface $message
+ * @return mixed
+ */
+
 	public function send(MessageInterface $message)
 	{
 		return $message->insertAfter($this->table, MessageInterface::SEPARATOR_COMMA);

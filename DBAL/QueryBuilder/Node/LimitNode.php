@@ -3,19 +3,40 @@ namespace DBAL\QueryBuilder\Node;
 
 use DBAL\QueryBuilder\MessageInterface;
 
+/**
+ * Clase/Interfaz LimitNode
+ */
 class LimitNode extends NotImplementedNode
 {
-	protected $isEmpty = false;
-	protected $limit = null;
-	protected $offset = null;
+        protected bool $isEmpty = false;
+        protected ?int $limit = null;
+        protected ?int $offset = null;
+/**
+ * setLimit
+ * @param mixed $limit
+ * @return mixed
+ */
+
 	public function setLimit($limit)
 	{
 		$this->limit = $limit;
 	}
+/**
+ * setOffset
+ * @param mixed $offset
+ * @return mixed
+ */
+
 	public function setOffset($offset)
 	{
 		$this->offset = $offset;
 	}
+/**
+ * send
+ * @param MessageInterface $message
+ * @return mixed
+ */
+
 	public function send(MessageInterface $message)
 	{
 		$msg = $message;

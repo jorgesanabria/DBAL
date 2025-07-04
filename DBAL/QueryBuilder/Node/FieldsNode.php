@@ -5,9 +5,18 @@ use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Message;
 use DBAL\QueryBuilder\Node\NodeInterface;
 
+/**
+ * Clase/Interfaz FieldsNode
+ */
 class FieldsNode extends Node
 {
-	protected $isEmpty = false;
+        protected bool $isEmpty = false;
+/**
+ * send
+ * @param MessageInterface $message
+ * @return mixed
+ */
+
 	public function send(MessageInterface $message)
 	{
 		$msg = new Message($message->type());
@@ -16,6 +25,13 @@ class FieldsNode extends Node
 		}
 		return ($msg->getLength() > 0)? $message->join($msg->insertBefore('SELECT')) : $message->join($msg->insertAfter('SELECT *'));
 	}
+/**
+ * appendChild
+ * @param NodeInterface $node
+ * @param mixed $name
+ * @return mixed
+ */
+
 	public function appendChild(NodeInterface $node, $name = null)
 	{
 		if ($node instanceof FieldNode) {
