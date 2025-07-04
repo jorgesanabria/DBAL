@@ -405,13 +405,39 @@ parameters and applies them to a `Crud` instance.
 
 ```php
 $mw = new DBAL\ODataMiddleware();
-$crud = (new DBAL\Crud($pdo))
-    ->from('books')
-    ->withMiddleware($mw);
+$crud = $mw->attach((new DBAL\Crud($pdo))->from('books'));
 
 $odata = '$filter=author_id eq 1 and price gt 10&$orderby=title desc&$top=5';
-$crud  = $mw->apply($crud, $odata);
-$rows  = iterator_to_array($crud->select(...$mw->getFields()));
+$rows  = $mw->query($odata);
+```
+The middleware can also be used to handle query strings directly from an HTTP
+request. If the request URI is:
+
+```
+/books?$filter=category%20eq%20'fantasy'&$select=name,synopsis,author&$top=10
+```
+
+you can parse the query and apply the parameters as follows to get the `name`,
+`synopsis` and `author` fields of up to ten fantasy books:
+
+```php
+$mw = new DBAL\ODataMiddleware();
+$crud = $mw->attach((new DBAL\Crud($pdo))->from('books'));
+
+$odata = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
+$books = $mw->query($odata);
+
+// The result will be an array with up to ten books where each item
+// contains only the `name`, `synopsis` and `author` fields.
+// Example:
+// [
+//     [
+//         'name'     => 'The Hobbit',
+//         'synopsis' => 'A hobbit goes on an adventure... ',
+//         'author'   => 'J.R.R. Tolkien'
+//     ],
+//     ...
+// ]
 ```
 ### Schema middleware
 
