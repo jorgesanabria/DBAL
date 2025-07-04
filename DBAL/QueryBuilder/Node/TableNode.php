@@ -1,31 +1,28 @@
 <?php
+declare(strict_types=1);
 namespace DBAL\QueryBuilder\Node;
 
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz TableNode
+ * Node that represents a table or table expression used in FROM/INSERT/UPDATE
+ * clauses.
  */
 class TableNode extends NotImplementedNode
 {
+        /** @var bool */
         protected bool $isEmpty = false;
-/**
- * __construct
- * @param mixed $table
- * @return void
- */
-
+        /**
+         * @param mixed $table Table name or expression.
+         */
         public function __construct(private mixed $table)
         {
         }
-/**
- * send
- * @param MessageInterface $message
- * @return mixed
- */
-
-	public function send(MessageInterface $message)
-	{
-		return $message->insertAfter($this->table, MessageInterface::SEPARATOR_COMMA);
-	}
+        /**
+         * Append the table expression to the message.
+         */
+        public function send(MessageInterface $message)
+        {
+                return $message->insertAfter($this->table, MessageInterface::SEPARATOR_COMMA);
+        }
 }

@@ -6,19 +6,19 @@ A lightweight Database Abstraction Layer for PHP.
 - ActiveRecord support with dynamic properties
 - Caching middleware with pluggable storage
 - Transaction and Unit of Work middlewares
-- ABM event hooks to listen for inserts, updates or deletes
+- CRUD event hooks to listen for inserts, updates or deletes
 - Improved documentation and error pages
 
 
 ## Features
 - Fluent query builder for CRUD operations
 - Dynamic filters via magic methods
-- Streaming and iterator-based results
+- Streaming and [iterator-based results](docs/overview.md#resultiterator)
 - Lazy and eager loading of relations
 - Middleware system with caching, transactions, validation and more
 - Schema builder and migration helpers
 - Attribute based entity validation and relation definition
-- Relation loader middleware for programmatic relations
+- Relation loader middleware for programmatic relations ([docs](docs/middlewares.md#relationloadermiddleware))
 - First/Last and Linq helpers
 - ActiveRecord objects for tracked updates
 - Development error pages and global filters
@@ -184,7 +184,9 @@ $rows = $crud
 ### Streaming results
 
 `Crud::stream()` returns a generator that yields each row lazily. A callback can
-be provided to process rows as they are produced.
+be provided to process rows as they are produced. See the
+[ResultIterator documentation](docs/overview.md#resultiterator) for details on
+grouping results and exporting them to JSON.
 
 ```php
 $generator = $crud->stream('id', 'name');
@@ -198,10 +200,24 @@ $crud->stream(function ($row) {
 }, 'id', 'name');
 ```
 
+### Fetch all results
+
+`Crud::fetchAll()` is a convenience method that returns an array with all rows
+from a query.
+
+```php
+$rows = $crud->fetchAll('id', 'name');
+
+foreach ($rows as $row) {
+    echo $row['name'];
+}
+```
+
 ### Middlewares
 
 Middlewares allow you to intercept query execution for tasks like logging or
-validation.
+validation. DBAL ships with a [LoggingMiddleware](docs/middlewares.md#loggingmiddleware)
+that forwards executed SQL to any PSR-3 logger.
 
 ```php
 $crud = (new DBAL\Crud($pdo))
@@ -276,7 +292,8 @@ $lastUser = $crud->last('id', 'name');
 
 ### Linq middleware
 
-`LinqMiddleware` exposes helper methods to query for the existence of records.
+`LinqMiddleware` exposes several helper methods for quick checks and aggregations.
+See [LinqMiddleware docs](docs/middlewares.md#linqmiddleware) for the full list.
 
 ```php
 $linq = new DBAL\LinqMiddleware();
@@ -285,7 +302,14 @@ $crud = (new DBAL\Crud($pdo))
     ->withMiddleware($linq);
 
 $hasInactive = $crud->any(['active__eq' => 0]);
+$noneInactive = $crud->none(['active__eq' => 1]);
 $allActive = $crud->all(['active__eq' => 1]);
+$someInactive = $crud->notAll(['active__eq' => 1]);
+
+$total = $crud->count();
+$highestId = $crud->max('id');
+$lowestId = $crud->min('id');
+$totalAge = $crud->sum('age');
 ```
 
 ### Entity validation middleware
@@ -352,7 +376,7 @@ foreach ($users as $user) {
 }
 
 // Lazy load
-$user = iterator_to_array($crud->where(['id' => 1])->select())[0];
+$user = $crud->where(['id' => 1])->fetchAll()[0];
 $profile = $user['profile'];
 echo $profile['photo'];
 ```
@@ -360,7 +384,7 @@ echo $profile['photo'];
 ### Relation loader middleware
 
 If you prefer configuring relations programmatically, `RelationLoaderMiddleware`
-offers a fluent API.
+offers a fluent API (see [RelationLoaderMiddleware docs](docs/middlewares.md#relationloadermiddleware)).
 
 ```php
 $rel = (new DBAL\RelationLoaderMiddleware())
@@ -372,7 +396,7 @@ $crud = (new DBAL\Crud($pdo))
     ->withMiddleware($rel)
     ->with('profile');
 
-$users = iterator_to_array($crud->select());
+$users = $crud->fetchAll();
 ```
 
 Lazy loading works the same and the related records are fetched only when needed.
@@ -401,17 +425,44 @@ $crud = (new DBAL\Crud($pdo))
 
 `ODataMiddleware` converts an OData style query string into a DBAL query. The
 middleware parses `$filter`, `$orderby`, `$top`, `$skip` and `$select`
-parameters and applies them to a `Crud` instance.
+parameters and applies them to a `Crud` instance. See
+[`docs/odata.md`](docs/odata.md) for a detailed reference.
 
 ```php
 $mw = new DBAL\ODataMiddleware();
-$crud = (new DBAL\Crud($pdo))
-    ->from('books')
-    ->withMiddleware($mw);
+$crud = $mw->attach((new DBAL\Crud($pdo))->from('books'));
 
 $odata = '$filter=author_id eq 1 and price gt 10&$orderby=title desc&$top=5';
-$crud  = $mw->apply($crud, $odata);
-$rows  = iterator_to_array($crud->select(...$mw->getFields()));
+$rows  = $mw->query($odata);
+```
+The middleware can also be used to handle query strings directly from an HTTP
+request. If the request URI is:
+
+```
+/books?$filter=category%20eq%20'fantasy'&$select=name,synopsis,author&$top=10
+```
+
+you can parse the query and apply the parameters as follows to get the `name`,
+`synopsis` and `author` fields of up to ten fantasy books:
+
+```php
+$mw = new DBAL\ODataMiddleware();
+$crud = $mw->attach((new DBAL\Crud($pdo))->from('books'));
+
+$odata = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
+$books = $mw->query($odata);
+
+// The result will be an array with up to ten books where each item
+// contains only the `name`, `synopsis` and `author` fields.
+// Example:
+// [
+//     [
+//         'name'     => 'The Hobbit',
+//         'synopsis' => 'A hobbit goes on an adventure... ',
+//         'author'   => 'J.R.R. Tolkien'
+//     ],
+//     ...
+// ]
 ```
 ### Schema middleware
 
@@ -450,19 +501,51 @@ $crud = (new DBAL\Crud($pdo))
 
 ### Cache middleware
 
-`CacheMiddleware` stores the result of SELECT statements and invalidates the cache when data changes. The package includes in-memory and SQLite storage adapters.
+`CacheMiddleware` caches the result of SELECT statements and clears the cache when data changes. It defaults to the in-memory `MemoryCacheStorage`, but you can use the provided `SqliteCacheStorage` or any custom `CacheStorageInterface` implementation.
 
 ### Active record
 
 `ActiveRecordMiddleware` decorates rows with an object capable of tracking modified fields. Calling `$record->update()` only persists changes.
 
+Example:
+
+```php
+$pdo = new \PDO('sqlite::memory:');
+$pdo->exec('CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
+$pdo->exec('INSERT INTO users(name) VALUES ("Alice")');
+
+$crud = (new DBAL\Crud($pdo))->from('users');
+$ar   = (new DBAL\ActiveRecordMiddleware())->attach($crud);
+
+$record = $ar->where(['id__eq' => 1])->fetchAll()[0];
+$record->name = 'Alice2'; // or $record->set__name('Alice2');
+$record->update(); // only changed fields are written
+```
+
 ### Transaction and unit of work
 
 `TransactionMiddleware` exposes helpers to start, commit or roll back transactions. `UnitOfWorkMiddleware` batches multiple operations and applies them atomically via `commit()`.  
 
-### ABM event middleware
+### CRUD event middleware
 
-`AbmEventMiddleware` lets you execute callbacks after inserts, bulk inserts, updates or deletes to implement custom hooks.
+`CrudEventMiddleware` lets you execute callbacks after inserts, bulk inserts, updates or deletes to implement custom hooks.
+
+### Query timing middleware
+
+`QueryTimingMiddleware` records how long each query takes. Attach it to a `Crud`
+instance and inspect the timings afterwards.
+
+```php
+$timer = new DBAL\QueryTimingMiddleware();
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($timer);
+
+$crud->insert(['name' => 'A']);
+iterator_to_array($crud->select());
+
+print_r($timer->getTimings());
+```
 
 ## Real use cases
 
@@ -513,7 +596,7 @@ $books->where(['id' => $bookId])->delete();
 
 ```php
 $results = $books
-    ->where(['title__like' => '%robot%'])
+    ->where(['title__like' => '%robot%']) // built-in LIKE filter
     ->order('ASC', ['title'])
     ->select('id', 'title');
 ```
@@ -523,7 +606,7 @@ $results = $books
 
 ```php
 $byAuthor = $books->where(function ($q) {
-    $q->author_id__gt(1)->title__like('%dune%');
+    $q->author_id__gt(1)->title__like('%dune%'); // built-in LIKE filter
 })->select('id', 'title');
 ```
 ### Working with relations
@@ -533,6 +616,8 @@ foreach ($books->with('author')->select() as $book) {
     echo $book['title'].' by '.$book['author']['name'];
 }
 ```
+
+See [LazyRelation documentation](docs/lazy-relations.md) for details on how related rows are loaded on demand and serialised.
 
 ### Bulk insert with transactions
 

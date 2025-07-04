@@ -1,9 +1,10 @@
 <?php
+declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use DBAL\Crud;
-use DBAL\AbmEventMiddleware;
+use DBAL\CrudEventMiddleware;
 
-class AbmEventMiddlewareTest extends TestCase
+class CrudEventMiddlewareTest extends TestCase
 {
     private function createPdo()
     {
@@ -16,7 +17,7 @@ class AbmEventMiddlewareTest extends TestCase
         $pdo->exec('CREATE TABLE test (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
 
         $events = [];
-        $mw = new AbmEventMiddleware(
+        $mw = new CrudEventMiddleware(
             function ($t, $fields, $id) use (&$events) { $events[] = ['insert', $t, $fields, $id]; },
             function ($t, $fields, $count) use (&$events) { $events[] = ['update', $t, $fields, $count]; },
             function ($t, $count) use (&$events) { $events[] = ['delete', $t, $count]; },

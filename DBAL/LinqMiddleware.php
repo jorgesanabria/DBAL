@@ -1,30 +1,28 @@
 <?php
+declare(strict_types=1);
 namespace DBAL;
 
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz LinqMiddleware
+ * Middleware that provides LINQ-style helper methods for querying.
+ *
+ * When attached to a {@see Crud} instance it exposes `any()`, `none()`, `all()`,
+ * `notAll()`, `count()`, `max()`, `min()` and `sum()` methods.
  */
 class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterface
 {
-/**
- * __invoke
- * @param MessageInterface $msg
- * @return void
- */
-
+    /**
+     * Part of the middleware chain; it performs no action.
+     */
     public function __invoke(MessageInterface $msg): void
     {
         // no-op
     }
 
-/**
- * countRows
- * @param Crud $crud
- * @return int
- */
-
+    /**
+     * Helper used by other methods to count rows.
+     */
     private function countRows(Crud $crud): int
     {
         $rows = iterator_to_array($crud->select('COUNT(*) AS c'));
@@ -97,6 +95,21 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
         return $this->countRows($crud->where(...$filters));
     }
 
+    /**
+     * Ensure that the given identifier is safe to use in a query.
+     */
+    private function quoteIdentifier(string $id): string
+    {
+        $parts = explode('.', $id);
+        foreach ($parts as $i => $p) {
+            if (!preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $p)) {
+                throw new \InvalidArgumentException("Invalid identifier: {$id}");
+            }
+            $parts[$i] = '"' . $p . '"';
+        }
+        return implode('.', $parts);
+    }
+
 /**
  * max
  * @param Crud $crud
@@ -106,6 +119,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
 
     public function max(Crud $crud, string $field)
     {
+        $field = $this->quoteIdentifier($field);
         $rows = iterator_to_array($crud->select("MAX($field) AS m"));
         return $rows[0]['m'] ?? null;
     }
@@ -119,6 +133,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
 
     public function min(Crud $crud, string $field)
     {
+        $field = $this->quoteIdentifier($field);
         $rows = iterator_to_array($crud->select("MIN($field) AS m"));
         return $rows[0]['m'] ?? null;
     }
@@ -132,6 +147,7 @@ class LinqMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfac
 
     public function sum(Crud $crud, string $field): float
     {
+        $field = $this->quoteIdentifier($field);
         $rows = iterator_to_array($crud->select("SUM($field) AS s"));
         return (float)($rows[0]['s'] ?? 0);
     }

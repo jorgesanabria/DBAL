@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use DBAL\QueryBuilder\Message;
 use DBAL\QueryBuilder\MessageInterface;
@@ -21,5 +22,13 @@ class FilterNodeTest extends TestCase
         $node = new FilterNode(['id__in' => $sub]);
         $msg = $node->send(new Message());
         $this->assertEquals('id in (SELECT id FROM users)', $msg->readMessage());
+    }
+
+    public function testFilterLike()
+    {
+        $node = new FilterNode(['title__like' => '%dune%']);
+        $msg = $node->send(new Message());
+        $this->assertEquals('title LIKE ?', $msg->readMessage());
+        $this->assertEquals(['%dune%'], $msg->getValues());
     }
 }

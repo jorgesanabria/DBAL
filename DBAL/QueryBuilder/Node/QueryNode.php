@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace DBAL\QueryBuilder\Node;
 
 use DBAL\QueryBuilder\MessageInterface;
@@ -6,18 +7,20 @@ use DBAL\QueryBuilder\Message;
 use DBAL\QueryBuilder\NodeInterface;
 
 /**
- * Clase/Interfaz QueryNode
+ * Root node for building complete SQL queries.
+ *
+ * It aggregates sub-nodes for each part of a query such as tables, fields,
+ * joins, where conditions, etc.
  */
 class QueryNode extends Node
 {
+        /** @var bool */
         protected bool $isEmpty = false;
-/**
- * __construct
- * @return void
- */
-
-	public function __construct()
-	{
+        /**
+         * Initialize all child nodes used to build queries.
+         */
+        public function __construct()
+        {
 		$this->appendChild(new TablesNode, 'tables');
 		$this->appendChild(new FieldsNode, 'fields');
 		$this->appendChild(new JoinsNode, 'joins');
@@ -28,19 +31,19 @@ class QueryNode extends Node
 		$this->appendChild(new LimitNode, 'limit');
 		$this->appendChild(new ChangeNode, 'change');
 	}
-/**
- * send
- * @param MessageInterface $message
- * @return mixed
- */
-
-	public function send(MessageInterface $message)
-	{
-		return self::build($this, $message);
-	}
-	public static function build(QueryNode $query, MessageInterface $message)
-	{
-		$use = [];
+        /**
+         * Generate the SQL for the configured query type.
+         */
+        public function send(MessageInterface $message)
+        {
+                return self::build($this, $message);
+        }
+        /**
+         * Execute the node pipeline according to the message type.
+         */
+        public static function build(QueryNode $query, MessageInterface $message)
+        {
+                $use = [];
 		if ($message->type() == MessageInterface::MESSAGE_TYPE_SELECT)
 			$use = ['fields', 'tables', 'joins', 'where', 'group', 'having', 'order', 'limit'];
 		else if ($message->type() == MessageInterface::MESSAGE_TYPE_INSERT)

@@ -1,25 +1,32 @@
 <?php
+declare(strict_types=1);
 namespace DBAL;
 
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz CacheMiddleware
+ * Middleware that caches the result of SELECT statements.
+ *
+ * A custom {@see CacheStorageInterface} implementation can be passed to the
+ * constructor. When omitted an in-memory storage is used. The entire cache is
+ * flushed whenever an INSERT, UPDATE or DELETE query is executed.
  */
 class CacheMiddleware implements MiddlewareInterface
 {
-/** @var mixed */
-    private $storage;
+    /**
+     * Storage backend used to persist cached query results.
+     */
+    private CacheStorageInterface $storage;
 
-/**
- * __construct
- * @param CacheStorageInterface $storage
- * @return void
- */
-
-    public function __construct(CacheStorageInterface $storage = null)
+    /**
+     * Initialise the middleware.
+     *
+     * @param CacheStorageInterface|null $storage Optional custom cache storage
+     *        implementation. If omitted an in-memory cache is used.
+     */
+    public function __construct(?CacheStorageInterface $storage = null)
     {
-        $this->storage = $storage ?: new MemoryCacheStorage();
+        $this->storage = $storage ?? new MemoryCacheStorage();
     }
 
 /**
@@ -51,12 +58,11 @@ class CacheMiddleware implements MiddlewareInterface
         return sha1($msg->readMessage() . '|' . serialize($msg->getValues()));
     }
 
-/**
- * fetch
- * @param MessageInterface $msg
- * @return mixed
- */
-
+    /**
+     * Retrieve cached rows for the given SELECT message.
+     *
+     * Non-SELECT statements always return `null`.
+     */
     public function fetch(MessageInterface $msg)
     {
         if ($msg->type() !== MessageInterface::MESSAGE_TYPE_SELECT) {
@@ -65,13 +71,9 @@ class CacheMiddleware implements MiddlewareInterface
         return $this->storage->get($this->key($msg));
     }
 
-/**
- * save
- * @param MessageInterface $msg
- * @param array $rows
- * @return void
- */
-
+    /**
+     * Store rows for the provided SELECT message in the cache.
+     */
     public function save(MessageInterface $msg, array $rows): void
     {
         if ($msg->type() !== MessageInterface::MESSAGE_TYPE_SELECT) {

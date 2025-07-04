@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace DBAL;
 
 use DBAL\QueryBuilder\DynamicFilterBuilder;
@@ -11,10 +12,21 @@ use DBAL\QueryBuilder\Node\FilterNode;
 class ODataMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterface
 {
     private array $selectFields = [];
+    private ?Crud $crud = null;
 
     public function __invoke(MessageInterface $msg): void
     {
         // no-op
+    }
+
+    /**
+     * Attach this middleware to a Crud instance and keep a reference to it.
+     */
+    public function attach(Crud $crud): Crud
+    {
+        $crud = $crud->withMiddleware($this);
+        $this->crud = $crud;
+        return $crud;
     }
 
     /**
@@ -49,6 +61,8 @@ class ODataMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfa
         }
         if (isset($params['$select'])) {
             $this->selectFields = array_map('trim', explode(',', $params['$select']));
+        } else {
+            $this->selectFields = [];
         }
 
         return $result;
@@ -60,6 +74,20 @@ class ODataMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterfa
     public function getFields(): array
     {
         return $this->selectFields;
+    }
+
+    /**
+     * Apply an OData query string to the attached Crud and return the results.
+     */
+    public function query(string $odata): array
+    {
+        if (!$this->crud) {
+            throw new \LogicException('ODataMiddleware not attached to Crud');
+        }
+
+        $crud = $this->apply($this->crud, $odata);
+        $fields = $this->selectFields;
+        return iterator_to_array($crud->select(...$fields));
     }
 
     private function parseFilter(string $expr): FilterNode

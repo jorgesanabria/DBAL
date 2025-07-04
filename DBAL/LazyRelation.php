@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace DBAL;
 
 use IteratorAggregate;
@@ -19,7 +20,7 @@ class LazyRelation implements IteratorAggregate, JsonSerializable
  * @return void
  */
 
-    public function __construct(private callable $loader)
+    public function __construct(private $loader)
     {
     }
 

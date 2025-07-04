@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace DBAL;
 
 /**
@@ -6,7 +7,6 @@ namespace DBAL;
  */
 class RelationDefinition
 {
-    private string $name;
     private string $table;
     private string $type;
     private array $conditions = [];

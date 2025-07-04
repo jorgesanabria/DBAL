@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace DBAL\Schema;
 
 /**
@@ -6,7 +7,6 @@ namespace DBAL\Schema;
  */
 class SchemaColumnBuilder
 {
-    private string $name;
     private string $type = '';
     private array $constraints = [];
 

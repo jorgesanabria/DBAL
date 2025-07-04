@@ -1,10 +1,12 @@
 <?php
+declare(strict_types=1);
 namespace DBAL;
 
 use DBAL\QueryBuilder\Query;
 use DBAL\QueryBuilder\MessageInterface;
 use DBAL\RelationDefinition;
-use DBAL\AbmEventInterface;
+use DBAL\CrudEventInterface;
+use DBAL\AfterExecuteMiddlewareInterface;
 use Generator;
 
 /**
@@ -12,71 +14,94 @@ use Generator;
  */
 class Crud extends Query
 {
-        protected \PDO $connection;
         protected array $mappers = [];
         protected array $middlewares = [];
         protected array $tables = [];
         protected array $with = [];
-/**
- * __construct
- * @param \PDO $connection
- * @return void
- */
+    /**
+     * Creates a new CRUD helper bound to a PDO connection.
+     *
+     * The connection is stored for later use by the query builder
+     * and will be used by every CRUD operation executed through this
+     * instance.
+     *
+     * @param \PDO $connection Database connection used for all queries.
+     */
 
         public function __construct(protected \PDO $connection)
         {
                 parent::__construct();
         }
-/**
- * map
- * @param callable $callback
- * @return mixed
- */
+    /**
+     * Registers a mapper callback to transform each fetched row.
+     *
+     * The mapper will be executed when results are iterated in
+     * {@see select()} or {@see stream()}.
+     *
+     * @param callable $callback Callback that receives a row array and
+     *                           returns the transformed value.
+     * @return self  New instance containing the mapper.
+     */
 
-        public function map(callable $callback)
+        public function map(callable $callback): self
         {
-                $clon = clone $this;
-                $clon->mappers[] = $callback;
-                return $clon;
+                $clone = clone $this;
+                $clone->mappers[] = $callback;
+                return $clone;
         }
-/**
- * withMiddleware
- * @param callable $mw
- * @return mixed
- */
+    /**
+     * Adds a middleware that will intercept query execution.
+     *
+     * Middlewares receive the {@link MessageInterface} before the SQL
+     * statement is executed and may alter it or perform additional work.
+     *
+     * @param callable $mw Middleware callable or object.
+     * @return self       New instance that contains the middleware.
+     */
 
-        public function withMiddleware(callable $mw)
+        public function withMiddleware(callable $mw): self
         {
-                $clon = clone $this;
-                $clon->middlewares[] = $mw;
-                return $clon;
+                $clone = clone $this;
+                $clone->middlewares[] = $mw;
+                return $clone;
         }
 
-/**
- * from
- * @param mixed $...$tables
- * @return mixed
- */
+    /**
+     * Defines the table or tables from which records will be selected.
+     *
+     * The method clones the current query object, appends the table names
+     * to the underlying query builder and tracks the first table as the
+     * primary table for insert/update/delete operations.
+     *
+     * @param string ...$tables List of tables or table nodes.
+     * @return self             New instance configured with the tables.
+     */
 
-        public function from(...$tables)
+        public function from(...$tables): self
         {
-                $clon = parent::from(...$tables);
+                $clone = parent::from(...$tables);
                 foreach ($tables as $table) {
-                        $clon->tables[] = $table;
+                        $clone->tables[] = $table;
                 }
-                return $clon;
+                return $clone;
         }
 
-/**
- * with
- * @param mixed $...$relations
- * @return mixed
- */
+    /**
+     * Eagerly loads relations defined by middlewares.
+     *
+     * For each requested relation the corresponding JOIN clause is
+     * added to the query using the definitions provided by registered
+     * middlewares. The method returns a new instance with the relation
+     * names stored so that lazy loading can be performed later.
+     *
+     * @param string ...$relations Names of relations to join.
+     * @return self                New instance prepared with the joins.
+     */
 
-        public function with(...$relations)
+        public function with(...$relations): self
         {
-                $clon = clone $this;
-                $defs = $clon->collectRelations($clon->primaryTable());
+                $clone = clone $this;
+                $defs = $clone->collectRelations($clone->primaryTable());
                 foreach ($relations as $rel) {
                         if (!isset($defs[$rel])) {
                                 continue;
@@ -89,18 +114,18 @@ class Crud extends Query
                                                 $conds[] = [$c[0] . '__eqf' => $c[2]];
                                         }
                                 }
-                                $clon = $clon->leftJoin($def->getTable(), ...$conds);
+                                $clone = $clone->leftJoin($def->getTable(), ...$conds);
                         } else {
                                 $join = $def['on'];
                                 if (($def['joinType'] ?? 'left') === 'inner') {
-                                        $clon = $clon->innerJoin($def['table'], $join);
+                                        $clone = $clone->innerJoin($def['table'], $join);
                                 } else {
-                                        $clon = $clon->leftJoin($def['table'], $join);
+                                        $clone = $clone->leftJoin($def['table'], $join);
                                 }
                         }
-                        $clon->with[] = $rel;
+                        $clone->with[] = $rel;
                 }
-                return $clon;
+                return $clone;
         }
 
 /**
@@ -108,7 +133,7 @@ class Crud extends Query
  * @return mixed
  */
 
-        private function primaryTable()
+        private function primaryTable(): string
         {
                 return $this->tables[0] ?? '';
         }
@@ -118,10 +143,19 @@ class Crud extends Query
  * @return mixed
  */
 
-        protected function runMiddlewares(MessageInterface $message)
+        protected function runMiddlewares(MessageInterface $message, float $time = null): void
         {
-                foreach ($this->middlewares as $mw)
-                        $mw($message);
+                if ($time === null) {
+                        foreach ($this->middlewares as $mw) {
+                                $mw($message);
+                        }
+                } else {
+                        foreach ($this->middlewares as $mw) {
+                                if ($mw instanceof AfterExecuteMiddlewareInterface) {
+                                        $mw->afterExecute($message, $time);
+                                }
+                        }
+                }
         }
 /**
  * collectRelations
@@ -129,7 +163,7 @@ class Crud extends Query
  * @return mixed
  */
 
-        private function collectRelations($table)
+        private function collectRelations(string $table): array
         {
                 $relations = [];
                 foreach ($this->middlewares as $mw) {
@@ -139,13 +173,18 @@ class Crud extends Query
                 }
                 return $relations;
         }
-/**
- * select
- * @param mixed $...$fields
- * @return mixed
- */
+    /**
+     * Executes a SELECT query and returns a lazy iterator.
+     *
+     * The returned {@link ResultIterator} will run registered middlewares
+     * when iteration starts and apply any mapper callbacks to each row.
+     *
+     * @param string|array ...$fields Fields to select. If empty all fields
+     *                                from the primary table are returned.
+     * @return ResultIterator Iterator over the query results.
+     */
 
-        public function select(...$fields)
+        public function select(...$fields): ResultIterator
         {
                 $message = $this->buildSelect(...$fields);
                 $relations = $this->collectRelations($this->primaryTable());
@@ -159,13 +198,34 @@ class Crud extends Query
                 );
         }
 
-/**
- * stream
- * @param mixed $...$args
- * @return mixed
- */
+    /**
+     * Returns all rows from a SELECT query as an array.
+     *
+     * This is a convenience method equivalent to
+     * `iterator_to_array($this->select(...$fields))`.
+     *
+     * @param string|array ...$fields Optional fields to select.
+     * @return array                   Array with the fetched rows.
+     */
 
-        public function stream(...$args)
+        public function fetchAll(...$fields): array
+        {
+                return iterator_to_array($this->select(...$fields));
+        }
+
+    /**
+     * Streams the result of a SELECT query using a generator.
+     *
+     * Middlewares are executed when the returned generator starts
+     * yielding values. Optionally a callback can be provided to handle
+     * each row as soon as it is fetched.
+     *
+     * @param callable|string ...$args Either a callback followed by fields
+     *                                 or only the list of fields to select.
+     * @return Generator Generator yielding mapped rows.
+     */
+
+        public function stream(...$args): Generator
         {
                 $callback = null;
                 if (isset($args[0]) && is_callable($args[0])) {
@@ -183,13 +243,20 @@ class Crud extends Query
                 );
                 return $generator->getIterator($callback);
         }
-/**
- * insert
- * @param array $fields
- * @return mixed
- */
+    /**
+     * Inserts a single row into the primary table.
+     *
+     * Validation middlewares implementing
+     * {@link EntityValidationInterface} are executed before the
+     * statement is built. All registered middlewares then receive the
+     * generated message prior to execution. After the insert the
+     * {@link CrudEventInterface} hooks are triggered.
+     *
+     * @param array $fields Associative array of column values to insert.
+     * @return mixed        The value returned by PDO::lastInsertId().
+     */
 
-        public function insert(array $fields)
+        public function insert(array $fields): string
         {
                 foreach ($this->middlewares as $mw) {
                         if ($mw instanceof EntityValidationInterface) {
@@ -199,22 +266,31 @@ class Crud extends Query
                 $message = $this->buildInsert($fields);
                 $this->runMiddlewares($message);
                 $stm = $this->connection->prepare($message->readMessage());
+                $start = microtime(true);
                 $stm->execute($message->getValues());
+                $time = microtime(true) - $start;
                 $id = $this->connection->lastInsertId();
                 foreach ($this->middlewares as $mw) {
-                        if ($mw instanceof AbmEventInterface) {
+                        if ($mw instanceof CrudEventInterface) {
                                 $mw->afterInsert($this->primaryTable(), $fields, $id);
                         }
                 }
+                $this->runMiddlewares($message, $time);
                 return $id;
         }
-/**
- * bulkInsert
- * @param array $rows
- * @return mixed
- */
+    /**
+     * Inserts multiple rows in a single statement.
+     *
+     * Each row is validated using any registered
+     * {@link EntityValidationInterface} middlewares. After the SQL is
+     * generated all middlewares are executed once and finally the
+     * {@link CrudEventInterface} bulk insert hook is triggered.
+     *
+     * @param array $rows Array of associative arrays representing rows.
+     * @return int        Number of inserted rows reported by PDO.
+     */
 
-        public function bulkInsert(array $rows)
+        public function bulkInsert(array $rows): int
         {
                 foreach ($this->middlewares as $mw) {
                         if ($mw instanceof EntityValidationInterface) {
@@ -226,22 +302,31 @@ class Crud extends Query
                 $message = $this->buildBulkInsert($rows);
                 $this->runMiddlewares($message);
                 $stm = $this->connection->prepare($message->readMessage());
+                $start = microtime(true);
                 $stm->execute($message->getValues());
+                $time = microtime(true) - $start;
                 $count = $stm->rowCount();
                 foreach ($this->middlewares as $mw) {
-                        if ($mw instanceof AbmEventInterface) {
+                        if ($mw instanceof CrudEventInterface) {
                                 $mw->afterBulkInsert($this->primaryTable(), $rows, $count);
                         }
                 }
+                $this->runMiddlewares($message, $time);
                 return $count;
         }
-/**
- * update
- * @param array $fields
- * @return mixed
- */
+    /**
+     * Updates records in the primary table using the current filters.
+     *
+     * Validation middlewares are invoked prior to building the SQL.
+     * After the UPDATE statement is created, all middlewares receive the
+     * message and may modify it. After execution the appropriate
+     * {@link CrudEventInterface} hook is called.
+     *
+     * @param array $fields Column values to update.
+     * @return int          Number of affected rows.
+     */
 
-        public function update(array $fields)
+        public function update(array $fields): int
         {
                 foreach ($this->middlewares as $mw) {
                         if ($mw instanceof EntityValidationInterface) {
@@ -251,43 +336,63 @@ class Crud extends Query
                 $message = $this->buildUpdate($fields);
                 $this->runMiddlewares($message);
                 $stm = $this->connection->prepare($message->readMessage());
+                $start = microtime(true);
                 $stm->execute($message->getValues());
+                $time = microtime(true) - $start;
                 $count = $stm->rowCount();
                 foreach ($this->middlewares as $mw) {
-                        if ($mw instanceof AbmEventInterface) {
+                        if ($mw instanceof CrudEventInterface) {
                                 $mw->afterUpdate($this->primaryTable(), $fields, $count);
                         }
                 }
+                $this->runMiddlewares($message, $time);
                 return $count;
         }
-/**
- * delete
- * @return mixed
- */
+    /**
+     * Deletes records matching the current filters.
+     *
+     * All registered middlewares receive the DELETE message prior to
+     * execution. After the statement is executed the delete event from
+     * {@link CrudEventInterface} is triggered.
+     *
+     * @return int Number of affected rows.
+     */
 
-       public function delete()
+       public function delete(): int
        {
                $message = $this->buildDelete();
                $this->runMiddlewares($message);
                $stm = $this->connection->prepare($message->readMessage());
+               $start = microtime(true);
                $stm->execute($message->getValues());
+               $time = microtime(true) - $start;
                $count = $stm->rowCount();
                foreach ($this->middlewares as $mw) {
-                       if ($mw instanceof AbmEventInterface) {
+                       if ($mw instanceof CrudEventInterface) {
                                $mw->afterDelete($this->primaryTable(), $count);
                        }
                }
+               $this->runMiddlewares($message, $time);
                return $count;
        }
 
-/**
- * __call
- * @param mixed $name
- * @param mixed $arguments
- * @return mixed
- */
+    /**
+     * Forwards unknown method calls to registered middlewares.
+     *
+     * If a middleware object exposes a method with the given name, it is
+     * invoked. When the middleware implements
+     * {@link CrudAwareMiddlewareInterface} the current Crud instance is
+     * prepended to the arguments.
+     *
+     * @param string $name      Method name being called.
+     * @param array  $arguments Arguments passed to the method.
+     * @return mixed            Result returned by the middleware method.
+     *
+     * @throws \BadMethodCallException When no middleware implements the
+     *                                  requested method.
+     */
 
-       public function __call($name, $arguments)
+       public function __call(string $name, array $arguments): mixed
        {
                foreach ($this->middlewares as $mw) {
                        if (is_object($mw) && is_callable([$mw, $name])) {

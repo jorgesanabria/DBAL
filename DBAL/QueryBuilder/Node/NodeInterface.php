@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace DBAL\QueryBuilder\Node;
 
 use DBAL\QueryBuilder\MessageInterface;
@@ -16,7 +17,7 @@ interface NodeInterface
 	public function send(MessageInterface $message);
 
 	/**
-	* Append child node to list childs
+        * Append a child node to the list of children
 	* @param NodeInterface the node to append
 	* @param string the node name
 	* @return string the node name
@@ -31,7 +32,7 @@ interface NodeInterface
 	public function hasChild($name);
 
 	/**
-	* Get child node of list childs or empty node if is not exists (or not implemented)
+        * Get child node from the list of children or an empty node if it does not exist (or is not implemented)
 	* @param string the node name
 	* @return NodeInterface the child node
 	*/
@@ -45,8 +46,8 @@ interface NodeInterface
 	public function removeChild($name);
 
 	/**
-	* Get all child nodes or empty array if is not exists (or not implemented)
-	* @return NodeInterface[]|[] the list of childs or empty array if is not implemented
+        * Get all child nodes or an empty array if none exist (or not implemented)
+        * @return NodeInterface[]|[] the list of children or empty array if not implemented
 	*/
 	public function allChildren();
 

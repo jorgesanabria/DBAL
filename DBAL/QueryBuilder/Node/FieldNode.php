@@ -1,33 +1,32 @@
 <?php
+declare(strict_types=1);
 namespace DBAL\QueryBuilder\Node;
 
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz FieldNode
+ * Node representing a single field or expression used in SELECT, GROUP BY or
+ * ORDER BY clauses.
  */
 class FieldNode extends NotImplementedNode
 {
+        /** @var bool */
         protected bool $isEmpty = false;
+
+        /** @var mixed Field or expression */
         protected mixed $field;
-/**
- * __construct
- * @param mixed $field
- * @return void
- */
-
-	public function __construct($field)
-	{
-		$this->field = $field;
-	}
-/**
- * send
- * @param MessageInterface $message
- * @return mixed
- */
-
-	public function send(MessageInterface $message)
-	{
-		return $message->insertAfter($this->field, MessageInterface::SEPARATOR_COMMA);
-	}
+        /**
+         * @param mixed $field Field name or expression.
+         */
+        public function __construct($field)
+        {
+                $this->field = $field;
+        }
+        /**
+         * Append the field to the given message.
+         */
+        public function send(MessageInterface $message)
+        {
+                return $message->insertAfter($this->field, MessageInterface::SEPARATOR_COMMA);
+        }
 }

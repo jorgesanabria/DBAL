@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace DBAL\QueryBuilder;
 
 /**
@@ -36,9 +37,9 @@ class Message implements MessageInterface
 		{
 			throw new \InvalidArgumentException('Type of message passed to method "join" is not equals to self this type');
 		}
-		$clon = $this->insertAfter($message->readMessage(), $separator);
-		$clon = $clon->addValues($message->values);
-		return $clon; 
+		$clone = $this->insertAfter($message->readMessage(), $separator);
+		$clone = $clone->addValues($message->values);
+		return $clone; 
 	}
 /**
  * insertBefore
@@ -49,12 +50,12 @@ class Message implements MessageInterface
 
 	public function insertBefore($string, $separator = MessageInterface::SEPARATOR_SPACE)
 	{
-		$clon = clone $this;
-		if (strlen($clon->message) > 0)
-			$clon->message = $string . $separator . $clon->message;			
+		$clone = clone $this;
+		if (strlen($clone->message) > 0)
+			$clone->message = $string . $separator . $clone->message;			
 		else
-			$clon->message = $string;
-		return $clon;
+			$clone->message = $string;
+		return $clone;
 	}
 /**
  * replace
@@ -65,9 +66,9 @@ class Message implements MessageInterface
 
 	public function replace($old, $now)
 	{
-		$clon = clone $this;
-		$clon->message = str_replace($old, $now, $clon->message);
-		return $clon;
+		$clone = clone $this;
+		$clone->message = str_replace($old, $now, $clone->message);
+		return $clone;
 	}
 /**
  * insertAfter
@@ -78,12 +79,12 @@ class Message implements MessageInterface
 
 	public function insertAfter($string, $separator = MessageInterface::SEPARATOR_SPACE)
 	{
-		$clon = clone $this;
-		if (strlen($clon->message) > 0)
-			$clon->message = $clon->message . $separator . $string;		
+		$clone = clone $this;
+		if (strlen($clone->message) > 0)
+			$clone->message = $clone->message . $separator . $string;		
 		else
-			$clon->message = $string;
-		return $clon;
+			$clone->message = $string;
+		return $clone;
 	}
 /**
  * addValues
@@ -93,9 +94,9 @@ class Message implements MessageInterface
 
 	public function addValues(array $values)
 	{
-		$clon = clone $this;
-		$clon->values = array_merge($clon->values, $values);
-		return $clon;
+		$clone = clone $this;
+		$clone->values = array_merge($clone->values, $values);
+		return $clone;
 	}
 /**
  * getValues

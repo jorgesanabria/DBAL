@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace DBAL\QueryBuilder;
 
 use DBAL\ResultIterator;
@@ -33,14 +34,14 @@ class Query extends QueryNode
 
 	public function from(...$tables)
 	{
-		$clon = clone $this;
+		$clone = clone $this;
                foreach ($tables as $table) {
                        $_table = ($table instanceof TableNode)
                                ? $table
                                : new TableNode($table);
-                       $clon->getChild('tables')->appendChild($_table);
+                       $clone->getChild('tables')->appendChild($_table);
                }
-		return $clon;
+		return $clone;
 	}
 /**
  * join
@@ -75,9 +76,9 @@ class Query extends QueryNode
 
         public function innerJoin($table, ...$on)
         {
-                $clon = clone $this;
-                $clon->join(JoinNode::INNER_JOIN, $table, $on);
-                return $clon;
+                $clone = clone $this;
+                $clone->join(JoinNode::INNER_JOIN, $table, $on);
+                return $clone;
         }
 /**
  * leftJoin
@@ -88,9 +89,9 @@ class Query extends QueryNode
 
         public function leftJoin($table, ...$on)
         {
-                $clon = clone $this;
-                $clon->join(JoinNode::LEFT_JOIN, $table, $on);
-                return $clon;
+                $clone = clone $this;
+                $clone->join(JoinNode::LEFT_JOIN, $table, $on);
+                return $clone;
         }
 /**
  * rightJoin
@@ -101,9 +102,9 @@ class Query extends QueryNode
 
         public function rightJoin($table, ...$on)
         {
-                $clon = clone $this;
-                $clon->join(JoinNode::RIGHT_JOIN, $table, $on);
-                return $clon;
+                $clone = clone $this;
+                $clone->join(JoinNode::RIGHT_JOIN, $table, $on);
+                return $clone;
         }
 /**
  * where
@@ -111,23 +112,29 @@ class Query extends QueryNode
  * @return mixed
  */
 
-       public function where(...$filters)
-       {
-               $clon = clone $this;
-               foreach ($filters as $filter) {
-                       if (is_callable($filter)) {
-                               $builder = new DynamicFilterBuilder();
-                               $filter($builder);
-                               $filter = $builder->toNode();
-                       }
-                       if ($filter instanceof FilterNode) {
-                               $clon->getChild('where')->appendChild($filter);
-                       } elseif (is_array($filter)) {
-                               $clon->getChild('where')->appendChild(new FilterNode($filter));
-                       }
-               }
-               return $clon;
-       }
+        public function where(...$filters)
+        {
+                $clone = clone $this;
+                foreach ($filters as $filter) {
+                        if (is_callable($filter)) {
+                                $builder = new DynamicFilterBuilder();
+                                $filter($builder);
+                                $filter = $builder->toNode();
+                        }
+                        if ($filter instanceof FilterNode) {
+                                if (count($filter->getParts()) === 0 && count($filter->allChildren()) > 1) {
+                                        foreach ($filter->allChildren() as $child) {
+                                                $clone->getChild('where')->appendChild($child);
+                                        }
+                                } else {
+                                        $clone->getChild('where')->appendChild($filter);
+                                }
+                        } elseif (is_array($filter)) {
+                                $clone->getChild('where')->appendChild(new FilterNode($filter));
+                        }
+                }
+                return $clone;
+        }
 /**
  * having
  * @param array $...$filters
@@ -136,10 +143,10 @@ class Query extends QueryNode
 
 	public function having(array ...$filters)
 	{
-		$clon = clone $this;
+		$clone = clone $this;
 		foreach ($filters as $filter)
-			$clon->getChild('having')->appendChild(new FilterNode($filter));
-		return $clon;
+			$clone->getChild('having')->appendChild(new FilterNode($filter));
+		return $clone;
 	}
 /**
  * group
@@ -149,10 +156,10 @@ class Query extends QueryNode
 
         public function group(...$fields)
         {
-                $clon = clone $this;
+                $clone = clone $this;
                 foreach ($fields as $field)
-                        $clon->getChild('group')->appendChild(new FieldNode($field));
-                return $clon;
+                        $clone->getChild('group')->appendChild(new FieldNode($field));
+                return $clone;
         }
 /**
  * groupBy
@@ -162,8 +169,8 @@ class Query extends QueryNode
 
         public function groupBy(...$fields)
         {
-                $clon = clone $this;
-                return $clon->group(...$fields);
+                $clone = clone $this;
+                return $clone->group(...$fields);
         }
 /**
  * order
@@ -174,10 +181,10 @@ class Query extends QueryNode
 
         public function order($type, array $fields)
         {
-                $clon = clone $this;
+                $clone = clone $this;
                 foreach ($fields as $field)
-                        $clon->getChild('order')->appendChild(new FieldNode(sprintf('%s %s', $field, $type)));
-		return $clon;
+                        $clone->getChild('order')->appendChild(new FieldNode(sprintf('%s %s', $field, $type)));
+		return $clone;
 	}
 /**
  * desc
@@ -187,8 +194,8 @@ class Query extends QueryNode
 
 	public function desc(...$fields)
 	{
-		$clon = clone $this;
-		return $clon->order(OrderNode::ORDER_DESC, $fields);
+		$clone = clone $this;
+		return $clone->order(OrderNode::ORDER_DESC, $fields);
 	}
 /**
  * asc
@@ -198,8 +205,8 @@ class Query extends QueryNode
 
 	public function asc(...$fields)
 	{
-		$clon = clone $this;
-		return $clon->order(OrderNode::ORDER_ASC, $fields);
+		$clone = clone $this;
+		return $clone->order(OrderNode::ORDER_ASC, $fields);
 	}
 /**
  * limit
@@ -209,9 +216,9 @@ class Query extends QueryNode
 
 	public function limit($limit)
 	{
-		$clon = clone $this;
-		$clon->getChild('limit')->setLimit($limit);
-		return $clon;
+		$clone = clone $this;
+		$clone->getChild('limit')->setLimit($limit);
+		return $clone;
 	}
 /**
  * offset
@@ -221,9 +228,9 @@ class Query extends QueryNode
 
 	public function offset($offset)
 	{
-		$clon = clone $this;
-		$clon->getChild('limit')->setOffset($offset);
-		return $clon;
+		$clone = clone $this;
+		$clone->getChild('limit')->setOffset($offset);
+		return $clone;
 	}
 /**
  * buildSelect
@@ -233,21 +240,21 @@ class Query extends QueryNode
 
 	public function buildSelect(...$fields)
 	{
-		$clon = clone $this;
+		$clone = clone $this;
 		$message = new Message(MessageInterface::MESSAGE_TYPE_SELECT);
 		if (sizeof($fields) == 0) {
-			$message = $clon->send($message);
+			$message = $clone->send($message);
 		} else {
-			$old = $clon->removeChild('fields');
-			$clon->appendChild(new FieldsNode, 'fields');
+			$old = $clone->removeChild('fields');
+			$clone->appendChild(new FieldsNode, 'fields');
 			foreach ($fields as $field) {
 				if (!$field instanceof FieldNode)
 					$field = new FieldNode($field);
-				$clon->getChild('fields')->appendChild($field);
+				$clone->getChild('fields')->appendChild($field);
 			}
-			$message = $clon->send($message);
-			$clon->removeChild('fields');
-			$clon->appendChild($old, 'fields');
+			$message = $clone->send($message);
+			$clone->removeChild('fields');
+			$clone->appendChild($old, 'fields');
 		}
 		return $message;
 	}
@@ -259,10 +266,10 @@ class Query extends QueryNode
 
         public function buildInsert(array $fields)
         {
-                $clon = clone $this;
+                $clone = clone $this;
                 $message = new Message(MessageInterface::MESSAGE_TYPE_INSERT);
-                $clon->getChild('change')->setFields($fields);
-                $message = $clon->send($message);
+                $clone->getChild('change')->setFields($fields);
+                $message = $clone->send($message);
                 return $message;
         }
 /**
@@ -273,10 +280,10 @@ class Query extends QueryNode
 
         public function buildBulkInsert(array $rows)
         {
-                $clon = clone $this;
+                $clone = clone $this;
                 $message = new Message(MessageInterface::MESSAGE_TYPE_INSERT);
-                $clon->getChild('change')->setRows($rows);
-                $message = $clon->send($message);
+                $clone->getChild('change')->setRows($rows);
+                $message = $clone->send($message);
                 return $message;
         }
 /**
@@ -287,10 +294,10 @@ class Query extends QueryNode
 
         public function buildUpdate(array $fields)
         {
-                $clon = clone $this;
+                $clone = clone $this;
                 $message = new Message(MessageInterface::MESSAGE_TYPE_UPDATE);
-                $clon->getChild('change')->setFields($fields);
-		$message = $clon->send($message);
+                $clone->getChild('change')->setFields($fields);
+		$message = $clone->send($message);
 		return $message;
 	}
 /**
@@ -300,9 +307,9 @@ class Query extends QueryNode
 
 	public function buildDelete()
 	{
-		$clon = clone $this;
+		$clone = clone $this;
 		$message = new Message(MessageInterface::MESSAGE_TYPE_DELETE);
-		$message = $clon->send($message);
+		$message = $clone->send($message);
 		return $message;
 	}
 }

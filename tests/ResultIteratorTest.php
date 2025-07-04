@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use DBAL\QueryBuilder\Query;
 use DBAL\ResultIterator;
+use DBAL\Crud;
 
 class ResultIteratorTest extends TestCase
 {

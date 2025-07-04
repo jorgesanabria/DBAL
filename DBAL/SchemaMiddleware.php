@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace DBAL;
 
 use PDO;
@@ -9,7 +10,6 @@ use DBAL\QueryBuilder\MessageInterface;
  */
 class SchemaMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterface
 {
-    private PDO $pdo;
 
 /**
  * __construct
