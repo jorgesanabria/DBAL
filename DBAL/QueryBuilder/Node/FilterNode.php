@@ -202,10 +202,15 @@ FilterNode::filter('in', function($field, $values, $message)
 
 FilterNode::filter('between', function($field, $values, $message)
 {
-	return $message->insertAfter(sprintf('( %s between ? AND ? )', $field), MessageInterface::SEPARATOR_OR)->addValues((array) $values);
+        return $message->insertAfter(sprintf('( %s between ? AND ? )', $field), MessageInterface::SEPARATOR_OR)->addValues((array) $values);
 });
 
 FilterNode::filter('eqf', function($field, $value, $message)
 {
-	return $message->insertAfter(sprintf('%s = %s', $field, $value), MessageInterface::SEPARATOR_OR);
+        return $message->insertAfter(sprintf('%s = %s', $field, $value), MessageInterface::SEPARATOR_OR);
+});
+
+FilterNode::filter('like', function($field, $value, $msg) {
+        return $msg->insertAfter(sprintf('%s LIKE ?', $field), MessageInterface::SEPARATOR_OR)
+                   ->addValues([$value]);
 });
