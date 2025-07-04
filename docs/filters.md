@@ -78,3 +78,33 @@ $case = (new CaseNode())
 // SELECT CASE WHEN status = 1 THEN 'active' WHEN status = 0 THEN 'inactive' ELSE 'unknown' END AS state FROM users
 ```
 
+
+## Custom filter builders
+
+Dynamic methods can be tailored to your domain by extending `DynamicFilterBuilder`:
+
+```php
+use DBAL\QueryBuilder\CustomFilterBuilder;
+
+$rows = $crud->where(function (CustomFilterBuilder $q) {
+    $q->isWoman()->andNext()->status__eq('active');
+})->select('id', 'name');
+```
+
+The `CustomFilterBuilder` class can define helpers that map to one or more
+filters. For example:
+
+```php
+class CustomFilterBuilder extends DynamicFilterBuilder
+{
+    public function isWoman(): self
+    {
+        parent::__call('gender__eq', ['fem']);
+        return $this;
+    }
+}
+```
+
+```sql
+SELECT id, name FROM users WHERE gender = 'fem' AND status = 'active';
+```
