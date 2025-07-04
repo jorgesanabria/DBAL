@@ -23,4 +23,12 @@ class FilterNodeTest extends TestCase
         $msg = $node->send(new Message());
         $this->assertEquals('id in (SELECT id FROM users)', $msg->readMessage());
     }
+
+    public function testFilterLike()
+    {
+        $node = new FilterNode(['title__like' => '%dune%']);
+        $msg = $node->send(new Message());
+        $this->assertEquals('title LIKE ?', $msg->readMessage());
+        $this->assertEquals(['%dune%'], $msg->getValues());
+    }
 }

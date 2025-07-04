@@ -557,7 +557,7 @@ $books->where(['id' => $bookId])->delete();
 
 ```php
 $results = $books
-    ->where(['title__like' => '%robot%'])
+    ->where(['title__like' => '%robot%']) // built-in LIKE filter
     ->order('ASC', ['title'])
     ->select('id', 'title');
 ```
@@ -567,7 +567,7 @@ $results = $books
 
 ```php
 $byAuthor = $books->where(function ($q) {
-    $q->author_id__gt(1)->title__like('%dune%');
+    $q->author_id__gt(1)->title__like('%dune%'); // built-in LIKE filter
 })->select('id', 'title');
 ```
 ### Working with relations
