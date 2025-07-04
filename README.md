@@ -456,6 +456,21 @@ $crud = (new DBAL\Crud($pdo))
 
 `ActiveRecordMiddleware` decorates rows with an object capable of tracking modified fields. Calling `$record->update()` only persists changes.
 
+Example:
+
+```php
+$pdo = new \PDO('sqlite::memory:');
+$pdo->exec('CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
+$pdo->exec('INSERT INTO users(name) VALUES ("Alice")');
+
+$crud = (new DBAL\Crud($pdo))->from('users');
+$ar   = (new DBAL\ActiveRecordMiddleware())->attach($crud);
+
+$record = iterator_to_array($ar->where(['id__eq' => 1])->select())[0];
+$record->name = 'Alice2'; // or $record->set__name('Alice2');
+$record->update(); // only changed fields are written
+```
+
 ### Transaction and unit of work
 
 `TransactionMiddleware` exposes helpers to start, commit or roll back transactions. `UnitOfWorkMiddleware` batches multiple operations and applies them atomically via `commit()`.  
