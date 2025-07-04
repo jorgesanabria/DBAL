@@ -291,7 +291,10 @@ $lastUser = $crud->last('id', 'name');
 
 ### Linq middleware
 
-`LinqMiddleware` exposes helper methods to query for the existence of records.
+`LinqMiddleware` exposes helper methods to check for the existence of rows and
+run simple aggregations (see
+[docs/middlewares.md#linqmiddleware](docs/middlewares.md#linqmiddleware) for a
+full reference).
 
 ```php
 $linq = new DBAL\LinqMiddleware();
@@ -300,7 +303,12 @@ $crud = (new DBAL\Crud($pdo))
     ->withMiddleware($linq);
 
 $hasInactive = $crud->any(['active__eq' => 0]);
-$allActive = $crud->all(['active__eq' => 1]);
+$noGuests    = $crud->none(['role__eq' => 'guest']);
+$allActive   = $crud->all(['active__eq' => 1]);
+$notAllFree  = $crud->notAll(['plan__eq' => 'free']);
+
+$totalUsers = $crud->count();      // also max(), min() and sum()
+$oldest     = $crud->max('age');
 ```
 
 ### Entity validation middleware
