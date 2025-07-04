@@ -286,5 +286,41 @@ foreach ($timing->getTimings() as $info) {
 }
 ```
 
+## Table specific middlewares
+Sometimes a condition should apply only to queries on a given table. Rather than
+modifying raw SQL strings, expose helper methods from a middleware that returns
+a new `Crud` instance with extra clauses added through the fluent API.
+
+```php
+use DBAL\Crud;
+use DBAL\MiddlewareInterface;
+use DBAL\CrudAwareMiddlewareInterface;
+use DBAL\QueryBuilder\MessageInterface;
+
+class SoftDeleteMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterface
+{
+    public function __invoke(MessageInterface $msg): void
+    {
+        // no-op
+    }
+
+    // Add `WHERE <table>.deleted_at IS NULL` to the query
+    public function withoutDeleted(Crud $crud, string $table): Crud
+    {
+        return $crud->where(["{$table}.deleted_at__isnull" => null]);
+    }
+}
+
+$softDelete = new SoftDeleteMiddleware();
+$crud = (new DBAL\Crud($pdo))
+    ->from('users')
+    ->withMiddleware($softDelete);
+
+$rows = $crud->withoutDeleted('users')->select('id', 'name');
+```
+
+This keeps the modification declarative and lets the middleware work with others
+like `CacheMiddleware` or `GlobalFilterMiddleware`.
+
 Each middleware implements `MiddlewareInterface` and can be combined freely.
 
