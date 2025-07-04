@@ -31,6 +31,7 @@ DBAL aims to be framework‑agnostic and has no dependencies beyond PDO. It work
 - **`lazy-relations.md`** – details the `LazyRelation` helper used for on-demand loading of related rows.
 - **`filters.md`** – extending filters and simplifying queries.
 - **`engines.md`** – supported database platforms and how to create your own.
+- **`custom-nodes.md`** – examples of creating nodes for unsupported SQL features.
 
 Each file can be read in isolation, but together they provide a comprehensive guide to DBAL.
 
