@@ -35,6 +35,54 @@ class ResultGenerator
     ) {
     }
 
+    /**
+     * Extract relation information from the given definition.
+     */
+    private function relationInfo(mixed $rel): ?array
+    {
+        if ($rel instanceof RelationDefinition) {
+            $cond = $rel->getConditions()[0] ?? null;
+            if (!$cond || $cond[1] !== '=') {
+                return null;
+            }
+            $localKey = explode('.', $cond[0])[1] ?? $cond[0];
+            $foreignKey = explode('.', $cond[2])[1] ?? $cond[2];
+            $table = $rel->getTable();
+            $type = $rel->getType();
+        } else {
+            $localKey = $rel['localKey'];
+            $foreignKey = $rel['foreignKey'];
+            $table = $rel['table'];
+            $type = $rel['type'];
+        }
+
+        return [$localKey, $foreignKey, $table, $type];
+    }
+
+    /**
+     * Create a loader closure for the relation.
+     */
+    private function relationLoader(string $table, string $foreignKey, string $type, mixed $value): callable
+    {
+        $pdo = $this->pdo;
+        $middlewares = $this->middlewares;
+
+        return function () use ($pdo, $middlewares, $table, $foreignKey, $type, $value) {
+            $crud = new Crud($pdo);
+            foreach ($middlewares as $mw) {
+                $crud = $crud->withMiddleware($mw);
+            }
+            $crud = $crud->from($table)->where([
+                $foreignKey . '__eq' => $value,
+            ]);
+            $rows = iterator_to_array($crud->select());
+            if (in_array($type, ['hasOne', 'belongsTo'])) {
+                return $rows[0] ?? null;
+            }
+            return $rows;
+        };
+    }
+
 /**
  * applyMappers
  * @param mixed $row
@@ -58,50 +106,28 @@ class ResultGenerator
     private function applyLazyRelations($row)
     {
         foreach ($this->relations as $name => $rel) {
-            if (!in_array($name, $this->eagerRelations)) {
-                $pdo = $this->pdo;
-                $middlewares = $this->middlewares;
-                if ($rel instanceof RelationDefinition) {
-                    $cond = $rel->getConditions()[0] ?? null;
-                    if (!$cond || $cond[1] !== '=') {
-                        continue;
-                    }
-                    $localKey = explode('.', $cond[0])[1] ?? $cond[0];
-                    $foreignKey = explode('.', $cond[2])[1] ?? $cond[2];
-                    $table = $rel->getTable();
-                    $type = $rel->getType();
-                } else {
-                    $localKey = $rel['localKey'];
-                    $foreignKey = $rel['foreignKey'];
-                    $table = $rel['table'];
-                    $type = $rel['type'];
-                }
-
-                if (!array_key_exists($localKey, $row)) {
-                    throw new \RuntimeException(sprintf(
-                        'Missing local key %s for relation %s',
-                        $localKey,
-                        $name
-                    ));
-                }
-                $value = $row[$localKey];
-                $loader = function () use ($pdo, $middlewares, $table, $foreignKey, $type, $value) {
-                    $crud = new Crud($pdo);
-                    foreach ($middlewares as $mw) {
-                        $crud = $crud->withMiddleware($mw);
-                    }
-                    $crud = $crud->from($table)->where([
-                        $foreignKey . '__eq' => $value,
-                    ]);
-                    $rows = iterator_to_array($crud->select());
-                    if (in_array($type, ['hasOne', 'belongsTo'])) {
-                        return $rows[0] ?? null;
-                    }
-                    return $rows;
-                };
-                $row[$name] = new LazyRelation($loader);
+            if (in_array($name, $this->eagerRelations)) {
+                continue;
             }
+
+            $info = $this->relationInfo($rel);
+            if ($info === null) {
+                continue;
+            }
+            [$localKey, $foreignKey, $table, $type] = $info;
+
+            if (!array_key_exists($localKey, $row)) {
+                throw new \RuntimeException(sprintf(
+                    'Missing local key %s for relation %s',
+                    $localKey,
+                    $name
+                ));
+            }
+            $value = $row[$localKey];
+            $loader = $this->relationLoader($table, $foreignKey, $type, $value);
+            $row[$name] = new LazyRelation($loader);
         }
+
         return $row;
     }
 

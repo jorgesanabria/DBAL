@@ -14,7 +14,7 @@ class ResultIterator implements \Iterator, \JsonSerializable
         protected mixed $result;
         protected int $i;
         protected ?\PDOStatement $stm;
-        protected array $rows = [];
+    protected array $rows = [];
 /**
  * __construct
  * @param \PDO $pdo
@@ -32,9 +32,96 @@ class ResultIterator implements \Iterator, \JsonSerializable
                 protected array $mappers = [],
                 protected array $middlewares = [],
                 protected array $relations = [],
-                protected array $eagerRelations = []
+        protected array $eagerRelations = []
         ) {
                 $this->i = 0;
+        }
+
+        /**
+         * Extract relation information from the given definition.
+         */
+        private function relationInfo(mixed $rel): ?array
+        {
+                if ($rel instanceof RelationDefinition) {
+                        $cond = $rel->getConditions()[0] ?? null;
+                        if (!$cond || $cond[1] !== '=') {
+                                return null;
+                        }
+                        $localKey = explode('.', $cond[0])[1] ?? $cond[0];
+                        $foreignKey = explode('.', $cond[2])[1] ?? $cond[2];
+                        $table = $rel->getTable();
+                        $type = $rel->getType();
+                } else {
+                        $localKey = $rel['localKey'];
+                        $foreignKey = $rel['foreignKey'];
+                        $table = $rel['table'];
+                        $type = $rel['type'];
+                }
+
+                return [$localKey, $foreignKey, $table, $type];
+        }
+
+        /**
+         * Retrieve the value of the local key from the current result.
+         */
+        private function localValue(mixed $result, string $localKey, string $name)
+        {
+                if (is_array($result)) {
+                        if (!array_key_exists($localKey, $result)) {
+                                throw new \RuntimeException(sprintf(
+                                        'Missing local key %s for relation %s',
+                                        $localKey,
+                                        $name
+                                ));
+                        }
+                        return $result[$localKey];
+                }
+
+                if (!isset($result->$localKey)) {
+                        throw new \RuntimeException(sprintf(
+                                'Missing local key %s for relation %s',
+                                $localKey,
+                                $name
+                        ));
+                }
+
+                return $result->$localKey;
+        }
+
+        /**
+         * Assign a LazyRelation instance to the given result.
+         */
+        private function assignRelation(mixed &$result, string $name, callable $loader): void
+        {
+                if (is_array($result)) {
+                        $result[$name] = new LazyRelation($loader);
+                } else {
+                        $result->$name = new LazyRelation($loader);
+                }
+        }
+
+        /**
+         * Create a loader closure for the relation.
+         */
+        private function relationLoader(string $table, string $foreignKey, string $type, mixed $value): callable
+        {
+                $pdo = $this->pdo;
+                $middlewares = $this->middlewares;
+
+                return function () use ($pdo, $middlewares, $table, $foreignKey, $type, $value) {
+                        $crud = new Crud($pdo);
+                        foreach ($middlewares as $mw) {
+                                $crud = $crud->withMiddleware($mw);
+                        }
+                        $crud = $crud->from($table)->where([
+                                $foreignKey . '__eq' => $value,
+                        ]);
+                        $rows = iterator_to_array($crud->select());
+                        if (in_array($type, ['hasOne', 'belongsTo'])) {
+                                return $rows[0] ?? null;
+                        }
+                        return $rows;
+                };
         }
 /**
  * rewind
@@ -109,72 +196,26 @@ class ResultIterator implements \Iterator, \JsonSerializable
         public function current(): mixed
         {
                 $result = $this->rows[$this->i];
-                foreach ($this->mappers as $mapper)
+                foreach ($this->mappers as $mapper) {
                         $result = call_user_func_array($mapper, [$result]);
+                }
 
                 foreach ($this->relations as $name => $rel) {
-                        if (!in_array($name, $this->eagerRelations)) {
-                                $pdo = $this->pdo;
-                                $middlewares = $this->middlewares;
-
-                                if ($rel instanceof RelationDefinition) {
-                                        $cond = $rel->getConditions()[0] ?? null;
-                                        if (!$cond || $cond[1] !== '=') {
-                                                continue;
-                                        }
-                                        $localKey = explode('.', $cond[0])[1] ?? $cond[0];
-                                        $foreignKey = explode('.', $cond[2])[1] ?? $cond[2];
-                                        $table = $rel->getTable();
-                                        $type = $rel->getType();
-                                } else {
-                                        $localKey = $rel['localKey'];
-                                        $foreignKey = $rel['foreignKey'];
-                                        $table = $rel['table'];
-                                        $type = $rel['type'];
-                                }
-
-                                if (is_array($result)) {
-                                        if (!array_key_exists($localKey, $result)) {
-                                                throw new \RuntimeException(sprintf(
-                                                        'Missing local key %s for relation %s',
-                                                        $localKey,
-                                                        $name
-                                                ));
-                                        }
-                                        $value = $result[$localKey];
-                                } else {
-                                        if (!isset($result->$localKey)) {
-                                                throw new \RuntimeException(sprintf(
-                                                        'Missing local key %s for relation %s',
-                                                        $localKey,
-                                                        $name
-                                                ));
-                                        }
-                                        $value = $result->$localKey;
-                                }
-
-                                $loader = function () use ($pdo, $middlewares, $table, $foreignKey, $type, $value) {
-                                        $crud = new Crud($pdo);
-                                        foreach ($middlewares as $mw) {
-                                                $crud = $crud->withMiddleware($mw);
-                                        }
-                                        $crud = $crud->from($table)->where([
-                                                $foreignKey.'__eq' => $value
-                                        ]);
-                                        $rows = iterator_to_array($crud->select());
-                                        if (in_array($type, ['hasOne', 'belongsTo'])) {
-                                                return $rows[0] ?? null;
-                                        }
-                                        return $rows;
-                                };
-
-                                if (is_array($result)) {
-                                        $result[$name] = new LazyRelation($loader);
-                                } else {
-                                        $result->$name = new LazyRelation($loader);
-                                }
+                        if (in_array($name, $this->eagerRelations)) {
+                                continue;
                         }
+
+                        $info = $this->relationInfo($rel);
+                        if ($info === null) {
+                                continue;
+                        }
+                        [$localKey, $foreignKey, $table, $type] = $info;
+
+                        $value = $this->localValue($result, $localKey, $name);
+                        $loader = $this->relationLoader($table, $foreignKey, $type, $value);
+                        $this->assignRelation($result, $name, $loader);
                 }
+
                 return $result;
         }
 /**
