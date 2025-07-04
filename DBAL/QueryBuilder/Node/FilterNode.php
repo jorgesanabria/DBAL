@@ -75,7 +75,7 @@ class FilterNode extends Node
                         $msg = $child->send($msg);
                 }
                 if ((count($this->parts) + count($this->allChildren())) > 1)
-                        $msg = $msg->insertBefore('(')->insertAfter(')');
+                        $msg = $msg->insertBefore('(', '')->insertAfter(')', '');
                 return ($msg->getLength() > 0)? $message->join($msg, $this->operator) : $message;
         }
 	public static function filter($name, callable $callback)
@@ -130,10 +130,13 @@ FilterNode::filter('le', function($field, $value, $message)
 
 FilterNode::filter('in', function($field, $values, $message)
 {
-	if ($values instanceof MessageInterface) {
-		$values = $values->insertBefore('(')->insertAfter(')');
-		return $message->insertAfter(sprintf('%s in', $field))->insertAfter($values->readMessage())->addValues($values->getValues());
-	}
+        if ($values instanceof MessageInterface) {
+                $values = $values->insertBefore('(', '')->insertAfter(')', '');
+                return $message
+                        ->insertAfter(sprintf('%s in', $field))
+                        ->insertAfter($values->readMessage(), MessageInterface::SEPARATOR_SPACE)
+                        ->addValues($values->getValues());
+        }
 	$q = array_fill(0, sizeof((array) $values), '?');
 	return $message->insertAfter(sprintf('%s in (%s)', $field, implode(', ', $q)), MessageInterface::SEPARATOR_OR)->addValues((array) $values);
 });
