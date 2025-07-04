@@ -47,3 +47,29 @@ foreach ($paged->select(...$fields) as $row) {
 $odata = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
 $rows  = $mw->query($odata);
 ```
+
+### Simplifying API endpoints
+
+You can expose a single route that accepts any combination of OData parameters
+and let the middleware translate them into SQL automatically. This approach keeps
+your API surface small while remaining flexible.
+
+```php
+$mw   = new DBAL\ODataMiddleware();
+$crud = $mw->attach((new DBAL\Crud($pdo))->from('books'));
+
+$query = $_SERVER['QUERY_STRING'] ?? '';
+$rows  = $mw->query($query);
+
+header('Content-Type: application/json');
+echo json_encode($rows);
+```
+
+Requests such as:
+
+```
+/books?$filter=price%20lt%2020&$orderby=title%20asc&$select=title,price&$top=5
+```
+
+return the filtered list of books without additional endpoint logic. OData
+parameters cover most filtering and pagination needs, reducing custom API code.
