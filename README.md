@@ -575,6 +575,8 @@ foreach ($books->with('author')->select() as $book) {
 }
 ```
 
+See [LazyRelation documentation](docs/lazy-relations.md) for details on how related rows are loaded on demand and serialised.
+
 ### Bulk insert with transactions
 
 ```php
