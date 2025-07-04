@@ -14,6 +14,11 @@ class CaseNode extends FieldNode
     protected mixed $else = null;
     protected ?string $alias = null;
 
+    public function __construct()
+    {
+        parent::__construct('');
+    }
+
     /**
      * Add a WHEN condition.
      *
