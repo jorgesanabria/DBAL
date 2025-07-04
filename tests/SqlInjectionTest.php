@@ -1,28 +1,46 @@
 <?php
 use PHPUnit\Framework\TestCase;
 use DBAL\Crud;
+use DBAL\LinqMiddleware;
 use DBAL\ODataMiddleware;
 
 class SqlInjectionTest extends TestCase
 {
     private function createPdo()
     {
-        return new PDO('sqlite::memory:');
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->exec('CREATE TABLE items (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
+        $pdo->exec('INSERT INTO items(name) VALUES ("safe")');
+        return $pdo;
+    }
+
+    public function testInjectionInFilterDoesNotExecute()
+    {
+        $pdo = $this->createPdo();
+        $crud = (new Crud($pdo))->from('items');
+        $malicious = "safe'; DROP TABLE items; --";
+        $rows = iterator_to_array($crud->where(['name__eq' => $malicious])->select());
+        $this->assertEmpty($rows);
+        $count = (int)$pdo->query('SELECT COUNT(*) FROM items')->fetchColumn();
+        $this->assertEquals(1, $count);
+    }
+
+    public function testLinqMiddlewareRejectsInvalidIdentifier()
+    {
+        $pdo = $this->createPdo();
+        $crud = (new Crud($pdo))->from('items')->withMiddleware(new LinqMiddleware());
+        $this->expectException(InvalidArgumentException::class);
+        $crud->max('name; DROP TABLE items; --');
     }
 
     public function testODataMiddlewareIgnoresInjection()
     {
         $pdo = $this->createPdo();
-        $pdo->exec('CREATE TABLE items (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)');
-        $pdo->exec('INSERT INTO items(name) VALUES ("Item")');
-
-        $crud = (new Crud($pdo))->from('items');
         $mw = new ODataMiddleware();
-
-        $query = '$filter=id eq 1; DROP TABLE items';
-        $mw->apply($crud, $query);
-
-        $rows = iterator_to_array($crud->select());
+        $crud = $mw->attach((new Crud($pdo))->from('items'));
+        $rows = $mw->query("$filter=name eq 'safe'; DROP TABLE items; --");
         $this->assertCount(1, $rows);
+        $count = (int)$pdo->query('SELECT COUNT(*) FROM items')->fetchColumn();
+        $this->assertEquals(1, $count);
     }
 }
