@@ -8,6 +8,7 @@ use DBAL\RelationDefinition;
 use DBAL\CrudEventInterface;
 use DBAL\AfterExecuteMiddlewareInterface;
 use Generator;
+use DBAL\LazyRelation;
 
 /**
  * Clase/Interfaz Crud
@@ -321,6 +322,11 @@ class Crud extends Query
         public function insertObject(object $obj): string
         {
                 $data = get_object_vars($obj);
+                foreach ($data as $k => $v) {
+                        if ($v instanceof LazyRelation) {
+                                unset($data[$k]);
+                        }
+                }
                 $id = $this->insert($data);
                 if (property_exists($obj, 'id')) {
                         $obj->id = is_numeric($id) ? (int) $id : $id;
@@ -337,7 +343,15 @@ class Crud extends Query
      */
         public function bulkInsertObjects(array $objects): int
         {
-                $rows = array_map(fn($o) => get_object_vars($o), $objects);
+                $rows = array_map(function ($o) {
+                        $row = get_object_vars($o);
+                        foreach ($row as $k => $v) {
+                                if ($v instanceof LazyRelation) {
+                                        unset($row[$k]);
+                                }
+                        }
+                        return $row;
+                }, $objects);
                 $count = $this->bulkInsert($rows);
                 foreach ($objects as $i => $obj) {
                         if (method_exists($obj, 'initActiveRecord')) {

@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace DBAL;
 
+use DBAL\LazyRelation;
+
 trait ActiveRecordTrait
 {
     private Crud $crud;
@@ -24,6 +26,9 @@ trait ActiveRecordTrait
 
         $changed = [];
         foreach ($current as $field => $value) {
+            if ($value instanceof LazyRelation) {
+                continue;
+            }
             if (!array_key_exists($field, $this->arOriginal) || $this->arOriginal[$field] !== $value) {
                 $changed[$field] = $value;
             }
