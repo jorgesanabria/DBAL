@@ -156,6 +156,20 @@ Adds helper methods for quick queries:
 - `max($field)` returns the maximum value of the given field.
 - `min($field)` returns the minimum value of the given field.
 - `sum($field)` returns the sum of the values in the given field.
+- `average($field)` returns the average value of the given field.
+- `distinct($field)` returns an array with the distinct values of the field.
+
+## RxMiddleware
+Adds helpers inspired by RxJS:
+
+- `map($crud, callable $fn, ...$fields)` applies a transformation to each row.
+- `filter($crud, callable $fn, ...$fields)` yields only matching rows.
+- `reduce($crud, callable $fn, $initial, ...$fields)` aggregates rows into a single value.
+- `debounce($crud, $ms, ...$fields)` delays each yielded row by the given milliseconds.
+- `catchError(callable $op, callable $handler)` executes `$op` and passes any error to `$handler`.
+- `retry(callable $op, $times, $delayMs)` retries `$op` if it throws an exception.
+- `merge(...$generators)` merges multiple generators.
+- `concat(...$generators)` concatenates generators sequentially.
 
 ## EntityValidationMiddleware
 Provides a fluent API to validate data and declare relations for eager or lazy loading.
