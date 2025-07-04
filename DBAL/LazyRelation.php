@@ -19,7 +19,7 @@ class LazyRelation implements IteratorAggregate, JsonSerializable
  * @return void
  */
 
-    public function __construct(private callable $loader)
+    public function __construct(private $loader)
     {
     }
 
