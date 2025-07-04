@@ -38,7 +38,7 @@ class SqlInjectionTest extends TestCase
         $pdo = $this->createPdo();
         $mw = new ODataMiddleware();
         $crud = $mw->attach((new Crud($pdo))->from('items'));
-        $rows = $mw->query("$filter=name eq 'safe'; DROP TABLE items; --");
+        $rows = $mw->query("\$filter=name eq 'safe'; DROP TABLE items; --");
         $this->assertCount(1, $rows);
         $count = (int)$pdo->query('SELECT COUNT(*) FROM items')->fetchColumn();
         $this->assertEquals(1, $count);
@@ -50,7 +50,7 @@ class SqlInjectionTest extends TestCase
         $mw = new ODataMiddleware();
         $crud = $mw->attach((new Crud($pdo))->from('items'));
         try {
-            $mw->query("$filter=id eqf '1; DROP TABLE items; --'");
+            $mw->query("\$filter=id eqf '1; DROP TABLE items; --'");
         } catch (\Throwable $e) {
             // Ignore driver errors while testing for SQL injection
         }
