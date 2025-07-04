@@ -6,17 +6,15 @@ use DBAL\QueryBuilder\Message;
 use DBAL\QueryBuilder\Node\NodeInterface;
 
 /**
- * Clase/Interfaz TablesNode
+ * Node that manages the list of tables used in a query.
  */
 class TablesNode extends Node
 {
+        /** @var bool */
         protected bool $isEmpty = false;
-/**
- * send
- * @param MessageInterface $message
- * @return mixed
- */
-
+        /**
+         * Build the table list for the current query type.
+         */
         public function send(MessageInterface $message)
         {
                 $msg = new Message($message->type());
@@ -34,18 +32,14 @@ class TablesNode extends Node
 		}
 		return $message;
 	}
-/**
- * appendChild
- * @param NodeInterface $node
- * @param mixed $name
- * @return mixed
- */
-
-	public function appendChild(NodeInterface $node, $name = null)
-	{
-		if ($node instanceof TableNode) {
-			$name = parent::appendChild($node, $name);
-		}
-		return $name;
+        /**
+         * Append a table to this node.
+         */
+        public function appendChild(NodeInterface $node, $name = null)
+        {
+                if ($node instanceof TableNode) {
+                        $name = parent::appendChild($node, $name);
+                }
+                return $name;
 	}
 }

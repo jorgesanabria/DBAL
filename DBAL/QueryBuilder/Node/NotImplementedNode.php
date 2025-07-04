@@ -2,7 +2,10 @@
 namespace DBAL\QueryBuilder\Node;
 
 /**
- * Clase/Interfaz NotImplementedNode
+ * Helper class for nodes that do not implement certain features.
+ *
+ * It provides empty implementations of the {@see NodeInterface} methods. Child
+ * classes may override only the methods they need.
  */
 abstract class NotImplementedNode implements NodeInterface
 {

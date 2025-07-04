@@ -4,40 +4,36 @@ namespace DBAL\QueryBuilder\Node;
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz LimitNode
+ * Node that builds `LIMIT` and `OFFSET` clauses for a query.
  */
 class LimitNode extends NotImplementedNode
 {
+        /** @var bool */
         protected bool $isEmpty = false;
+
+        /** @var int|null */
         protected ?int $limit = null;
+
+        /** @var int|null */
         protected ?int $offset = null;
-/**
- * setLimit
- * @param mixed $limit
- * @return mixed
- */
-
-	public function setLimit($limit)
-	{
-		$this->limit = $limit;
-	}
-/**
- * setOffset
- * @param mixed $offset
- * @return mixed
- */
-
-	public function setOffset($offset)
-	{
-		$this->offset = $offset;
-	}
-/**
- * send
- * @param MessageInterface $message
- * @return mixed
- */
-
-	public function send(MessageInterface $message)
+        /**
+         * Define the maximum number of rows to return.
+         */
+        public function setLimit($limit)
+        {
+                $this->limit = $limit;
+        }
+        /**
+         * Define the starting offset of the result set.
+         */
+        public function setOffset($offset)
+        {
+                $this->offset = $offset;
+        }
+        /**
+         * Append LIMIT/OFFSET to the query message when defined.
+         */
+        public function send(MessageInterface $message)
 	{
 		$msg = $message;
 		if ($this->limit === null && $this->offset === null)

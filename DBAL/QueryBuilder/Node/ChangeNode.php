@@ -5,40 +5,42 @@ use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Message;
 
 /**
- * Clase/Interfaz ChangeNode
+ * Node used for INSERT and UPDATE statements.
+ *
+ * It stores field/value pairs or multiple rows of values depending on the
+ * operation being built.
  */
 class ChangeNode extends NotImplementedNode
 {
-/** @var mixed */
+        /** @var bool */
         protected bool $isEmpty = false;
-        protected array $fields = [];
-        protected ?array $rows = null;
-/**
- * setFields
- * @param array $fields
- * @return mixed
- */
 
+        /** @var array<string,mixed> */
+        protected array $fields = [];
+
+        /** @var array<int,array<string,mixed>>|null */
+        protected ?array $rows = null;
+        /**
+         * Define field/value pairs for INSERT or UPDATE operations.
+         *
+         * @param array<string,mixed> $fields
+         */
         public function setFields(array $fields)
         {
                 $this->fields = $fields;
         }
-/**
- * setRows
- * @param array $rows
- * @return mixed
- */
-
+        /**
+         * Define multiple rows for bulk INSERT operations.
+         *
+         * @param array<int,array<string,mixed>> $rows
+         */
         public function setRows(array $rows)
         {
                 $this->rows = $rows;
         }
-/**
- * send
- * @param MessageInterface $message
- * @return mixed
- */
-
+        /**
+         * Build the INSERT or UPDATE fragment based on the message type.
+         */
         public function send(MessageInterface $message)
         {
                 $msg = null;
