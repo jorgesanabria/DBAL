@@ -314,6 +314,38 @@ class Crud extends Query
                 $this->runMiddlewares($message, $time);
                 return $count;
         }
+
+    /**
+     * Insert an object by converting its public properties to an array.
+     */
+        public function insertObject(object $obj): string
+        {
+                $data = get_object_vars($obj);
+                $id = $this->insert($data);
+                if (property_exists($obj, 'id')) {
+                        $obj->id = is_numeric($id) ? (int) $id : $id;
+                }
+                if (method_exists($obj, 'initActiveRecord')) {
+                        $data['id'] = $id;
+                        $obj->initActiveRecord($this, $data);
+                }
+                return $id;
+        }
+
+    /**
+     * Bulk insert a list of objects.
+     */
+        public function bulkInsertObjects(array $objects): int
+        {
+                $rows = array_map(fn($o) => get_object_vars($o), $objects);
+                $count = $this->bulkInsert($rows);
+                foreach ($objects as $i => $obj) {
+                        if (method_exists($obj, 'initActiveRecord')) {
+                                $obj->initActiveRecord($this, $rows[$i]);
+                        }
+                }
+                return $count;
+        }
     /**
      * Updates records in the primary table using the current filters.
      *

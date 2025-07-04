@@ -21,6 +21,30 @@ $crud = $caster->attach($crud, 'users');
 Relations defined with `#[HasOne]`, `#[HasMany]` or `#[BelongsTo]` on the class
 properties will be available for lazy or eager loading via `with()`.
 
+If the entity class uses `ActiveRecordTrait` the returned objects can be
+updated directly and new instances can be inserted:
+
+```php
+class UserEntity {
+    use DBAL\ActiveRecordTrait;
+    public $id;
+    public $name;
+}
+
+$crud = (new DBAL\Crud($pdo))->from('users');
+$crud = $caster->attach($crud, 'users');
+
+$user = iterator_to_array($crud->select())[0];
+$user->name = 'Bob';
+$user->update();
+
+$another = new UserEntity();
+$another->name = 'Alice';
+$crud->insertObject($another);
+```
+
+Multiple entities can also be inserted at once with `bulkInsertObjects()`.
+
 ## CacheMiddleware
 
 `CacheMiddleware` stores the rows returned by SELECT statements. By default it
