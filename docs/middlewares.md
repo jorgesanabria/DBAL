@@ -69,7 +69,31 @@ Appends extra filters automatically to every SELECT statement.
 Creates or alters tables through a fluent schema builder.
 
 ## DevelopmentErrorMiddleware
-Shows a detailed HTML page when an uncaught exception happens during development.
+Installs an exception handler that displays a friendly HTML page when an
+uncaught exception occurs. The constructor accepts:
+- `console` (bool) writes a text version of the error to `STDERR`.
+- `persistPath` (string) directory where generated files are stored.
+- `theme` (string) either `light` or `dark`.
+- `fontSize` (string) one of `small`, `medium` or `large`.
+
+```php
+$errors = new DBAL\DevelopmentErrorMiddleware([
+    'console'     => true,
+    'persistPath' => __DIR__.'/errors',
+]);
+$crud = (new DBAL\Crud($pdo))
+    ->withMiddleware($errors);
+```
+
+If `persistPath` is configured the directory will contain timestamped folders
+with the following files:
+```
+errors/
+└── YYYYMMDD_HHMMSS/
+    ├── error.html
+    ├── style.css
+    └── script.js
+```
 
 Each middleware implements `MiddlewareInterface` and can be combined freely.
 
