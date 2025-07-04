@@ -375,3 +375,27 @@ $rec->update();
 ```
 
 Even though these scenarios use SQLite for brevity, the same code works with any relational database supported by PDO.
+
+## Generic query endpoint with OData
+
+When your application only needs to expose data for simple lookups, `ODataMiddleware`
+can power a single endpoint that handles filtering and pagination automatically.
+
+```php
+$router->get('/packages', function () use ($pdo) {
+    $mw   = new DBAL\ODataMiddleware();
+    $crud = $mw->attach((new DBAL\Crud($pdo))->from('packages'));
+
+    return response()->json($mw->query($_SERVER['QUERY_STRING'] ?? ''));
+});
+```
+
+Clients may request:
+
+```
+/packages?$filter=status%20eq%20'delivered'&$select=code,status&$top=20
+```
+
+and receive the matching rows without additional controller logic. A wide range
+of queries can be served through this single route, avoiding a proliferation of
+custom endpoints.
