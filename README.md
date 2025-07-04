@@ -13,7 +13,7 @@ A lightweight Database Abstraction Layer for PHP.
 ## Features
 - Fluent query builder for CRUD operations
 - Dynamic filters via magic methods
-- Streaming and iterator-based results
+- Streaming and [iterator-based results](docs/overview.md#resultiterator)
 - Lazy and eager loading of relations
 - Middleware system with caching, transactions, validation and more
 - Schema builder and migration helpers
@@ -184,7 +184,9 @@ $rows = $crud
 ### Streaming results
 
 `Crud::stream()` returns a generator that yields each row lazily. A callback can
-be provided to process rows as they are produced.
+be provided to process rows as they are produced. See the
+[ResultIterator documentation](docs/overview.md#resultiterator) for details on
+grouping results and exporting them to JSON.
 
 ```php
 $generator = $crud->stream('id', 'name');

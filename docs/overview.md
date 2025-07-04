@@ -45,3 +45,34 @@ foreach ($crud->select('id', 'name') as $user) {
 ```
 
 From here you can chain methods to insert or update records, join other tables, apply filters and attach any middleware your project requires. The rest of the documentation explores these features in more depth.
+
+## ResultIterator
+
+Calling `select()` returns a `ResultIterator` object. The iterator executes the query on the first iteration and keeps the fetched rows so it can be traversed multiple times. Any mappers declared with `map()` are applied to each row as it is returned.
+
+### groupBy()
+
+Use `groupBy()` to organise rows by a field name or with a callback that generates the grouping key:
+
+```php
+$users  = $crud->select();
+$byStatus = $users->groupBy('status');
+$byLetter = $users->groupBy(function ($row) {
+    return $row['name'][0];
+});
+```
+
+### Iteration behaviour
+
+Each loop over a `ResultIterator` works on the already fetched rows without executing the query again. This allows multiple traversals or converting the iterator to an array safely.
+
+### jsonSerialize()
+
+Because the iterator implements `JsonSerializable` it can be passed directly to `json_encode()`. The method rewinds the iterator and returns all rows as an array.
+
+```php
+$users   = $crud->select();
+$grouped = $users->groupBy('status');
+
+file_put_contents('users.json', json_encode($users));
+```
