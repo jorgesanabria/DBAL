@@ -12,3 +12,5 @@ spl_autoload_register(function ($class) {
         require $file;
     }
 });
+
+require __DIR__ . '/../DBAL/Hooks/helpers.php';
