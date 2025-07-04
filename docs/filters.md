@@ -43,3 +43,38 @@ SELECT id, name FROM products WHERE (stock > 0 AND discontinued = 0);
 ```
 
 By giving the complex expression a descriptive name, subsequent queries remain concise and easier to read.
+
+## Subqueries and CASE expressions
+
+Queries can now embed other queries or build `CASE` statements fluently. Use `Query::subQuery()` together with the `IN` filter to reference a subselect:
+
+```php
+$active = (new DBAL\QueryBuilder\Query())
+    ->from('users')
+    ->where(['status' => 'active'])
+    ->subQuery('id');
+
+$msg = (new DBAL\QueryBuilder\Query())
+    ->from('posts')
+    ->where(['user_id__in' => $active])
+    ->buildSelect();
+// SELECT * FROM posts WHERE user_id in (SELECT id FROM users WHERE status = ?)
+```
+
+The new `CaseNode` helper simplifies generating conditional expressions:
+
+```php
+use DBAL\QueryBuilder\Node\CaseNode;
+
+$case = (new CaseNode())
+    ->when('status = 1', "'active'")
+    ->when('status = 0', "'inactive'")
+    ->else("'unknown'")
+    ->as('state');
+
+(new DBAL\QueryBuilder\Query())
+    ->from('users')
+    ->buildSelect($case);
+// SELECT CASE WHEN status = 1 THEN 'active' WHEN status = 0 THEN 'inactive' ELSE 'unknown' END AS state FROM users
+```
+
