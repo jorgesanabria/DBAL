@@ -35,37 +35,40 @@ class UnitOfWorkMiddleware implements MiddlewareInterface, CrudAwareMiddlewareIn
 
 /**
  * registerNew
+ * @param Crud $crud
  * @param string $table
  * @param array $data
  * @return void
  */
 
-    public function registerNew(string $table, array $data): void
+    public function registerNew(Crud $crud, string $table, array $data): void
     {
         $this->news[] = ['table' => $table, 'data' => $data];
     }
 
 /**
  * registerDirty
+ * @param Crud $crud
  * @param string $table
  * @param array $data
  * @param array $where
  * @return void
  */
 
-    public function registerDirty(string $table, array $data, array $where): void
+    public function registerDirty(Crud $crud, string $table, array $data, array $where): void
     {
         $this->dirty[] = ['table' => $table, 'data' => $data, 'where' => $where];
     }
 
 /**
  * registerDelete
+ * @param Crud $crud
  * @param string $table
  * @param array $where
  * @return void
  */
 
-    public function registerDelete(string $table, array $where): void
+    public function registerDelete(Crud $crud, string $table, array $where): void
     {
         $this->delete[] = ['table' => $table, 'where' => $where];
     }
