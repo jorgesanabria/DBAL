@@ -23,16 +23,6 @@ class EntityValidationMiddleware implements EntityValidationInterface
     private array $rules = [];
     private array $relations = [];
 
-    private string $currentTable;
-    private string $currentField;
-
-/**
- * __invoke
- * @param MessageInterface $msg
- * @return void
- */
-
-
     public function __invoke(MessageInterface $msg): void
     {
         // no-op
@@ -54,56 +44,15 @@ class EntityValidationMiddleware implements EntityValidationInterface
                 'validators' => []
             ];
 
-        if ($type !== null && $table !== null && $localKey !== null && $foreignKey !== null) {
-            $relation = match ($type) {
-                'hasOne'    => $relation->hasOne($table),
-                'hasMany'   => $relation->hasMany($table),
-                'belongsTo' => $relation->belongsTo($table),
-                default     => throw new InvalidArgumentException('Invalid relation type'),
-            };
-
-            $relation->on(
-                "{$this->currentTable}.{$localKey}",
-                '=',
-                "{$table}.{$foreignKey}"
-            );
-        }
-
-        return $relation;
-    }
-
-/**
- * getRelations
- * @param string $table
- * @return array
- */
-
-    public function getRelations(string $table): array
-    {
-        return $this->relations[$table] ?? [];
-    }
-
-/**
- * required
- * @return self
- */
-
-    public function required(): self
-    {
-        $this->rules[$this->currentTable][$this->currentField]['required'] = true;
-        return $this;
-    }
-
-/**
- * string
- * @return self
- */
-
-    public function string(): self
-    {
-        return $this->addValidator(function ($value) {
-            if (!is_string($value)) {
-                throw new InvalidArgumentException('Value must be a string');
+            if ($prop->getAttributes(Required::class)) {
+                $rule['required'] = true;
+            }
+            foreach ($prop->getAttributes(StringType::class) as $a) {
+                $rule['validators'][] = function ($value) {
+                    if (!is_string($value)) {
+                        throw new InvalidArgumentException('Value must be a string');
+                    }
+                };
             }
             foreach ($prop->getAttributes(IntegerType::class) as $a) {
                 $rule['validators'][] = function ($value) {
