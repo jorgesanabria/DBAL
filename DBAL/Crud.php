@@ -12,7 +12,6 @@ use Generator;
  */
 class Crud extends Query
 {
-        protected \PDO $connection;
         protected array $mappers = [];
         protected array $middlewares = [];
         protected array $tables = [];
