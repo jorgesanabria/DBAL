@@ -72,4 +72,21 @@ class QueryBuilderTest extends TestCase
 
         $this->assertEquals($groupSql, $groupBySql);
     }
+
+    public function testNewFilters()
+    {
+        $query = (new Query())
+            ->from('users')
+            ->where([
+                'name__startsWith' => 'Al',
+                'code__notIn' => ['A', 'B'],
+                'deleted_at__isNull' => null,
+            ]);
+        $msg = $query->buildSelect();
+        $this->assertEquals(
+            'SELECT * FROM users WHERE name LIKE ? AND code not in (?, ?) AND deleted_at IS NULL',
+            $msg->readMessage()
+        );
+        $this->assertEquals(['Al%', 'A', 'B'], $msg->getValues());
+    }
 }
