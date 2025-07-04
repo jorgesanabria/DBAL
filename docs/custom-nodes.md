@@ -1,6 +1,7 @@
 # Extending DBAL with Custom Nodes
 
 DBAL's query builder is made of small nodes that generate fragments of SQL. While the built-in nodes cover the most common clauses, you can create your own node classes when you need features not available in the core.
+For a breakdown of the default nodes see [node-architecture.md](node-architecture.md).
 
 ## Example: ON DUPLICATE KEY UPDATE
 
