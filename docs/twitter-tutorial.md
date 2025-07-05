@@ -88,9 +88,9 @@ $tweetId = $tweets->insert([
 ## Reading the Timeline
 ```php
 $timeline = $tweets
-    ->leftJoin('users u', function ($on) {
-        $on->condition('tweets.user_id', DBAL\QueryBuilder\FilterOp::EQF, 'u.id');
-    })
+    ->leftJoin('users u', fn ($on) =>
+        $on->condition('tweets.user_id', DBAL\QueryBuilder\FilterOp::EQF, 'u.id')
+    )
     ->desc('tweets.created_at')
     ->select('tweets.*', 'u.username');
 ```
@@ -149,13 +149,12 @@ Use event hooks to store notifications for external systems:
 ```php
 use DBAL\Hooks\{afterInsert};
 
-$tweets = afterInsert($tweets, function ($row) use ($pdo) {
-    $notify = (new DBAL\Crud($pdo))->from('notifications');
-    $notify->insert([
+$tweets = afterInsert($tweets, fn ($row) =>
+    (new DBAL\Crud($pdo))->from('notifications')->insert([
         'type'    => 'tweet.created',
         'payload' => json_encode($row),
-    ]);
-});
+    ])
+);
 ```
 External processes can poll the `notifications` table and dispatch events to other services.
 

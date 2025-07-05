@@ -7,19 +7,21 @@ DBAL is framework agnostic and can be used alongside popular minimalistic framew
 use Psr\Container\ContainerInterface;
 use DBAL\Crud;
 
-return function (ContainerInterface $c) {
-    $pdo = $c->get('pdo');
-    return (new Crud($pdo))->from('books');
-};
+return fn (ContainerInterface $c) =>
+    (new Crud($c->get('pdo')))->from('books');
 ```
 
 ## Lumen
 ```php
-$router->get('/books', function () {
-    $pdo = app('db')->connection()->getPdo();
-    $crud = (new DBAL\Crud($pdo))->from('books');
-    return response()->json(iterator_to_array($crud->select()));
-});
+$router->get('/books', fn () =>
+    response()->json(
+        iterator_to_array(
+            (new DBAL\Crud(app('db')->connection()->getPdo()))
+                ->from('books')
+                ->select()
+        )
+    )
+);
 ```
 
 ## Plain PHP

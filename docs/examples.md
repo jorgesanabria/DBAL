@@ -53,19 +53,19 @@ $rows = $books
 ### Queries with the dynamic API
 ```php
 use DBAL\QueryBuilder\FilterOp;
-$rows = $books->where(function ($q) {
+$rows = $books->where(fn ($q) =>
     $q->condition('title', FilterOp::LIKE, '%dune%')
       ->andNext()
-      ->condition('price', FilterOp::LT, 20);
-})->select('id', 'title');
+      ->condition('price', FilterOp::LT, 20)
+)->select('id', 'title');
 ```
 
 ### Manual joins
 ```php
 $rows = $books
-    ->leftJoin('authors a', function ($on) {
-        $on->condition('books.author_id', FilterOp::EQF, 'a.id');
-    })
+    ->leftJoin('authors a', fn ($on) =>
+        $on->condition('books.author_id', FilterOp::EQF, 'a.id')
+    )
     ->select('books.title', 'a.name AS author');
 ```
 
@@ -195,17 +195,17 @@ $rows = $reservations
 
 ### Queries with the dynamic API
 ```php
-$rows = $reservations->where(function ($q) {
-    $q->seat__like('A%')->andNext()->price__gt(10);
-})->select('id', 'seat', 'price');
+$rows = $reservations->where(fn ($q) =>
+    $q->seat__like('A%')->andNext()->price__gt(10)
+)->select('id', 'seat', 'price');
 ```
 
 ### Manual joins
 ```php
 $rows = $reservations
-    ->innerJoin('screenings s', function ($on) {
-        $on->condition('reservations.screening_id', FilterOp::EQF, 's.id');
-    })
+    ->innerJoin('screenings s', fn ($on) =>
+        $on->condition('reservations.screening_id', FilterOp::EQF, 's.id')
+    )
     ->select('s.movie', 'reservations.seat');
 ```
 
@@ -308,19 +308,19 @@ $rows = $packages
 
 ### Queries with the dynamic API
 ```php
-$rows = $packages->where(function ($q) {
+$rows = $packages->where(fn ($q) =>
     $q->condition('status', FilterOp::EQ, 'in_transit')
       ->orNext()
-      ->code__startWith('PKG');
-})->select('id', 'code');
+      ->code__startWith('PKG')
+)->select('id', 'code');
 ```
 
 ### Manual joins
 ```php
 $rows = $packages
-    ->join('warehouses w', function ($on) {
-        $on->condition('packages.warehouse_id', FilterOp::EQF, 'w.id');
-    })
+    ->join('warehouses w', fn ($on) =>
+        $on->condition('packages.warehouse_id', FilterOp::EQF, 'w.id')
+    )
     ->select('packages.code', 'w.name AS warehouse');
 ```
 
@@ -382,12 +382,13 @@ When your application only needs to expose data for simple lookups, `ODataMiddle
 can power a single endpoint that handles filtering and pagination automatically.
 
 ```php
-$router->get('/packages', function () use ($pdo) {
-    $mw   = new DBAL\ODataMiddleware();
-    $crud = $mw->attach((new DBAL\Crud($pdo))->from('packages'));
-
-    return response()->json($mw->query($_SERVER['QUERY_STRING'] ?? ''));
-});
+$router->get('/packages', fn () =>
+    response()->json(
+        (new DBAL\ODataMiddleware())
+            ->attach((new DBAL\Crud($pdo))->from('packages'))
+            ->query($_SERVER['QUERY_STRING'] ?? '')
+    )
+);
 ```
 
 Clients may request:
