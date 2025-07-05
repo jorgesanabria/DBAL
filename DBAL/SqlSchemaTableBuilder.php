@@ -11,6 +11,17 @@ class SqlSchemaTableBuilder
 {
     private array $definitions = [];
 
+    /**
+     * Quote a table or column identifier ensuring it matches expected patterns.
+     */
+    private function quoteIdentifier(string $id): string
+    {
+        if (!preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $id)) {
+            throw new \InvalidArgumentException("Invalid identifier: {$id}");
+        }
+        return '"' . $id . '"';
+    }
+
 /**
  * __construct
  * @param PDO $pdo
@@ -21,6 +32,7 @@ class SqlSchemaTableBuilder
 
     public function __construct(private PDO $pdo, private string $table, private bool $create = true)
     {
+        $this->table = $this->quoteIdentifier($table);
     }
 /**
  * column
@@ -33,9 +45,9 @@ class SqlSchemaTableBuilder
     {
         if ($this->create) {
             if ($type === null) {
-                $this->definitions[] = $name;
+                $this->definitions[] = $this->quoteIdentifier($name);
             } else {
-                $this->definitions[] = sprintf('%s %s', $name, $type);
+                $this->definitions[] = sprintf('%s %s', $this->quoteIdentifier($name), $type);
             }
         }
         return $this;
@@ -52,9 +64,9 @@ class SqlSchemaTableBuilder
     {
         if (!$this->create) {
             if ($type === null) {
-                $this->definitions[] = sprintf('ADD COLUMN %s', $name);
+                $this->definitions[] = sprintf('ADD COLUMN %s', $this->quoteIdentifier($name));
             } else {
-                $this->definitions[] = sprintf('ADD COLUMN %s %s', $name, $type);
+                $this->definitions[] = sprintf('ADD COLUMN %s %s', $this->quoteIdentifier($name), $type);
             }
         }
         return $this;
@@ -69,7 +81,7 @@ class SqlSchemaTableBuilder
     public function dropColumn(string $name): self
     {
         if (!$this->create) {
-            $this->definitions[] = sprintf('DROP COLUMN %s', $name);
+            $this->definitions[] = sprintf('DROP COLUMN %s', $this->quoteIdentifier($name));
         }
         return $this;
     }

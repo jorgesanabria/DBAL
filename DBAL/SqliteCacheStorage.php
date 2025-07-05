@@ -38,7 +38,7 @@ class SqliteCacheStorage implements CacheStorageInterface
         $stmt = $this->pdo->prepare($msg->readMessage());
         $stmt->execute($msg->getValues());
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ? unserialize($row['value']) : null;
+        return $row ? json_decode($row['value'], true) : null;
     }
 
 /**
@@ -50,7 +50,7 @@ class SqliteCacheStorage implements CacheStorageInterface
 
     public function set(string $key, $value): void
     {
-        $msg = $this->query->buildInsert(['key' => $key, 'value' => serialize($value)]);
+        $msg = $this->query->buildInsert(['key' => $key, 'value' => json_encode($value)]);
         $msg = (new \DBAL\QueryBuilder\Node\ReplaceNode())->send($msg);
         $stmt = $this->pdo->prepare($msg->readMessage());
         $stmt->execute($msg->getValues());

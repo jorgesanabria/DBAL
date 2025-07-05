@@ -153,6 +153,21 @@ class FilterNode extends Node
                 }
                 throw new \RuntimeException(sprintf('The filter "%s" is not exists', $op), 500);
         }
+
+        /**
+         * Validate and quote an SQL identifier (optionally schema-qualified).
+         */
+        private static function quoteIdentifier(string $id): string
+        {
+                $parts = explode('.', $id);
+                foreach ($parts as $i => $p) {
+                        if (!preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $p)) {
+                                throw new \InvalidArgumentException("Invalid identifier: {$id}");
+                        }
+                        $parts[$i] = '"' . $p . '"';
+                }
+                return implode('.', $parts);
+        }
 }
 
 
@@ -206,6 +221,8 @@ FilterNode::filter(FilterOp::BETWEEN, function($field, $values, $message)
 
 FilterNode::filter(FilterOp::EQF, function($field, $value, $message)
 {
+        $field = FilterNode::quoteIdentifier($field);
+        $value = FilterNode::quoteIdentifier((string) $value);
         return $message->insertAfter(sprintf('%s = %s', $field, $value), MessageInterface::SEPARATOR_AND);
 });
 

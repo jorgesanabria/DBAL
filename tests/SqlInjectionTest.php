@@ -52,8 +52,9 @@ class SqlInjectionTest extends TestCase
         $crud = $mw->attach((new Crud($pdo))->from('items'));
         try {
             $mw->query("\$filter=id eqf '1; DROP TABLE items; --'");
-        } catch (\Throwable $e) {
-            // Ignore driver errors while testing for SQL injection
+            $this->fail('Exception not thrown');
+        } catch (InvalidArgumentException $e) {
+            // Expected
         }
         $count = (int)$pdo->query('SELECT COUNT(*) FROM items')->fetchColumn();
         $this->assertEquals(1, $count);
