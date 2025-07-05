@@ -157,7 +157,7 @@ class FilterNode extends Node
         /**
          * Validate and quote an SQL identifier (optionally schema-qualified).
          */
-        private static function quoteIdentifier(string $id): string
+       public static function quoteIdentifier(string $id): string
         {
                 $parts = explode('.', $id);
                 foreach ($parts as $i => $p) {
