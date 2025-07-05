@@ -45,7 +45,11 @@ class SqlSchemaTableBuilder
     {
         if ($this->create) {
             if ($type === null) {
-                $this->definitions[] = $this->quoteIdentifier($name);
+                if (str_contains($name, ' ')) {
+                    $this->definitions[] = $name;
+                } else {
+                    $this->definitions[] = $this->quoteIdentifier($name);
+                }
             } else {
                 $this->definitions[] = sprintf('%s %s', $this->quoteIdentifier($name), $type);
             }
@@ -64,7 +68,11 @@ class SqlSchemaTableBuilder
     {
         if (!$this->create) {
             if ($type === null) {
-                $this->definitions[] = sprintf('ADD COLUMN %s', $this->quoteIdentifier($name));
+                if (str_contains($name, ' ')) {
+                    $this->definitions[] = sprintf('ADD COLUMN %s', $name);
+                } else {
+                    $this->definitions[] = sprintf('ADD COLUMN %s', $this->quoteIdentifier($name));
+                }
             } else {
                 $this->definitions[] = sprintf('ADD COLUMN %s %s', $this->quoteIdentifier($name), $type);
             }
