@@ -9,6 +9,7 @@ use GraphQL\Type\Schema;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ScalarType;
+use GraphQL\Type\Definition\CustomScalarType;
 use GraphQL\Utils\AST;
 use PDO;
 
@@ -75,7 +76,7 @@ class GraphQLMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInter
 
     private function buildSchema(): void
     {
-        $this->jsonType = new ScalarType([
+        $this->jsonType = new CustomScalarType([
             'name' => 'JSON',
             'serialize' => fn($v) => $v,
             'parseValue' => fn($v) => $v,
