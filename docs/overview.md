@@ -69,9 +69,7 @@ Use `groupBy()` to organise rows by a field name or with a callback that generat
 ```php
 $users  = $crud->select();
 $byStatus = $users->groupBy('status');
-$byLetter = $users->groupBy(function ($row) {
-    return $row['name'][0];
-});
+$byLetter = $users->groupBy(fn ($row) => $row['name'][0]);
 ```
 
 ### Iteration behaviour

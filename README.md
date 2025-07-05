@@ -110,9 +110,9 @@ DELETE FROM users WHERE id = ?;
 ```php
 $result = $crud
     ->from('users u')
-    ->leftJoin('profiles p', function ($on) {
-        $on->{'u.id__eqf'}('p.user_id');
-    })
+    ->leftJoin('profiles p', fn ($on) =>
+        $on->{'u.id__eqf'}('p.user_id')
+    )
     ->where(['p.active__eq' => 1])
     ->select('u.id', 'p.photo');
 ```
@@ -123,10 +123,10 @@ SELECT u.id, p.photo FROM users u LEFT JOIN profiles p ON u.id = p.user_id WHERE
 ### Dynamic filters
 
 ```php
-$crud->where(function ($q) {
+$crud->where(fn ($q) =>
     $q->name__startWith('Al')
-       ->age__ge(21);
-});
+       ->age__ge(21)
+);
 ```
 ```sql
 SELECT * FROM users WHERE name LIKE 'Al%%' AND age >= 21;
@@ -135,13 +135,13 @@ SELECT * FROM users WHERE name LIKE 'Al%%' AND age >= 21;
 Dynamic filters can also be grouped with logical operators:
 
 ```php
-$crud->where(function ($q) {
-    $q->orGroup(function ($g) {
-        $g->name__eq('Alice')->orNext()->name__eq('Bob');
-    })->andGroup(function ($g) {
-        $g->status__eq('active');
-    });
-});
+$crud->where(fn ($q) =>
+    $q->orGroup(fn ($g) =>
+        $g->name__eq('Alice')->orNext()->name__eq('Bob')
+    )->andGroup(fn ($g) =>
+        $g->status__eq('active')
+    )
+);
 ```sql
 SELECT * FROM users WHERE (name = 'Alice' OR name = 'Bob') AND status = 'active';
 ```
@@ -154,10 +154,10 @@ Custom filters can be registered using `FilterNode::filter`:
 ```php
 use DBAL\QueryBuilder\Node\FilterNode;
 
-FilterNode::filter('startWith', function ($field, $value, $msg) {
-    return $msg->insertAfter(sprintf('%s LIKE ?', $field))
-               ->addValues([$value . '%']);
-});
+FilterNode::filter('startWith', fn ($field, $value, $msg) =>
+    $msg->insertAfter(sprintf('%s LIKE ?', $field))
+               ->addValues([$value . '%'])
+);
 
 $crud->where(['name__startWith' => 'Al']);
 ```
@@ -191,9 +191,7 @@ SELECT status, COUNT(*) AS total FROM users GROUP BY status HAVING COUNT(*) > 1 
 ### Mappers
 
 ```php
-$crudWithMapper = $crud->map(function (array $row) {
-    return (object) $row;
-});
+$crudWithMapper = $crud->map(fn (array $row) => (object) $row);
 
 foreach ($crudWithMapper->select() as $row) {
     echo $row->name;
@@ -212,9 +210,7 @@ $users = $crud->select();
 
 $byStatus = $users->groupBy('status');
 
-$byLetter = $users->groupBy(function ($row) {
-    return $row['name'][0];
-});
+$byLetter = $users->groupBy(fn ($row) => $row['name'][0]);
 ```
 ```sql
 SELECT * FROM users;
@@ -252,9 +248,7 @@ foreach ($generator as $row) {
     echo $row['name'];
 }
 
-$crud->stream(function ($row) {
-    echo $row['name'];
-}, 'id', 'name');
+$crud->stream(fn ($row) => print $row['name'], 'id', 'name');
 ```
 
 ### Fetch all results
@@ -279,9 +273,9 @@ that forwards executed SQL to any PSR-3 logger.
 ```php
 $crud = (new DBAL\Crud($pdo))
     ->from('users')
-    ->withMiddleware(function (DBAL\QueryBuilder\MessageInterface $msg) {
-        error_log($msg->readMessage());
-    });
+    ->withMiddleware(fn (DBAL\QueryBuilder\MessageInterface $msg) =>
+        error_log($msg->readMessage())
+    );
 
 $crud->insert(['name' => 'John']);
 ```
@@ -493,11 +487,9 @@ Lazy loading works the same and the related records are fetched only when needed
 use DBAL\GlobalFilterMiddleware;
 
 $mw = new GlobalFilterMiddleware([], [
-    function ($m) {
-        return stripos($m->readMessage(), 'WHERE') !== false
-            ? $m->replace('WHERE', 'WHERE deleted = 0 AND')
-            : $m->insertAfter('WHERE deleted = 0');
-    }
+    fn ($m) => stripos($m->readMessage(), 'WHERE') !== false
+        ? $m->replace('WHERE', 'WHERE deleted = 0 AND')
+        : $m->insertAfter('WHERE deleted = 0')
 ]);
 
 $crud = (new DBAL\Crud($pdo))
@@ -705,9 +697,9 @@ $results = $books
 ### Filtering with dynamic methods
 
 ```php
-$byAuthor = $books->where(function ($q) {
-    $q->author_id__gt(1)->title__like('%dune%'); // built-in LIKE filter
-})->select('id', 'title');
+$byAuthor = $books->where(fn ($q) =>
+    $q->author_id__gt(1)->title__like('%dune%') // built-in LIKE filter
+)->select('id', 'title');
 ```
 ### Working with relations
 

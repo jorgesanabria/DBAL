@@ -9,10 +9,10 @@ Use `FilterNode::filter()` to declare a new operator. The callback receives the 
 ```php
 use DBAL\QueryBuilder\Node\FilterNode;
 
-FilterNode::filter('startWith', function ($field, $value, $msg) {
-    return $msg->insertAfter(sprintf('%s LIKE ?', $field))
-               ->addValues([$value . '%']);
-});
+FilterNode::filter('startWith', fn ($field, $value, $msg) =>
+    $msg->insertAfter(sprintf('%s LIKE ?', $field))
+               ->addValues([$value . '%'])
+);
 ```
 
 Once defined, the filter is available through dynamic methods or array conditions:
@@ -30,9 +30,9 @@ SELECT id, name FROM users WHERE name LIKE 'Al%';
 Filters can encapsulate multiple expressions or even subqueries. This keeps your application code readable while complex conditions remain hidden inside the filter implementation.
 
 ```php
-FilterNode::filter('available', function ($field, $value, $msg) {
-    return $msg->insertAfter('(stock > 0 AND discontinued = 0)');
-});
+FilterNode::filter('available', fn ($field, $value, $msg) =>
+    $msg->insertAfter('(stock > 0 AND discontinued = 0)')
+);
 
 $products = (new DBAL\Crud($pdo))->from('products');
 $rows = $products->where(['stock__available' => null])->select('id', 'name');
@@ -86,9 +86,9 @@ Dynamic methods can be tailored to your domain by extending `DynamicFilterBuilde
 ```php
 use DBAL\QueryBuilder\CustomFilterBuilder;
 
-$rows = $crud->where(function (CustomFilterBuilder $q) {
-    $q->isWoman()->andNext()->status__eq('active');
-})->select('id', 'name');
+$rows = $crud->where(fn (CustomFilterBuilder $q) =>
+    $q->isWoman()->andNext()->status__eq('active')
+)->select('id', 'name');
 ```
 
 The `CustomFilterBuilder` class can define helpers that map to one or more
