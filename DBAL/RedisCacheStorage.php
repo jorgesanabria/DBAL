@@ -27,12 +27,12 @@ class RedisCacheStorage implements CacheStorageInterface
     public function get(string $key)
     {
         $val = $this->redis->get($this->prefix . $key);
-        return $val === false ? null : unserialize($val);
+        return $val === false ? null : json_decode($val, true);
     }
 
     public function set(string $key, $value): void
     {
-        $this->redis->set($this->prefix . $key, serialize($value));
+        $this->redis->set($this->prefix . $key, json_encode($value));
     }
 
     public function delete(string $key = null): void
