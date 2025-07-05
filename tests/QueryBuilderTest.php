@@ -66,7 +66,10 @@ class QueryBuilderTest extends TestCase
                 $j->condition('u.id', \DBAL\QueryBuilder\FilterOp::EQF, 'p.user_id');
             });
         $msg = $query->buildSelect();
-        $this->assertEquals('SELECT * FROM users u LEFT JOIN profiles p ON u.id = p.user_id', $msg->readMessage());
+        $this->assertEquals(
+            'SELECT * FROM users u LEFT JOIN profiles p ON "u"."id" = "p"."user_id"',
+            $msg->readMessage()
+        );
     }
 
     public function testGroupByAlias()
