@@ -185,6 +185,26 @@ Adds helpers inspired by RxJS:
 ## EntityValidationMiddleware
 Provides a fluent API to validate data and declare relations for eager or lazy loading.
 
+## TypeSecurityMiddleware
+Casts inserted and updated values according to validation attributes and hides
+properties marked with `#[Hidden]`. Register an entity class and attach the
+middleware to filter out sensitive fields from query results:
+
+```php
+#[DBAL\Attributes\Table('users')]
+class User {
+    #[DBAL\Attributes\StringType]
+    public $name;
+    #[DBAL\Attributes\Hidden]
+    public $password;
+}
+
+$ts = (new DBAL\TypeSecurityMiddleware())
+    ->register(User::class);
+$crud = (new DBAL\Crud($pdo))->from('users');
+$crud = $ts->attach($crud, 'users');
+```
+
 ## RelationLoaderMiddleware
 Defines relations programmatically without PHP attributes. Use `table()` to pick
 the table being configured and `hasOne()`, `hasMany()` or `belongsTo()` to

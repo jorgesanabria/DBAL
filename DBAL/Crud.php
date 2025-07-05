@@ -7,6 +7,7 @@ use DBAL\QueryBuilder\MessageInterface;
 use DBAL\RelationDefinition;
 use DBAL\CrudEventInterface;
 use DBAL\AfterExecuteMiddlewareInterface;
+use DBAL\EntityCastInterface;
 use Generator;
 use DBAL\LazyRelation;
 
@@ -264,6 +265,11 @@ class Crud extends Query
                                 $mw->beforeInsert($this->primaryTable(), $fields);
                         }
                 }
+                foreach ($this->middlewares as $mw) {
+                        if ($mw instanceof EntityCastInterface) {
+                                $fields = $mw->castInsert($this->primaryTable(), $fields);
+                        }
+                }
                 $message = $this->buildInsert($fields);
                 $this->runMiddlewares($message);
                 $stm = $this->connection->prepare($message->readMessage());
@@ -297,6 +303,13 @@ class Crud extends Query
                         if ($mw instanceof EntityValidationInterface) {
                                 foreach ($rows as $row) {
                                         $mw->beforeInsert($this->primaryTable(), $row);
+                                }
+                        }
+                }
+                foreach ($this->middlewares as $mw) {
+                        if ($mw instanceof EntityCastInterface) {
+                                foreach ($rows as $i => $row) {
+                                        $rows[$i] = $mw->castInsert($this->primaryTable(), $row);
                                 }
                         }
                 }
@@ -377,6 +390,11 @@ class Crud extends Query
                 foreach ($this->middlewares as $mw) {
                         if ($mw instanceof EntityValidationInterface) {
                                 $mw->beforeUpdate($this->primaryTable(), $fields);
+                        }
+                }
+                foreach ($this->middlewares as $mw) {
+                        if ($mw instanceof EntityCastInterface) {
+                                $fields = $mw->castUpdate($this->primaryTable(), $fields);
                         }
                 }
                 $message = $this->buildUpdate($fields);

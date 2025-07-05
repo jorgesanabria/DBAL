@@ -11,6 +11,7 @@ use DBAL\Attributes\StringType;
 use DBAL\Attributes\IntegerType;
 use DBAL\Attributes\MaxLength;
 use DBAL\Attributes\Email;
+use DBAL\Attributes\Hidden;
 use DBAL\Attributes\HasOne;
 use DBAL\Attributes\HasMany;
 use DBAL\Attributes\BelongsTo;
@@ -24,6 +25,8 @@ class EntityValidationMiddleware implements EntityValidationInterface
 {
     private array $rules = [];
     private array $relations = [];
+    private array $casts = [];
+    private array $hidden = [];
 
     public function __invoke(MessageInterface $msg): void
     {
@@ -52,6 +55,8 @@ class EntityValidationMiddleware implements EntityValidationInterface
 
         $this->rules[$table] = [];
         $this->relations[$table] = [];
+        $this->casts[$table] = [];
+        $this->hidden[$table] = [];
 
         foreach ($ref->getProperties() as $prop) {
             $field = $prop->getName();
@@ -59,6 +64,7 @@ class EntityValidationMiddleware implements EntityValidationInterface
                 'required' => false,
                 'validators' => []
             ];
+            $cast = null;
 
             if ($prop->getAttributes(Required::class)) {
                 $rule['required'] = true;
@@ -69,6 +75,7 @@ class EntityValidationMiddleware implements EntityValidationInterface
                         throw new InvalidArgumentException('Value must be a string');
                     }
                 };
+                $cast = 'string';
             }
             foreach ($prop->getAttributes(IntegerType::class) as $a) {
                 $rule['validators'][] = function ($value) {
@@ -76,6 +83,7 @@ class EntityValidationMiddleware implements EntityValidationInterface
                         throw new InvalidArgumentException('Value must be an integer');
                     }
                 };
+                $cast = 'int';
             }
             foreach ($prop->getAttributes(MaxLength::class) as $a) {
                 $len = $a->newInstance()->length;
@@ -91,6 +99,13 @@ class EntityValidationMiddleware implements EntityValidationInterface
                         throw new InvalidArgumentException('Invalid email');
                     }
                 };
+            }
+
+            if ($cast !== null) {
+                $this->casts[$table][$field] = $cast;
+            }
+            if ($prop->getAttributes(Hidden::class)) {
+                $this->hidden[$table][] = $field;
             }
 
             if ($rule['required'] || $rule['validators']) {
