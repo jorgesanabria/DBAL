@@ -58,7 +58,7 @@ class SubqueryCaseWhenTest extends TestCase
             ->buildSelect($subField);
 
         $this->assertEquals(
-            'SELECT (SELECT COUNT(*) FROM posts WHERE posts.user_id = u.id) cnt FROM users u',
+            'SELECT (SELECT COUNT(*) FROM posts WHERE "posts"."user_id" = "u"."id") cnt FROM users u',
             $msg->readMessage()
         );
     }
