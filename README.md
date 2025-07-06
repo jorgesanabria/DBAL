@@ -21,6 +21,7 @@ A lightweight Database Abstraction Layer for PHP.
 - CRUD event hooks to listen for inserts, updates or deletes
 - Queue middleware to publish events to systems like Kafka
 - Improved documentation and error pages
+- See the [changelog](CHANGELOG.md) for release history
 
 
 ## Features
