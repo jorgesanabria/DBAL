@@ -771,15 +771,12 @@ Each `use*` function returns the configured `Crud` instance and, when
 applicable, the middleware object so you can call helper methods like
 `begin()` or `commit()`.
 
-## Testing
-
-Las pruebas se ejecutan con `composer run-script test`. Para más detalles, consulta [CONTRIBUTING.md](CONTRIBUTING.md).
-
-
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for setup and testing instructions.
+Contributions are welcome! Please see
+[CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. By participating you agree
+to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-## License
+
 
 This project is distributed under the terms of the [GNU General Public License v3.0](LICENSE). You may use, modify and redistribute the code as long as you disclose your source and license your changes under the same GPLv3.
