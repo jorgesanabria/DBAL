@@ -12,7 +12,7 @@ use Generator;
 use DBAL\LazyRelation;
 
 /**
- * Clase/Interfaz Crud
+ * Fluent API for building and executing CRUD operations on a PDO connection.
  */
 class Crud extends Query
 {

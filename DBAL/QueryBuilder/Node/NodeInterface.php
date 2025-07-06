@@ -5,7 +5,7 @@ namespace DBAL\QueryBuilder\Node;
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz NodeInterface
+ * Base interface for nodes in the QueryBuilder AST.
  */
 interface NodeInterface
 {

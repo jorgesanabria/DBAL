@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace DBAL;
 
 /**
- * Clase/Interfaz RelationDefinition
+ * Fluent builder describing a relationship between two tables.
  */
 class RelationDefinition
 {

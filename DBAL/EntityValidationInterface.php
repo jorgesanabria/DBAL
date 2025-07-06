@@ -5,7 +5,7 @@ namespace DBAL;
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz EntityValidationInterface
+ * Middleware interface for validating data before it is persisted.
  */
 interface EntityValidationInterface extends MiddlewareInterface
 {

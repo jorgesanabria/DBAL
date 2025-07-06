@@ -5,23 +5,23 @@ namespace DBAL;
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz ActiveRecordMiddleware
+ * Middleware that wraps result rows in ActiveRecord objects.
  */
 class ActiveRecordMiddleware implements MiddlewareInterface
 {
 /**
- * __invoke
+ * Middleware hook executed for each query. Currently does nothing.
+ *
  * @param MessageInterface $msg
- * @return void
  */
-
         public function __invoke(MessageInterface $msg): void
         {
                 // no-op
         }
 
 /**
- * attach
+ * Attach this middleware and map rows to ActiveRecord instances.
+ *
  * @param Crud $crud
  * @return Crud
  */

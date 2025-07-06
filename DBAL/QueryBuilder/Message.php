@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace DBAL\QueryBuilder;
 
 /**
- * Clase/Interfaz Message
+ * Mutable SQL statement with associated bound values.
  */
 class Message implements MessageInterface
 {

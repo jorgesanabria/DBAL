@@ -5,15 +5,14 @@ namespace DBAL;
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz MiddlewareInterface
+ * Base interface for all query middleware components.
  */
 interface MiddlewareInterface
 {
 /**
- * __invoke
+ * Process the given SQL message before or after execution.
+ *
  * @param MessageInterface $message
- * @return void
  */
-
     public function __invoke(MessageInterface $message): void;
 }

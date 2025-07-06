@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace DBAL\QueryBuilder;
 
 /**
- * Clase/Interfaz MessageInterface
+ * Contract for building and manipulating SQL message fragments.
  */
 interface MessageInterface
 {

@@ -6,7 +6,7 @@ use DBAL\QueryBuilder\MessageInterface;
 use Exception;
 
 /**
- * Clase/Interfaz UnitOfWorkMiddleware
+ * Middleware that batches CRUD operations and commits them in a transaction.
  */
 class UnitOfWorkMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterface
 {

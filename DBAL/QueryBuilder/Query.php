@@ -24,7 +24,7 @@ use DBAL\QueryBuilder\Node\ChangeNode;
 use DBAL\QueryBuilder\DynamicFilterBuilder;
 
 /**
- * Clase/Interfaz Query
+ * Fluent builder used to compose SQL SELECT, INSERT, UPDATE and DELETE statements.
  */
 class Query extends QueryNode
 {

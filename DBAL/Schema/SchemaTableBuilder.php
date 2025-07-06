@@ -5,7 +5,7 @@ namespace DBAL\Schema;
 use DBAL\Platform\PlatformInterface;
 
 /**
- * Clase/Interfaz SchemaTableBuilder
+ * Builder for CREATE TABLE statements using fluent column definitions.
  */
 class SchemaTableBuilder
 {
