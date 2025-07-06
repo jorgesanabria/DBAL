@@ -648,8 +648,8 @@ DBAL is primarily intended for building microservices, powering small scripts an
 
 These example domains are merely illustrative—developers are free to decide where and how to apply the library.
 
-DBAL integrates easily with minimal frameworks like Slim and Lumen or even plain PHP scripts. Additional examples, including a microblogging tutorial, can be found in the [docs](docs/) folder.
-For database specific notes see [`docs/engines.md`](docs/engines.md).
+DBAL integrates easily with minimal frameworks like Slim and Lumen or even plain PHP scripts. [`docs/integration.md`](docs/integration.md) explains how to use the library in those environments.
+[`docs/examples.md`](docs/examples.md) collects practical scenarios including a microblogging tutorial. For database specific notes see [`docs/engines.md`](docs/engines.md).
 
 ## Bookstore example
 
