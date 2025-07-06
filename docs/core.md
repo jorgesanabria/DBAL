@@ -1,29 +1,49 @@
 # Core Architecture
 
-DBAL se estructura alrededor de un constructor de consultas y un conjunto de nodos que generan fragmentos de SQL. La clase principal es `Crud`, que hereda de `Query` para componer `SELECT`, `INSERT`, `UPDATE` y `DELETE` de forma fluida. El objetivo es mantener la capa delgada sobre PDO sin dependencias adicionales y ofrecer un API extensible.
+DBAL revolves around a query builder and a set of nodes that generate SQL
+fragments. The main class is `Crud`, which extends `Query` to fluently compose
+`SELECT`, `INSERT`, `UPDATE` and `DELETE`. The goal is to keep a thin layer over
+PDO with no extra dependencies while providing an extensible API.
 
-## Clases base de nodos
+## Base node classes
 
-Los nodos implementan `NodeInterface` y habitualmente extienden `Node`, que gestiona el árbol de subnodos. Cada nodo produce parte de la sentencia mediante `send()` y puede contener otros nodos.
+Nodes implement `NodeInterface` and usually extend `Node`, which manages the
+tree of child nodes. Each node outputs part of the statement through `send()`
+and can contain other nodes.
 
-`QueryNode` es la raíz de todas las consultas y agrega subnodos para tablas, campos, filtros y demás elementos. Dependiendo del tipo de mensaje se emplean solo los nodos necesarios para generar la SQL.
+`QueryNode` is the root of every query and adds children for tables, fields,
+filters and other elements. Depending on the message type only the necessary
+nodes are used to generate the SQL.
 
-`FilterNode` permite registrar operadores mediante `FilterNode::filter()`. Los filtros reciben el nombre del campo, el valor proporcionado y el objeto `Message` donde deben insertar la porción de SQL. El archivo define operadores básicos como `eq`, `ne`, `gt` o `like`.
+`FilterNode` lets you register operators via `FilterNode::filter()`. Filters
+receive the field name, the supplied value and the `Message` object where the
+SQL fragment should be inserted. The file defines basic operators such as `eq`,
+`ne`, `gt` or `like`.
 
-## Crud y ResultIterator
+## Crud and ResultIterator
 
-`Crud` añade middlewares, mapeadores y gestión de relaciones sobre el constructor de consultas. Al ejecutar `select()` se devuelve un `ResultIterator` que aplica los mapeadores y ejecuta los middlewares. Este iterador carga relaciones de forma perezosa mediante `LazyRelation`.
+`Crud` adds middlewares, mappers and relation handling on top of the query
+builder. Calling `select()` returns a `ResultIterator` that applies the mappers
+and executes the middlewares. This iterator loads relations lazily through
+`LazyRelation`.
 
-## Filosofía
+## Philosophy
 
-Tal como se menciona en la introducción de la documentación, DBAL pretende ser una capa liviana y agnóstica que ofrezca un constructor fluido, filtros dinámicos y utilidades de iteración sin acoplarse a ningún framework concreto.
+As mentioned in the introduction, DBAL aims to be a lightweight and agnostic
+layer offering a fluent builder, dynamic filters and iteration utilities without
+coupling to any framework.
 
-## Extensión de funcionalidades
+## Extending functionality
 
-La arquitectura por nodos y filtros está pensada para ampliarse sin tocar el núcleo:
+The node and filter architecture is designed to grow without touching the core:
 
-- **Filtros personalizados**: `FilterNode::filter()` permite añadir nuevos operadores y utilizarlos desde las condiciones o desde los filtros dinámicos.
-- **Nuevos nodos**: Para soportar estructuras SQL no contempladas se puede crear una clase que implemente `NodeInterface` (o extienda `Node`/`NotImplementedNode`) y añadirla al árbol de `QueryNode` o a consultas personalizadas. `CaseNode` y `SubQueryNode` son ejemplos de nodos que encapsulan lógica más avanzada.
+- **Custom filters**: `FilterNode::filter()` lets you add new operators and use
+  them from conditions or dynamic filters.
+- **New nodes**: To support SQL structures not covered you can create a class
+  implementing `NodeInterface` (or extending `Node`/`NotImplementedNode`) and
+  add it to the `QueryNode` tree or to custom queries. `CaseNode` and
+  `SubQueryNode` encapsulate more advanced logic.
 
-Al crear un nodo nuevo también puede modificarse `QueryNode::build()` para que incluya el nodo durante la construcción o invocarlo manualmente desde una instancia de `Query`.
+When creating a new node you can also modify `QueryNode::build()` so it includes
+the node during construction or invoke it manually from a `Query` instance.
 

@@ -1,6 +1,18 @@
 # DBAL
 
 A lightweight Database Abstraction Layer for PHP.
+
+* [What's New](#whats-new)
+* [Features](#features)
+* [Installation](#installation)
+* [Basic Usage](#basic-usage)
+* [Database Engines](#database-engines)
+* [Middlewares](#middlewares)
+* [Real use cases](#real-use-cases)
+* [Bookstore example](#bookstore-example)
+* [Expanding DBAL](#expanding-dbal)
+* [Hook Helpers](#hook-helpers)
+
 ## What's New
 - Requires **PHP 8.1** and uses attributes for entity validation and relations
 - ActiveRecord support with dynamic properties
@@ -17,7 +29,7 @@ A lightweight Database Abstraction Layer for PHP.
 - Streaming and [iterator-based results](docs/overview.md#resultiterator)
 - Lazy and eager loading of relations
 - Middleware system with caching, transactions, validation and more
-- Schema builder and migration helpers
+- [Schema builder and migration helpers](docs/schema-builder.md)
 - Platform classes for SQLite, PostgreSQL, SQL Server and MySQL/MariaDB
 - Attribute based entity validation and relation definition
 - Relation loader middleware for programmatic relations ([docs](docs/middlewares.md#relationloadermiddleware))
@@ -553,7 +565,8 @@ $result = $mw->handle('{ read { id, title } }');
 ```
 ### Schema middleware
 
-`SchemaMiddleware` provides a fluent API to create or modify tables via the `Crud` instance.
+`SchemaMiddleware` provides a fluent API to create or modify tables via the `Crud` instance. See
+[`docs/schema-builder.md`](docs/schema-builder.md) for a more detailed guide.
 
 ```php
 $schema = new DBAL\SchemaMiddleware($pdo);
@@ -758,3 +771,11 @@ applicable, the middleware object so you can call helper methods like
 `begin()` or `commit()`.
 
 
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for setup and testing instructions.
+
+## License
+
+This project is distributed under the terms of the [GNU General Public License v3.0](LICENSE). You may use, modify and redistribute the code as long as you disclose your source and license your changes under the same GPLv3.
