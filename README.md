@@ -757,4 +757,7 @@ Each `use*` function returns the configured `Crud` instance and, when
 applicable, the middleware object so you can call helper methods like
 `begin()` or `commit()`.
 
+## Testing
+
+Las pruebas se ejecutan con `composer run-script test`. Para más detalles, consulta [CONTRIBUTING.md](CONTRIBUTING.md).
 
