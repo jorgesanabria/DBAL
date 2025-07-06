@@ -6,7 +6,7 @@ use PDO;
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz SchemaMiddleware
+ * Middleware exposing schema management helpers to Crud instances.
  */
 class SchemaMiddleware implements MiddlewareInterface, CrudAwareMiddlewareInterface
 {

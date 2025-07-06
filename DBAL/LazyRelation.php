@@ -7,7 +7,7 @@ use ArrayIterator;
 use JsonSerializable;
 
 /**
- * Clase/Interfaz LazyRelation
+ * Deferred loader for relations that fetches data on demand.
  */
 class LazyRelation implements IteratorAggregate, JsonSerializable
 {

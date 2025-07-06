@@ -6,7 +6,7 @@ use DBAL\QueryBuilder\MessageInterface;
 use DBAL\QueryBuilder\Message;
 
 /**
- * Clase/Interfaz GlobalFilterMiddleware
+ * Applies predefined filters to SELECT statements automatically.
  */
 class GlobalFilterMiddleware implements MiddlewareInterface
 {
@@ -14,10 +14,10 @@ class GlobalFilterMiddleware implements MiddlewareInterface
     private array $globalFilters = [];
 
 /**
- * __construct
- * @param array $tableFilters
- * @param array $globalFilters
- * @return void
+ * Create the middleware with optional table specific and global filters.
+ *
+ * @param array $tableFilters  Filters applied per table
+ * @param array $globalFilters Filters applied to all tables
  */
 
     public function __construct(array $tableFilters = [], array $globalFilters = [])
@@ -51,9 +51,9 @@ class GlobalFilterMiddleware implements MiddlewareInterface
     }
 
 /**
- * __invoke
+ * Apply the configured filters to the given query message.
+ *
  * @param MessageInterface $msg
- * @return void
  */
 
     public function __invoke(MessageInterface $msg): void

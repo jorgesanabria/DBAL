@@ -5,25 +5,25 @@ namespace DBAL;
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz FirstLastMiddleware
+ * Middleware providing helpers to retrieve the first or last record of a query.
  */
 class FirstLastMiddleware implements MiddlewareInterface
 {
     private Crud $crud;
 
 /**
- * __invoke
+ * Execute the middleware. This implementation performs no action.
+ *
  * @param MessageInterface $msg
- * @return void
  */
-
     public function __invoke(MessageInterface $msg): void
     {
         // no-op
     }
 
 /**
- * attach
+ * Register the middleware on the given Crud instance and return it.
+ *
  * @param Crud $crud
  * @return Crud
  */
@@ -36,8 +36,9 @@ class FirstLastMiddleware implements MiddlewareInterface
     }
 
 /**
- * first
- * @param mixed $...$fields
+ * Return the first row produced by the current query.
+ *
+ * @param mixed ...$fields
  * @return mixed
  */
 
@@ -51,9 +52,10 @@ class FirstLastMiddleware implements MiddlewareInterface
     }
 
 /**
- * firstOrDefault
+ * Return the first row or the provided default when no rows exist.
+ *
  * @param mixed $default
- * @param mixed $...$fields
+ * @param mixed ...$fields
  * @return mixed
  */
 
@@ -67,8 +69,9 @@ class FirstLastMiddleware implements MiddlewareInterface
     }
 
 /**
- * last
- * @param mixed $...$fields
+ * Return the last row from the result set.
+ *
+ * @param mixed ...$fields
  * @return mixed
  */
 
@@ -82,9 +85,10 @@ class FirstLastMiddleware implements MiddlewareInterface
     }
 
 /**
- * lastOrDefault
+ * Return the last row or the provided default when the query yields no rows.
+ *
  * @param mixed $default
- * @param mixed $...$fields
+ * @param mixed ...$fields
  * @return mixed
  */
 

@@ -7,7 +7,7 @@ use DBAL\QueryBuilder\Node\FilterNode;
 use DBAL\QueryBuilder\FilterOp;
 
 /**
- * Clase/Interfaz DynamicFilterBuilder
+ * Utility builder used to construct complex filter expressions.
  */
 class DynamicFilterBuilder
 {

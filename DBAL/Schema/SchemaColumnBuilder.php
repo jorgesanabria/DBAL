@@ -5,7 +5,7 @@ namespace DBAL\Schema;
 use DBAL\Platform\PlatformInterface;
 
 /**
- * Clase/Interfaz SchemaColumnBuilder
+ * Helper for assembling column definitions in CREATE/ALTER statements.
  */
 class SchemaColumnBuilder
 {

@@ -9,7 +9,7 @@ use DBAL\AfterExecuteMiddlewareInterface;
 use DBAL\RelationDefinition;
 
 /**
- * Clase/Interfaz ResultGenerator
+ * Generator wrapper that streams results and applies middlewares on demand.
  */
 class ResultGenerator
 {

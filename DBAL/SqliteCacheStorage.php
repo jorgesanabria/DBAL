@@ -5,7 +5,7 @@ namespace DBAL;
 use PDO;
 
 /**
- * Clase/Interfaz SqliteCacheStorage
+ * Cache storage implementation backed by an SQLite database file.
  */
 class SqliteCacheStorage implements CacheStorageInterface
 {

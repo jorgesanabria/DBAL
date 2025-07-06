@@ -5,7 +5,7 @@ namespace DBAL\QueryBuilder\Node;
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz EmptyNode
+ * QueryBuilder node that returns the message unchanged.
  */
 class EmptyNode extends NotImplementedNode
 {

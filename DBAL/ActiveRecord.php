@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace DBAL;
 
 /**
- * Clase/Interfaz ActiveRecord
+ * Lightweight Active Record wrapper backed by a Crud instance.
  */
 class ActiveRecord implements \JsonSerializable
 {
@@ -11,10 +11,10 @@ class ActiveRecord implements \JsonSerializable
     private array $modified = [];
 
 /**
- * __construct
- * @param Crud $crud
- * @param array $original
- * @return void
+ * Create a new ActiveRecord bound to the given Crud instance.
+ *
+ * @param Crud  $crud      Crud object used for persistence
+ * @param array $original  Original field values
  */
 
     public function __construct(private Crud $crud, array $original)
@@ -23,9 +23,10 @@ class ActiveRecord implements \JsonSerializable
     }
 
 /**
- * __call
+ * Handle dynamic getters and setters for record fields.
+ *
  * @param string $name
- * @param array $arguments
+ * @param array  $arguments
  * @return mixed
  */
 
@@ -46,7 +47,8 @@ class ActiveRecord implements \JsonSerializable
     }
 
 /**
- * __get
+ * Magic getter to retrieve modified or original field values.
+ *
  * @param string $name
  * @return mixed|null
  */
@@ -59,10 +61,10 @@ class ActiveRecord implements \JsonSerializable
     }
 
 /**
- * __set
+ * Magic setter that marks the given field as modified.
+ *
  * @param string $name
- * @param mixed $value
- * @return void
+ * @param mixed  $value
  */
 
     public function __set(string $name, mixed $value): void
@@ -71,8 +73,9 @@ class ActiveRecord implements \JsonSerializable
     }
 
 /**
- * update
- * @return int
+ * Persist all modified fields back to the database.
+ *
+ * @return int Number of affected rows
  */
 
     public function update(): int
@@ -103,7 +106,8 @@ class ActiveRecord implements \JsonSerializable
     }
 
 /**
- * jsonSerialize
+ * Convert the record into an array for JSON encoding.
+ *
  * @return array
  */
 

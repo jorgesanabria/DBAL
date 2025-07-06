@@ -5,7 +5,7 @@ namespace DBAL;
 use DBAL\QueryBuilder\MessageInterface;
 
 /**
- * Clase/Interfaz RelationLoaderMiddleware
+ * Middleware used to register relations for eager or lazy loading.
  */
 class RelationLoaderMiddleware implements MiddlewareInterface
 {

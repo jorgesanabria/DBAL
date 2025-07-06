@@ -3,22 +3,23 @@ declare(strict_types=1);
 namespace DBAL;
 
 /**
- * Clase/Interfaz CacheStorageInterface
+ * Interface for simple key-value cache backends.
  */
 interface CacheStorageInterface
 {
 /**
- * get
+ * Retrieve a cached value by key.
+ *
  * @param string $key
  * @return mixed
  */
 
     public function get(string $key);
 /**
- * set
+ * Store a value in the cache.
+ *
  * @param string $key
- * @param mixed $value
- * @return void
+ * @param mixed  $value
  */
 
     public function set(string $key, $value): void;

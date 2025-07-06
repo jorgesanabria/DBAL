@@ -5,7 +5,7 @@ namespace DBAL;
 use PDO;
 
 /**
- * Clase/Interfaz SqlSchemaTableBuilder
+ * Builds and executes CREATE or ALTER TABLE statements using PDO.
  */
 class SqlSchemaTableBuilder
 {

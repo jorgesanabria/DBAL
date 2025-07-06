@@ -7,7 +7,7 @@ use DBAL\AfterExecuteMiddlewareInterface;
 use DBAL\RelationDefinition;
 
 /**
- * Clase/Interfaz ResultIterator
+ * Iterator that fetches query results lazily and triggers middlewares.
  */
 class ResultIterator implements \Iterator, \JsonSerializable
 {
