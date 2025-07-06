@@ -1,6 +1,18 @@
 # DBAL
 
 A lightweight Database Abstraction Layer for PHP.
+
+* [What's New](#whats-new)
+* [Features](#features)
+* [Installation](#installation)
+* [Basic Usage](#basic-usage)
+* [Database Engines](#database-engines)
+* [Middlewares](#middlewares)
+* [Real use cases](#real-use-cases)
+* [Bookstore example](#bookstore-example)
+* [Expanding DBAL](#expanding-dbal)
+* [Hook Helpers](#hook-helpers)
+
 ## What's New
 - Requires **PHP 8.1** and uses attributes for entity validation and relations
 - ActiveRecord support with dynamic properties
@@ -9,6 +21,7 @@ A lightweight Database Abstraction Layer for PHP.
 - CRUD event hooks to listen for inserts, updates or deletes
 - Queue middleware to publish events to systems like Kafka
 - Improved documentation and error pages
+- See the [changelog](CHANGELOG.md) for release history
 
 
 ## Features
@@ -17,7 +30,7 @@ A lightweight Database Abstraction Layer for PHP.
 - Streaming and [iterator-based results](docs/overview.md#resultiterator)
 - Lazy and eager loading of relations
 - Middleware system with caching, transactions, validation and more
-- Schema builder and migration helpers
+- [Schema builder and migration helpers](docs/schema-builder.md)
 - Platform classes for SQLite, PostgreSQL, SQL Server and MySQL/MariaDB
 - Attribute based entity validation and relation definition
 - Relation loader middleware for programmatic relations ([docs](docs/middlewares.md#relationloadermiddleware))
@@ -553,7 +566,8 @@ $result = $mw->handle('{ read { id, title } }');
 ```
 ### Schema middleware
 
-`SchemaMiddleware` provides a fluent API to create or modify tables via the `Crud` instance.
+`SchemaMiddleware` provides a fluent API to create or modify tables via the `Crud` instance. See
+[`docs/schema-builder.md`](docs/schema-builder.md) for a more detailed guide.
 
 ```php
 $schema = new DBAL\SchemaMiddleware($pdo);
@@ -648,8 +662,8 @@ DBAL is primarily intended for building microservices, powering small scripts an
 
 These example domains are merely illustrative—developers are free to decide where and how to apply the library.
 
-DBAL integrates easily with minimal frameworks like Slim and Lumen or even plain PHP scripts. Additional examples, including a microblogging tutorial, can be found in the [docs](docs/) folder.
-For database specific notes see [`docs/engines.md`](docs/engines.md).
+DBAL integrates easily with minimal frameworks like Slim and Lumen or even plain PHP scripts. [`docs/integration.md`](docs/integration.md) explains how to use the library in those environments.
+[`docs/examples.md`](docs/examples.md) collects practical scenarios including a microblogging tutorial. For database specific notes see [`docs/engines.md`](docs/engines.md).
 
 ## Bookstore example
 
@@ -764,3 +778,5 @@ Contributions are welcome! Please see
 to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 
+
+This project is distributed under the terms of the [GNU General Public License v3.0](LICENSE). You may use, modify and redistribute the code as long as you disclose your source and license your changes under the same GPLv3.
