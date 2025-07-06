@@ -757,4 +757,10 @@ Each `use*` function returns the configured `Crud` instance and, when
 applicable, the middleware object so you can call helper methods like
 `begin()` or `commit()`.
 
+## Contributing
+
+Contributions are welcome! Please see
+[CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. By participating you agree
+to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
+
 
