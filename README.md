@@ -1,6 +1,18 @@
 # DBAL
 
 A lightweight Database Abstraction Layer for PHP.
+
+* [What's New](#whats-new)
+* [Features](#features)
+* [Installation](#installation)
+* [Basic Usage](#basic-usage)
+* [Database Engines](#database-engines)
+* [Middlewares](#middlewares)
+* [Real use cases](#real-use-cases)
+* [Bookstore example](#bookstore-example)
+* [Expanding DBAL](#expanding-dbal)
+* [Hook Helpers](#hook-helpers)
+
 ## What's New
 - Requires **PHP 8.1** and uses attributes for entity validation and relations
 - ActiveRecord support with dynamic properties
