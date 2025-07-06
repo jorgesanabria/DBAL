@@ -758,3 +758,11 @@ applicable, the middleware object so you can call helper methods like
 `begin()` or `commit()`.
 
 
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for setup and testing instructions.
+
+## License
+
+This project is distributed under the terms of the [GNU General Public License v3.0](LICENSE). You may use, modify and redistribute the code as long as you disclose your source and license your changes under the same GPLv3.
