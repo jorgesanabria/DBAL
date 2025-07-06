@@ -15,7 +15,7 @@ DBAL is a lightweight Database Abstraction Layer written in PHP. It builds upon 
 - **Iterator or generator based results**: process rows lazily or load them eagerly as needed.
 - **Relation loading**: define `hasOne`, `hasMany` and other relations and access related data with minimal code.
 - **Powerful middlewares**: add caching, transaction support, validation or active record behaviour with plug‑and‑play components.
-- **Schema builder**: create or alter tables programmatically without writing SQL strings.
+- **[Schema builder](schema-builder.md)**: create or alter tables programmatically without writing SQL strings.
 - **Table specific helpers**: use custom middlewares to reuse filters on particular tables via the fluent API.
 - **Friendly error pages**: during development a middleware can render detailed error screens.
 
@@ -34,6 +34,7 @@ DBAL aims to be framework‑agnostic and has no dependencies beyond PDO. It work
 - **`filters.md`** – extending filters and simplifying queries.
 - **`engines.md`** – supported database platforms and how to create your own.
 - **`custom-nodes.md`** – examples of creating nodes for unsupported SQL features.
+- **`schema-builder.md`** – using `SchemaMiddleware` to create, modify and migrate tables.
 
 Each file can be read in isolation, but together they provide a comprehensive guide to DBAL.
 

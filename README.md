@@ -17,7 +17,7 @@ A lightweight Database Abstraction Layer for PHP.
 - Streaming and [iterator-based results](docs/overview.md#resultiterator)
 - Lazy and eager loading of relations
 - Middleware system with caching, transactions, validation and more
-- Schema builder and migration helpers
+- [Schema builder and migration helpers](docs/schema-builder.md)
 - Platform classes for SQLite, PostgreSQL, SQL Server and MySQL/MariaDB
 - Attribute based entity validation and relation definition
 - Relation loader middleware for programmatic relations ([docs](docs/middlewares.md#relationloadermiddleware))
@@ -553,7 +553,8 @@ $result = $mw->handle('{ read { id, title } }');
 ```
 ### Schema middleware
 
-`SchemaMiddleware` provides a fluent API to create or modify tables via the `Crud` instance.
+`SchemaMiddleware` provides a fluent API to create or modify tables via the `Crud` instance. See
+[`docs/schema-builder.md`](docs/schema-builder.md) for a more detailed guide.
 
 ```php
 $schema = new DBAL\SchemaMiddleware($pdo);
